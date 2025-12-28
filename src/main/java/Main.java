@@ -2,17 +2,21 @@ import static spark.Spark.*;
 
 public class Main {
     public static void main(String[] args) {
-        // Port par défaut pour Replit et serveurs Web
-        port(8080);
 
-        // Emplacement des fichiers HTML/JS
+        // Port dynamique fourni par Render
+        String portEnv = System.getenv("PORT");
+        if (portEnv != null) {
+            port(Integer.parseInt(portEnv));
+        } else {
+            port(8080); // fallback local
+        }
+
+        // Dossiers des fichiers HTML/JS (public doit être dans resources/public)
         staticFiles.location("/public");
 
-        // Message de démarrage
         System.out.println("=== Simulation Chambre Froide 3D Lancée ===");
-        System.out.println("Accédez à : http://localhost:8080");
+        System.out.println("Accédez à Render avec l'URL fournie");
 
-        // API de test pour la température
         get("/api/data", (req, res) -> {
             res.type("application/json");
             return "{\"temperature\": -18.4, \"unite\": \"Celsius\"}";
