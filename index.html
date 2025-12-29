@@ -4,23 +4,75 @@
     <meta charset="UTF-8">
     <title>Simulation Chambre Froide 3D</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f8ff;
-            text-align: center;
-            padding: 50px;
-        }
-        h1 {
-            color: #0077b6;
-        }
-        p {
-            font-size: 18px;
+        body { margin: 0; overflow: hidden; font-family: sans-serif; }
+        #info {
+            position: absolute; top: 10px; width: 100%; text-align: center;
+            color: white; background: rgba(0,0,0,0.5); padding: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Simulation Chambre Froide 3D</h1>
-    <p>Bienvenue sur l’application de simulation 3D des chambres froides.</p>
-    <p>API de test : <a href="/api/data">/api/data</a></p>
+    <div id="info">Simulation Chambre Froide 3D - Utilisez la souris pour tourner</div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // 1. SCÈNE ET CAMÉRA
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x202020);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 5, 5);
+
+        // 2. RENDU
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 3. CONTRÔLES
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // 4. LA CHAMBRE FROIDE (Boîte transparente)
+        const geometry = new THREE.BoxGeometry(4, 3, 6);
+        const material = new THREE.MeshPhongMaterial({ 
+            color: 0x00aaff, 
+            transparent: true, 
+            opacity: 0.3,
+            side: THREE.DoubleSide 
+        });
+        const coldRoom = new THREE.Mesh(geometry, material);
+        scene.add(coldRoom);
+
+        // Ajout des arêtes (le squelette de la chambre)
+        const edges = new THREE.EdgesGeometry(geometry);
+        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
+        scene.add(line);
+
+        // 5. SOL
+        const grid = new THREE.GridHelper(20, 20);
+        scene.add(grid);
+
+        // 6. LUMIÈRE
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(10, 10, 10);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x404040));
+
+        // 7. ANIMATION
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Redimensionnement fenêtre
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
 </body>
 </html>
