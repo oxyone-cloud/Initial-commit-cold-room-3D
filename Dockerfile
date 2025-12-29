@@ -1,16 +1,16 @@
-# Image Maven avec Java 11
+# Utiliser une image Maven avec Java 11
 FROM maven:3.9.0-eclipse-temurin-11
 
-# Copier le projet
+# Copier tout le projet dans le conteneur
 COPY . /app
 WORKDIR /app
 
-# Build Maven
+# Build Maven et créer le jar avec toutes les dépendances
 RUN mvn clean package
 
-# Exposer le port pour Render
-ENV PORT 8080
+# Définir le port via format clé=valeur (warning Docker corrigé)
+ENV PORT=8080
 EXPOSE 8080
 
-# Lancer le serveur Spark
-CMD ["java", "-jar", "target/simulation-3d-1.0-SNAPSHOT-jar-with-dependencies.jar"]
+# Commande pour lancer le serveur Spark
+CMD ["java", "-cp", "target/simulation-3d-1.0-SNAPSHOT.jar", "com.coldroom.Main"]
