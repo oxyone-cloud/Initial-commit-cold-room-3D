@@ -2,31 +2,52 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Chambre Froide - Finition Totale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chambre Froide Industrielle - Monitoring Expert</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #050505; font-family: sans-serif; }
-        #ui-controls {
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Panneau de contrôle principal (Desktop à gauche) */
+        #desktop-panel {
             position: absolute; top: 20px; left: 20px;
-            background: rgba(0, 0, 0, 0.9); color: white;
-            padding: 20px; border-radius: 10px; border: 2px solid #fff;
-            z-index: 1000; width: 220px;
+            background: rgba(10, 10, 10, 0.95); color: white;
+            padding: 25px; border-radius: 12px; border: 2px solid #555;
+            z-index: 1000; width: 280px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        .temp-val { font-size: 32px; font-weight: bold; color: #00aaff; margin: 10px 0; }
-        input[type=range] { width: 100%; cursor: pointer; }
+
+        .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .value { font-size: 28px; font-weight: bold; color: #00aaff; margin-bottom: 15px; }
+        .alert-box { 
+            padding: 10px; border-radius: 5px; background: #1a1a1a; 
+            font-weight: bold; text-align: center; margin-top: 10px; border: 1px solid #333;
+        }
+        
+        input[type=range] { width: 100%; cursor: pointer; margin-top: 5px; margin-bottom: 15px; }
+        .danger { color: #ff4444 !important; border-color: #ff4444 !important; }
+        .ok { color: #00ff88 !important; }
     </style>
 </head>
 <body>
-    <div id="ui-controls">
-        <div style="font-size: 11px; color: #aaa;">MONITORING INDUSTRIEL</div>
-        <div id="tempDisplay" class="temp-val">4.0°C</div>
+    <div id="desktop-panel">
+        <div class="label">Tableau de Bord Industriel</div>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+
+        <div class="label">Température Intérieure</div>
+        <div id="tempDisplay" class="value">4.0°C</div>
         <input type="range" id="tempSlider" min="-20" max="20" value="4" step="0.5">
-        <div id="status" style="color:#00ff88; font-weight:bold; margin-top:10px;">SYSTÈME OK</div>
+
+        <div class="label">Densité de Charge (kg/m³)</div>
+        <div id="tonDisplay" class="value">150 kg/m³</div>
+        <input type="range" id="tonSlider" min="0" max="500" value="150" step="10">
+
+        <div id="alertBox" class="alert-box ok">SYSTÈME OPÉRATIONNEL</div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
+        // --- CONFIGURATION SCÈNE 3D ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -34,91 +55,88 @@
         document.body.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(15, 12, 15);
+        camera.position.set(15, 12, 18);
 
         scene.add(new THREE.AmbientLight(0xffffff, 0.6));
         const light = new THREE.PointLight(0xffffff, 1);
         light.position.set(10, 20, 10);
         scene.add(light);
-        
         scene.add(new THREE.GridHelper(30, 30, 0x333333, 0x222222));
 
-        // --- CHAMBRE (Parois Bleu Eau) ---
-        const chamberMat = new THREE.MeshStandardMaterial({ 
-            color: 0x0077be, transparent: true, opacity: 0.3, metalness: 0.3
-        });
+        // --- CHAMBRE ET ÉQUIPEMENTS ---
+        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x0077be, transparent: true, opacity: 0.3 });
         const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), chamberMat);
         chamber.position.y = 4;
         scene.add(chamber);
 
-        // --- STRUCTURE EXTÉRIEURE TRÈS ÉPAISSE (Gris Foncé) ---
+        // Structure épaisse
         const frameMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
         function addBar(w, h, d, x, y, z) {
             const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
             bar.position.set(x, y, z);
             scene.add(bar);
         }
-        // Montants verticaux (angles)
-        addBar(0.6, 8, 0.6, 5, 4, 5); addBar(0.6, 8, 0.6, -5, 4, 5);
-        addBar(0.6, 8, 0.6, 5, 4, -5); addBar(0.6, 8, 0.6, -5, 4, -5);
-        // Barres horizontales (haut et bas)
-        addBar(10, 0.6, 0.6, 0, 8, 5); addBar(10, 0.6, 0.6, 0, 0, 5);
-        addBar(10, 0.6, 0.6, 0, 8, -5); addBar(10, 0.6, 0.6, 0, 0, -5);
-        addBar(0.6, 0.6, 10, 5, 8, 0); addBar(0.6, 0.6, 10, 5, 0, 0);
-        addBar(0.6, 0.6, 10, -5, 8, 0); addBar(0.6, 0.6, 10, -5, 0, 0);
+        addBar(0.6, 8.6, 0.6, 5, 4, 5); addBar(0.6, 8.6, 0.6, -5, 4, 5);
+        addBar(0.6, 8.6, 0.6, 5, 4, -5); addBar(0.6, 8.6, 0.6, -5, 4, -5);
+        addBar(10.6, 0.6, 0.6, 0, 8.3, 5); addBar(10.6, 0.6, 0.6, 0, 0, 5);
+        addBar(10.6, 0.6, 0.6, 0, 8.3, -5); addBar(10.6, 0.6, 0.6, 0, 0, -5);
 
-        // --- TOUS LES COINS BLANCS INTÉRIEURS (Profilés sanitaires) ---
+        // Coins blancs intérieurs
         const cornerMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-        function addInnerLine(w, h, d, x, y, z) {
+        function addCorner(w, h, d, x, y, z) {
             const c = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), cornerMat);
             c.position.set(x, y, z);
             scene.add(c);
         }
-        // Coins Verticaux
-        addInnerLine(0.2, 7.6, 0.2, 4.7, 4, 4.7); addInnerLine(0.2, 7.6, 0.2, -4.7, 4, 4.7);
-        addInnerLine(0.2, 7.6, 0.2, 4.7, 4, -4.7); addInnerLine(0.2, 7.6, 0.2, -4.7, 4, -4.7);
-        // Coins Horizontaux Plafond
-        addInnerLine(9.4, 0.2, 0.2, 0, 7.7, 4.7); addInnerLine(9.4, 0.2, 0.2, 0, 7.7, -4.7);
-        addInnerLine(0.2, 0.2, 9.4, 4.7, 7.7, 0); addInnerLine(0.2, 0.2, 9.4, -4.7, 7.7, 0);
-        // Coins Horizontaux Sol
-        addInnerLine(9.4, 0.2, 0.2, 0, 0.3, 4.7); addInnerLine(9.4, 0.2, 0.2, 0, 0.3, -4.7);
-        addInnerLine(0.2, 0.2, 9.4, 4.7, 0.3, 0); addInnerLine(0.2, 0.2, 9.4, -4.7, 0.3, 0);
+        addCorner(0.2, 7.8, 0.2, 4.7, 4, 4.7); addCorner(0.2, 7.8, 0.2, -4.7, 4, 4.7);
+        addCorner(0.2, 7.8, 0.2, 4.7, 4, -4.7); addCorner(0.2, 7.8, 0.2, -4.7, 4, -4.7);
 
-        // --- PORTE ---
-        const door = new THREE.Mesh(new THREE.BoxGeometry(3, 6, 0.2), new THREE.MeshStandardMaterial({ color: 0x222222 }));
-        door.position.set(0, 3, 5);
-        scene.add(door);
-
-        // --- ÉVAPORATEUR ---
-        const evap = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 1.5), new THREE.MeshStandardMaterial({ color: 0xeeeeee }));
-        evap.position.set(0, 6.8, -3.5);
+        // Moteur et Évaporateur
+        const motor = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshStandardMaterial({color: 0x333333}));
+        motor.position.set(6.5, 1.5, 0);
+        scene.add(motor);
+        const evap = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 1), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
+        evap.position.set(0, 7, -4);
         scene.add(evap);
 
-        // --- MOTEUR EXTÉRIEUR ---
-        const motor = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.5, 2.5), new THREE.MeshStandardMaterial({ color: 0x333333 }));
-        motor.position.set(6.8, 1.5, 0);
-        scene.add(motor);
+        // --- LOGIQUE DE SURVEILLANCE (Le "Desktop") ---
+        const tempSlider = document.getElementById('tempSlider');
+        const tonSlider = document.getElementById('tonSlider');
+        const tempDisp = document.getElementById('tempDisplay');
+        const tonDisp = document.getElementById('tonDisplay');
+        const alertBox = document.getElementById('alertBox');
 
-        // --- LOGIQUE SLIDER ---
-        const slider = document.getElementById('tempSlider');
-        const display = document.getElementById('tempDisplay');
-        const status = document.getElementById('status');
+        function updateMonitoring() {
+            const t = parseFloat(tempSlider.value);
+            const w = parseInt(tonSlider.value);
+            
+            tempDisp.innerText = t.toFixed(1) + "°C";
+            tonDisp.innerText = w + " kg/m³";
 
-        slider.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            display.innerText = val.toFixed(1) + "°C";
-            if(val > 7) {
-                display.style.color = "#ff4444";
-                status.innerText = "ALERTE : TEMP. ÉLEVÉE";
-                status.style.color = "#ff4444";
-                chamberMat.color.setHex(0xff3333);
+            const tempAlert = t > 7;
+            const weightAlert = w > 250;
+
+            if (tempAlert || weightAlert) {
+                alertBox.classList.remove('ok');
+                alertBox.classList.add('danger');
+                chamberMat.color.setHex(0xff4444); // Le cube devient rouge
+                
+                let message = "";
+                if(tempAlert && weightAlert) message = "DANGER : TEMPÉRATURE & SURCHARGE";
+                else if(tempAlert) message = "ALERTE : TEMPÉRATURE ÉLEVÉE";
+                else message = "ALERTE : SURCHARGE TONNAGE";
+                
+                alertBox.innerText = message;
             } else {
-                display.style.color = "#00aaff";
-                status.innerText = "SYSTÈME OK";
-                status.style.color = "#00ff88";
-                chamberMat.color.setHex(0x0077be);
+                alertBox.classList.remove('danger');
+                alertBox.classList.add('ok');
+                alertBox.innerText = "SYSTÈME OPÉRATIONNEL";
+                chamberMat.color.setHex(0x0077be); // Retour au bleu
             }
-        });
+        }
+
+        tempSlider.addEventListener('input', updateMonitoring);
+        tonSlider.addEventListener('input', updateMonitoring);
 
         function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
         animate();
