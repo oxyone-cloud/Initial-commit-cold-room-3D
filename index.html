@@ -3,142 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chambre Froide Industrielle - Monitoring Expert</title>
+    <title>Chambre Froide Industrielle - Full Structure</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; }
-        
-        /* Panneau de contrôle principal (Desktop à gauche) */
         #desktop-panel {
             position: absolute; top: 20px; left: 20px;
             background: rgba(10, 10, 10, 0.95); color: white;
-            padding: 25px; border-radius: 12px; border: 2px solid #555;
-            z-index: 1000; width: 280px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            padding: 25px; border-radius: 12px; border: 2px solid #fff;
+            z-index: 1000; width: 280px; box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
-
         .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
         .value { font-size: 28px; font-weight: bold; color: #00aaff; margin-bottom: 15px; }
-        .alert-box { 
-            padding: 10px; border-radius: 5px; background: #1a1a1a; 
-            font-weight: bold; text-align: center; margin-top: 10px; border: 1px solid #333;
-        }
-        
-        input[type=range] { width: 100%; cursor: pointer; margin-top: 5px; margin-bottom: 15px; }
-        .danger { color: #ff4444 !important; border-color: #ff4444 !important; }
+        .alert-box { padding: 10px; border-radius: 5px; background: #1a1a1a; font-weight: bold; text-align: center; margin-top: 10px; border: 1px solid #333; }
+        input[type=range] { width: 100%; cursor: pointer; margin-bottom: 15px; }
+        .danger { color: #ff4444 !important; border-color: #ff4444 !important; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         .ok { color: #00ff88 !important; }
     </style>
 </head>
 <body>
     <div id="desktop-panel">
-        <div class="label">Tableau de Bord Industriel</div>
+        <div class="label">Supervision Réseau Oxyone</div>
         <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
-
-        <div class="label">Température Intérieure</div>
+        <div class="label">Température (°C)</div>
         <div id="tempDisplay" class="value">4.0°C</div>
         <input type="range" id="tempSlider" min="-20" max="20" value="4" step="0.5">
-
-        <div class="label">Densité de Charge (kg/m³)</div>
+        <div class="label">Charge Totale (kg/m³)</div>
         <div id="tonDisplay" class="value">150 kg/m³</div>
         <input type="range" id="tonSlider" min="0" max="500" value="150" step="10">
-
-        <div id="alertBox" class="alert-box ok">SYSTÈME OPÉRATIONNEL</div>
+        <div id="alertBox" class="alert-box ok">SYSTÈME OK</div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
-        // --- CONFIGURATION SCÈNE 3D ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         camera.position.set(15, 12, 18);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-        const light = new THREE.PointLight(0xffffff, 1);
-        light.position.set(10, 20, 10);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 10, 7.5);
         scene.add(light);
-        scene.add(new THREE.GridHelper(30, 30, 0x333333, 0x222222));
+        scene.add(new THREE.GridHelper(30, 30, 0x222222, 0x111111));
 
-        // --- CHAMBRE ET ÉQUIPEMENTS ---
-        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x0077be, transparent: true, opacity: 0.3 });
+        // --- CHAMBRE ---
+        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x0077be, transparent: true, opacity: 0.25 });
         const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), chamberMat);
         chamber.position.y = 4;
         scene.add(chamber);
 
-        // Structure épaisse
+        // --- ARMATURE EXTERIEURE COMPLETE (12 POUTRES) ---
         const frameMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
-        function addBar(w, h, d, x, y, z) {
-            const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
-            bar.position.set(x, y, z);
-            scene.add(bar);
+        function makeBeam(w, h, d, x, y, z) {
+            const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
+            b.position.set(x, y, z);
+            scene.add(b);
         }
-        addBar(0.6, 8.6, 0.6, 5, 4, 5); addBar(0.6, 8.6, 0.6, -5, 4, 5);
-        addBar(0.6, 8.6, 0.6, 5, 4, -5); addBar(0.6, 8.6, 0.6, -5, 4, -5);
-        addBar(10.6, 0.6, 0.6, 0, 8.3, 5); addBar(10.6, 0.6, 0.6, 0, 0, 5);
-        addBar(10.6, 0.6, 0.6, 0, 8.3, -5); addBar(10.6, 0.6, 0.6, 0, 0, -5);
+        // Verticaux
+        makeBeam(0.6, 8, 0.6, 5, 4, 5); makeBeam(0.6, 8, 0.6, -5, 4, 5);
+        makeBeam(0.6, 8, 0.6, 5, 4, -5); makeBeam(0.6, 8, 0.6, -5, 4, -5);
+        // Horizontaux haut
+        makeBeam(10.6, 0.6, 0.6, 0, 8, 5); makeBeam(10.6, 0.6, 0.6, 0, 8, -5);
+        makeBeam(0.6, 0.6, 10.6, 5, 8, 0); makeBeam(0.6, 0.6, 10.6, -5, 8, 0);
+        // Horizontaux bas
+        makeBeam(10.6, 0.6, 0.6, 0, 0, 5); makeBeam(10.6, 0.6, 0.6, 0, 0, -5);
+        makeBeam(0.6, 0.6, 10.6, 5, 0, 0); makeBeam(0.6, 0.6, 10.6, -5, 0, 0);
 
-        // Coins blancs intérieurs
+        // --- COINS BLANCS INTERIEURS (12 PROFILÉS) ---
         const cornerMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-        function addCorner(w, h, d, x, y, z) {
+        function makeInner(w, h, d, x, y, z) {
             const c = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), cornerMat);
             c.position.set(x, y, z);
             scene.add(c);
         }
-        addCorner(0.2, 7.8, 0.2, 4.7, 4, 4.7); addCorner(0.2, 7.8, 0.2, -4.7, 4, 4.7);
-        addCorner(0.2, 7.8, 0.2, 4.7, 4, -4.7); addCorner(0.2, 7.8, 0.2, -4.7, 4, -4.7);
+        // Verticaux
+        makeInner(0.2, 7.4, 0.2, 4.7, 4, 4.7); makeInner(0.2, 7.4, 0.2, -4.7, 4, 4.7);
+        makeInner(0.2, 7.4, 0.2, 4.7, 4, -4.7); makeInner(0.2, 7.4, 0.2, -4.7, 4, -4.7);
+        // Plafond
+        makeInner(9.4, 0.2, 0.2, 0, 7.7, 4.7); makeInner(9.4, 0.2, 0.2, 0, 7.7, -4.7);
+        makeInner(0.2, 0.2, 9.4, 4.7, 7.7, 0); makeInner(0.2, 0.2, 9.4, -4.7, 7.7, 0);
+        // Sol
+        makeInner(9.4, 0.2, 0.2, 0, 0.3, 4.7); makeInner(9.4, 0.2, 0.2, 0, 0.3, -4.7);
+        makeInner(0.2, 0.2, 9.4, 4.7, 0.3, 0); makeInner(0.2, 0.2, 9.4, -4.7, 0.3, 0);
 
-        // Moteur et Évaporateur
-        const motor = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshStandardMaterial({color: 0x333333}));
-        motor.position.set(6.5, 1.5, 0);
-        scene.add(motor);
-        const evap = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 1), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
-        evap.position.set(0, 7, -4);
-        scene.add(evap);
+        // --- EQUIPEMENTS ANIMÉS ---
+        const motorGroup = new THREE.Group();
+        const motorBody = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshStandardMaterial({color:0x222222}));
+        const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color:0x555555, side:THREE.DoubleSide}));
+        fanExt.position.set(1.01, 0, 0); fanExt.rotation.y = Math.PI/2;
+        motorGroup.add(motorBody, fanExt);
+        motorGroup.position.set(6.5, 1.5, 0); scene.add(motorGroup);
 
-        // --- LOGIQUE DE SURVEILLANCE (Le "Desktop") ---
-        const tempSlider = document.getElementById('tempSlider');
-        const tonSlider = document.getElementById('tonSlider');
-        const tempDisp = document.getElementById('tempDisplay');
-        const tonDisp = document.getElementById('tonDisplay');
+        const evapGroup = new THREE.Group();
+        const evapBody = new THREE.Mesh(new THREE.BoxGeometry(3, 1, 1.5), new THREE.MeshStandardMaterial({color:0xeeeeee}));
+        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.4, 16), new THREE.MeshBasicMaterial({color:0x333333}));
+        fanInt.position.set(0, 0, 0.76);
+        evapGroup.add(evapBody, fanInt);
+        evapGroup.position.set(0, 7, -3.5); scene.add(evapGroup);
+
+        // Porte
+        const door = new THREE.Mesh(new THREE.BoxGeometry(3, 6, 0.2), new THREE.MeshStandardMaterial({color: 0x111111}));
+        door.position.set(0, 3, 5); scene.add(door);
+
+        // --- LOGIQUE ---
+        const tS = document.getElementById('tempSlider');
+        const wS = document.getElementById('tonSlider');
         const alertBox = document.getElementById('alertBox');
 
-        function updateMonitoring() {
-            const t = parseFloat(tempSlider.value);
-            const w = parseInt(tonSlider.value);
+        function update() {
+            const t = parseFloat(tS.value); const w = parseInt(wS.value);
+            document.getElementById('tempDisplay').innerText = t.toFixed(1) + "°C";
+            document.getElementById('tonDisplay').innerText = w + " kg/m³";
             
-            tempDisp.innerText = t.toFixed(1) + "°C";
-            tonDisp.innerText = w + " kg/m³";
-
-            const tempAlert = t > 7;
-            const weightAlert = w > 250;
-
-            if (tempAlert || weightAlert) {
-                alertBox.classList.remove('ok');
-                alertBox.classList.add('danger');
-                chamberMat.color.setHex(0xff4444); // Le cube devient rouge
-                
-                let message = "";
-                if(tempAlert && weightAlert) message = "DANGER : TEMPÉRATURE & SURCHARGE";
-                else if(tempAlert) message = "ALERTE : TEMPÉRATURE ÉLEVÉE";
-                else message = "ALERTE : SURCHARGE TONNAGE";
-                
-                alertBox.innerText = message;
+            if (t > 7 || w > 250) {
+                alertBox.className = "alert-box danger";
+                alertBox.innerText = (t > 7 && w > 250) ? "DANGER GLOBAL" : (t > 7 ? "ALERTE TEMP" : "ALERTE POIDS");
+                chamberMat.color.setHex(0xff0000);
             } else {
-                alertBox.classList.remove('danger');
-                alertBox.classList.add('ok');
-                alertBox.innerText = "SYSTÈME OPÉRATIONNEL";
-                chamberMat.color.setHex(0x0077be); // Retour au bleu
+                alertBox.className = "alert-box ok"; alertBox.innerText = "SYSTÈME OK";
+                chamberMat.color.setHex(0x0077be);
             }
         }
+        tS.addEventListener('input', update); wS.addEventListener('input', update);
 
-        tempSlider.addEventListener('input', updateMonitoring);
-        tonSlider.addEventListener('input', updateMonitoring);
-
-        function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+        function animate() {
+            requestAnimationFrame(animate);
+            fanExt.rotation.z += 0.2; // Rotation ventilateur moteur
+            fanInt.rotation.z += 0.3; // Rotation ventilateur intérieur
+            controls.update();
+            renderer.render(scene, camera);
+        }
         animate();
     </script>
 </body>
