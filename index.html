@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oxyone - Chambre Froide Amovible Positive</title>
+    <title>Oxyone - Digital Twin Precise Dimensions</title>
     <style>
         body { margin: 0; overflow: hidden; background: #010101; font-family: 'Segoe UI', sans-serif; color: white; }
         #ui-panel {
@@ -15,16 +15,15 @@
         .alert { padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; border: 1px solid #333; margin-bottom: 12px; font-size: 12px; }
         .ok { color: #00ff88; border-color: #00ff88; }
         .danger { color: #ff4444; border-color: #ff4444; background: rgba(255, 0, 0, 0.2); animation: blink 1s infinite; }
-        .bt-detect { color: #00aaff; border-color: #00aaff; background: rgba(0, 170, 255, 0.1); }
-        @keyframes blink { 50% { opacity: 0.5; } }
         input { width: 100%; cursor: pointer; margin-bottom: 10px; accent-color: #00aaff; }
+        .dim-label { position: absolute; color: yellow; font-weight: bold; font-size: 14px; pointer-events: none; text-shadow: 1px 1px 2px black; }
     </style>
 </head>
 <body>
     <div id="ui-panel">
-        <div class="label">Supervision Bluetooth</div>
+        <div class="label">OXYONE RTLS</div>
         <div id="btAlert" class="alert ok">SCANNING...</div>
-        <div id="sysAlert" class="alert ok">CHARGE: NOMINALE</div>
+        <div id="sysAlert" class="alert ok">DENSITÉ OK</div>
         
         <div class="label">Température (°C)</div>
         <div id="tDisp" class="value">0.0°C</div>
@@ -34,6 +33,10 @@
         <div id="wDisp" class="value">100 kg/m²</div>
         <input type="range" id="wSlider" min="0" max="500" value="100">
     </div>
+
+    <div class="dim-label" style="top: 85%; left: 50%;">Long: 2.74m</div>
+    <div class="dim-label" style="top: 50%; left: 80%;">Larg: 1.83m</div>
+    <div class="dim-label" style="top: 30%; left: 45%;">Haut: 2.00m</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -45,98 +48,103 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(6, 4, 8); // Zoomé sur les nouvelles dimensions
+        camera.position.set(6, 4, 8);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        scene.add(new THREE.AmbientLight(0xffffff, 0.9));
         const sun = new THREE.DirectionalLight(0xffffff, 1);
         sun.position.set(5, 10, 5); scene.add(sun);
 
-        // --- DIMENSIONS IMAGE (1 unit = 1 meter) ---
+        // --- DIMENSIONS ---
         const L = 2.74; const W = 1.83; const H = 2; const doorH = 0.8;
-
-        // --- STRUCTURE ---
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8 });
-        function addBeam(w, h, d, x, y, z) {
-            const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
-            b.position.set(x, y, z); scene.add(b);
-        }
-        // Poteaux aux 4 coins
-        addBeam(0.1, H, 0.1, L/2, H/2, W/2); addBeam(0.1, H, 0.1, -L/2, H/2, W/2);
-        addBeam(0.1, H, 0.1, L/2, H/2, -W/2); addBeam(0.1, H, 0.1, -L/2, H/2, -W/2);
-        // Cadre supérieur
-        addBeam(L, 0.1, 0.1, 0, H, W/2); addBeam(L, 0.1, 0.1, 0, H, -W/2);
 
         // --- CHAMBRE ---
         const chamberMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.15, side: 2 });
         const chamber = new THREE.Mesh(new THREE.BoxGeometry(L, H, W), chamberMat);
         chamber.position.y = H/2; scene.add(chamber);
 
-        // --- PORTE (0.8M) ---
-        const door = new THREE.Mesh(new THREE.BoxGeometry(0.8, doorH, 0.15), new THREE.MeshStandardMaterial({color: 0x111111}));
+        // --- STRUCTURE GRISE ---
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
+        function addPillar(x, z) {
+            const p = new THREE.Mesh(new THREE.BoxGeometry(0.1, H, 0.1), frameMat);
+            p.position.set(x, H/2, z); scene.add(p);
+        }
+        addPillar(L/2, W/2); addPillar(-L/2, W/2); addPillar(L/2, -W/2); addPillar(-L/2, -W/2);
+
+        // --- FLÈCHES DE DIMENSIONS ---
+        function addDimArrow(start, end, color) {
+            const dir = new THREE.Vector3().subVectors(end, start).normalize();
+            const len = start.distanceTo(end);
+            const arrow = new THREE.ArrowHelper(dir, start, len, color, 0.2, 0.1);
+            scene.add(arrow);
+        }
+        addDimArrow(new THREE.Vector3(-L/2, 0.1, W/2+0.5), new THREE.Vector3(L/2, 0.1, W/2+0.5), 0xffff00); // Longeur
+        addDimArrow(new THREE.Vector3(L/2+0.5, 0.1, -W/2), new THREE.Vector3(L/2+0.5, 0.1, W/2), 0x00ff00); // Largeur
+        addDimArrow(new THREE.Vector3(-L/2-0.5, 0, -W/2), new THREE.Vector3(-L/2-0.5, H, -W/2), 0xff0000); // Hauteur
+
+        // --- ÉVAPORATEUR (HAUT) ---
+        const evapGroup = new THREE.Group();
+        const evapBody = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 0.6), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
+        evapGroup.add(evapBody);
+        const fan = new THREE.Mesh(new THREE.CircleGeometry(0.2, 16), new THREE.MeshBasicMaterial({color: 0x222222, side: 2}));
+        fan.position.z = 0.31; evapGroup.add(fan);
+        evapGroup.position.set(0, H - 0.3, -W/2 + 0.4);
+        scene.add(evapGroup);
+
+        // --- PORTE (0.8m) ---
+        const door = new THREE.Mesh(new THREE.BoxGeometry(0.8, doorH, 0.1), new THREE.MeshStandardMaterial({color: 0x111111}));
         door.position.set(0, doorH/2, W/2); scene.add(door);
 
-        // --- ÉTAGÈRES ---
-        for(let h=0.5; h<H; h+=0.7) {
-            const sL = new THREE.Mesh(new THREE.BoxGeometry(L/3, 0.05, W*0.8), new THREE.MeshStandardMaterial({color: 0x888888}));
-            sL.position.set(-L/3, h, 0); scene.add(sL);
-            const sR = sL.clone(); sR.position.x = L/3; scene.add(sR);
+        // --- CHARIOT (TAG BT) ---
+        const chariot = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.2, 0.6), new THREE.MeshStandardMaterial({color: 0xffff00}));
+        scene.add(chariot);
+
+        // --- FLUX D'AIR DESCENDANT ---
+        const particles = new THREE.Group();
+        for(let i=0; i<30; i++) {
+            const p = new THREE.Mesh(new THREE.SphereGeometry(0.02), new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.5}));
+            p.position.set(Math.random()*1-0.5, H-0.5, -W/2+0.5);
+            particles.add(p);
         }
-
-        // --- ZONE BT & TAG ---
-        const btZone = new THREE.Mesh(new THREE.RingGeometry(1, 1.2, 32), new THREE.MeshBasicMaterial({color: 0x00aaff, transparent: true, opacity: 0.5, side: 2}));
-        btZone.rotation.x = -Math.PI/2; btZone.position.set(0, 0.02, W/2 + 2); scene.add(btZone);
-
-        const btTag = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.1, 0.3), new THREE.MeshStandardMaterial({color: 0xffff00}));
-        scene.add(btTag);
-
-        // --- FLUX D'AIR (DESCENDANT) ---
-        const pGroup = new THREE.Group();
-        for(let i=0; i<40; i++) {
-            const p = new THREE.Mesh(new THREE.SphereGeometry(0.03), new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.4}));
-            p.position.set(Math.random()*L-L/2, Math.random()*H, Math.random()*W-W/2);
-            pGroup.add(p);
-        }
-        scene.add(pGroup);
+        scene.add(particles);
 
         // --- LOGIQUE ---
         const tS = document.getElementById('tSlider');
         const wS = document.getElementById('wSlider');
-
-        function update() {
-            const t = tS.value; const w = wS.value;
-            document.getElementById('tDisp').innerText = t + ".0°C";
-            document.getElementById('wDisp').innerText = w + " kg/m²";
-
-            if(w > 250 || t > 15) {
-                sysAlert.innerText = w > 250 ? "ALERTE: SURCHARGE" : "ALERTE: TEMPÉRATURE";
-                sysAlert.className = "alert danger";
-                chamberMat.color.setHex(0xff4444);
-            } else {
-                sysAlert.innerText = "CHARGE: NOMINALE";
-                sysAlert.className = "alert ok";
-                chamberMat.color.setHex(0x00aaff);
-            }
-        }
-        tS.addEventListener('input', update);
-        wS.addEventListener('input', update);
+        const sysAlert = document.getElementById('sysAlert');
 
         function animate() {
             requestAnimationFrame(animate);
             const time = Date.now() * 0.001;
+            fan.rotation.z += 0.3;
 
-            btTag.position.set(Math.sin(time)*0.5, 0.1, W/2 + 2 + Math.cos(time)*0.5);
-            const dist = btTag.position.distanceTo(btZone.position);
-            btAlert.innerText = dist < 1.5 ? "PALETTE DETECTÉE: #8801" : "SCANNING...";
+            // Chariot : Va-et-vient linéaire
+            chariot.position.set(0, 0.1, 2 + Math.sin(time) * 2);
+            const dist = chariot.position.z - W/2;
+            btAlert.innerText = dist < 1.5 ? "PALETTE DÉTECTÉE" : "SCANNING...";
             btAlert.className = dist < 1.5 ? "alert bt-detect" : "alert ok";
 
-            pGroup.children.forEach(p => {
+            // Air qui descend
+            particles.children.forEach(p => {
                 p.position.y -= 0.03;
-                if(p.position.y < 0) p.position.y = H;
+                if(p.position.y < 0) p.position.y = H - 0.5;
             });
+
+            // Alerte Densité 250kg/m2
+            const w = wS.value;
+            document.getElementById('wDisp').innerText = w + " kg/m²";
+            document.getElementById('tDisp').innerText = tS.value + ".0°C";
+            
+            if(w > 250) {
+                sysAlert.innerText = "ALERTE SURCHARGE"; sysAlert.className = "alert danger";
+                chamberMat.color.setHex(0xffaa00);
+            } else {
+                sysAlert.innerText = "DENSITÉ OK"; sysAlert.className = "alert ok";
+                chamberMat.color.setHex(0x00aaff);
+            }
 
             renderer.render(scene, camera);
         }
-        update(); animate();
+        animate();
     </script>
 </body>
 </html>
