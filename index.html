@@ -2,29 +2,29 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oxyone - Jumeau Numérique (Zone de Détection Visible)</title>
+    <title>Oxyone - Digital Twin Warehouse Edition</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #010101; font-family: 'Segoe UI', sans-serif; color: white; }
+        body { margin: 0; overflow: hidden; background: #0a0a0a; font-family: 'Segoe UI', sans-serif; color: white; }
         #ui-panel {
             position: absolute; top: 20px; left: 20px;
-            background: rgba(10, 10, 10, 0.95); padding: 20px; border-radius: 12px; 
-            border: 2px solid #00aaff; z-index: 100; width: 280px; box-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
+            background: rgba(15, 15, 15, 0.9); padding: 20px; border-radius: 12px; 
+            border: 2px solid #00aaff; z-index: 100; width: 280px;
         }
         .label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
         .value { font-size: 22px; font-weight: bold; color: #00aaff; margin-bottom: 10px; }
         .alert { padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; border: 1px solid #333; margin-bottom: 12px; font-size: 12px; }
         .ok { color: #00ff88; border-color: #00ff88; }
         .danger { color: #ff4444; border-color: #ff4444; background: rgba(255, 0, 0, 0.2); animation: blink 1s infinite; }
-        .bt-detect { color: #00aaff; border-color: #00aaff; background: rgba(0, 170, 255, 0.3); box-shadow: 0 0 15px #00aaff; }
+        .bt-detect { color: #00aaff; border-color: #00aaff; background: rgba(0, 170, 255, 0.2); }
+        @keyframes blink { 50% { opacity: 0.5; } }
         input { width: 100%; cursor: pointer; margin-bottom: 10px; accent-color: #00aaff; }
-        .dim-label { position: absolute; color: #ffcc00; font-weight: bold; font-size: 14px; text-shadow: 2px 2px 4px black; pointer-events: none; }
     </style>
 </head>
 <body>
     <div id="ui-panel">
-        <div class="label">OXYONE RTLS</div>
-        <div id="btAlert" class="alert ok">SCANNING...</div>
-        <div id="sysAlert" class="alert ok">DENSITÉ OK</div>
+        <div class="label">OXYONE SUPERVISION</div>
+        <div id="btAlert" class="alert ok">SCANNING RTLS...</div>
+        <div id="sysAlert" class="alert ok">SYSTEME NOMINAL</div>
         
         <div class="label">Température (°C)</div>
         <div id="tDisp" class="value">0.0°C</div>
@@ -34,10 +34,6 @@
         <div id="wDisp" class="value">100 kg/m²</div>
         <input type="range" id="wSlider" min="0" max="500" value="100">
     </div>
-
-    <div class="dim-label" style="bottom: 5%; left: 45%;">L: 2.74m</div>
-    <div class="dim-label" style="top: 40%; right: 15%;">W: 1.83m</div>
-    <div class="dim-label" style="top: 20%; left: 35%;">H: 2.00m</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -49,75 +45,81 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(6, 4, 8);
+        camera.position.set(10, 8, 12);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-        const light = new THREE.PointLight(0xffffff, 1.2);
-        light.position.set(5, 10, 5); scene.add(light);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const sun = new THREE.DirectionalLight(0xffffff, 1);
+        sun.position.set(10, 20, 10); scene.add(sun);
 
         // --- DIMENSIONS ---
-        const L = 2.74; const W = 1.83; const H = 2.0; 
-        const doorW = 0.95; const doorH = 1.8;
+        const L = 2.74; const W = 1.83; const H = 2.0;
 
-        // --- STRUCTURE INDUSTRIELLE ---
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x777777, metalness: 0.8 });
+        // --- SOL DE L'ENTREPOT ---
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), new THREE.MeshStandardMaterial({color: 0x222222}));
+        floor.rotation.x = -Math.PI/2; scene.add(floor);
+        const grid = new THREE.GridHelper(50, 50, 0x444444, 0x222222); scene.add(grid);
+
+        // --- FONCTION STRUCTURE ---
+        const metalMat = new THREE.MeshStandardMaterial({ color: 0x777777, metalness: 0.8 });
         function addBeam(w, h, d, x, y, z) {
-            const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
+            const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), metalMat);
             b.position.set(x, y, z); scene.add(b);
         }
-        // Piliers et Cadres (Haut et Bas)
-        [[-L/2, W/2], [L/2, W/2], [-L/2, -W/2], [L/2, -W/2]].forEach(p => addBeam(0.12, H, 0.12, p[0], H/2, p[1]));
-        addBeam(L, 0.1, 0.1, 0, H, W/2); addBeam(L, 0.1, 0.1, 0, H, -W/2);
-        addBeam(0.1, 0.1, W, L/2, H, 0); addBeam(0.1, 0.1, W, -L/2, H, 0);
-        addBeam(L, 0.05, 0.05, 0, 0, W/2); addBeam(L, 0.05, 0.05, 0, 0, -W/2);
 
-        // --- CHAMBRE ---
-        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.15, side: 2 });
+        // --- CHAMBRE FROIDE OXYONE ---
+        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.2 });
         const chamber = new THREE.Mesh(new THREE.BoxGeometry(L, H, W), chamberMat);
         chamber.position.y = H/2; scene.add(chamber);
 
-        // --- PORTE ---
-        const door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.1), new THREE.MeshStandardMaterial({color: 0x222222}));
-        door.position.set(0, doorH/2, W/2); scene.add(door);
+        // Ossature complète
+        [[-L/2, W/2], [L/2, W/2], [-L/2, -W/2], [L/2, -W/2]].forEach(p => addBeam(0.1, H, 0.1, p[0], H/2, p[1]));
+        addBeam(L, 0.1, 0.1, 0, H, W/2); addBeam(L, 0.1, 0.1, 0, H, -W/2);
+        addBeam(0.1, 0.1, W, L/2, H, 0); addBeam(0.1, 0.1, W, -L/2, H, 0);
+        
+        // Porte
+        const door = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.8, 0.1), new THREE.MeshStandardMaterial({color: 0x111111}));
+        door.position.set(0, 0.9, W/2); scene.add(door);
 
-        // --- EVAPORATEUR ---
-        const evap = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 0.6), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
+        // Étagères Internes
+        for(let j=0.4; j<H; j+=0.6) {
+            const shL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.05, W*0.8), metalMat);
+            shL.position.set(-L/2 + 0.4, j, 0); scene.add(shL);
+            const shR = shL.clone(); shR.position.x = L/2 - 0.4; scene.add(shR);
+        }
+
+        // --- AERATION (EVAPORATEUR & PARTICULES) ---
+        const evap = new THREE.Mesh(new THREE.BoxGeometry(1, 0.4, 0.6), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
         evap.position.set(0, H - 0.3, -W/2 + 0.4); scene.add(evap);
 
-        // --- ZONE DE DÉTECTION BLUETOOTH (DISQUE BRILLANT) ---
-        const btGroup = new THREE.Group();
-        const btCircle = new THREE.Mesh(
-            new THREE.CircleGeometry(1.8, 32),
-            new THREE.MeshBasicMaterial({ color: 0x00aaff, transparent: true, opacity: 0.4, side: 2 })
-        );
-        btCircle.rotation.x = -Math.PI / 2;
-        btCircle.position.y = 0.02;
-        btGroup.add(btCircle);
-        
-        // Anneau extérieur plus brillant
-        const btRing = new THREE.Mesh(
-            new THREE.RingGeometry(1.75, 1.85, 32),
-            new THREE.MeshBasicMaterial({ color: 0x00ffff, side: 2 })
-        );
-        btRing.rotation.x = -Math.PI / 2;
-        btRing.position.y = 0.03;
-        btGroup.add(btRing);
-        
-        btGroup.position.set(0, 0, W/2 + 2);
-        scene.add(btGroup);
-
-        // --- CHARIOT ---
-        const chariot = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 1), new THREE.MeshStandardMaterial({color: 0xffcc00}));
-        scene.add(chariot);
-
-        // --- FLÈCHES DE DIMENSIONS ---
-        function addArrow(s, e, col) {
-            const dir = new THREE.Vector3().subVectors(e, s).normalize();
-            scene.add(new THREE.ArrowHelper(dir, s, s.distanceTo(e), col, 0.2, 0.1));
+        const pGroup = new THREE.Group();
+        for(let i=0; i<50; i++) {
+            const p = new THREE.Mesh(new THREE.SphereGeometry(0.02), new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.6}));
+            p.position.set(Math.random()*0.8-0.4, H-0.5, -W/2+0.5);
+            pGroup.add(p);
         }
-        addArrow(new THREE.Vector3(-L/2, 0.1, W/2 + 0.5), new THREE.Vector3(L/2, 0.1, W/2 + 0.5), 0xffff00); // L
-        addArrow(new THREE.Vector3(L/2 + 0.5, 0.1, -W/2), new THREE.Vector3(L/2 + 0.5, 0.1, W/2), 0x00ff00); // W
-        addArrow(new THREE.Vector3(-L/2 - 0.5, 0, -W/2), new THREE.Vector3(-L/2 - 0.5, H, -W/2), 0xff0000); // H
+        scene.add(pGroup);
+
+        // --- ENVIRONNEMENT COMMERCIAL (RACKS EXTÉRIEURS) ---
+        function addRack(x, z) {
+            const rackH = 5;
+            addBeam(0.1, rackH, 2, x-1.5, rackH/2, z);
+            addBeam(0.1, rackH, 2, x+1.5, rackH/2, z);
+            for(let h=1; h<=rackH; h+=1.5) {
+                addBeam(3, 0.1, 2, x, h, z);
+                // Ajout de palettes
+                const pal = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: Math.random() * 0xffffff}));
+                pal.position.set(x + (Math.random()-0.5), h+0.3, z + (Math.random()-0.5));
+                scene.add(pal);
+            }
+        }
+        addRack(-6, 0); addRack(6, 0); addRack(0, -6);
+
+        // --- ZONE DETECTION & CHARIOT ---
+        const btZone = new THREE.Mesh(new THREE.CircleGeometry(2, 32), new THREE.MeshBasicMaterial({color: 0x00aaff, transparent: true, opacity: 0.3, side: 2}));
+        btZone.rotation.x = -Math.PI/2; btZone.position.set(0, 0.05, W/2 + 3); scene.add(btZone);
+
+        const chariot = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 1), new THREE.MeshStandardMaterial({color: 0xffcc00}));
+        scene.add(chariot);
 
         // --- ANIMATION ---
         const tS = document.getElementById('tSlider');
@@ -127,33 +129,27 @@
             requestAnimationFrame(animate);
             const t = Date.now() * 0.001;
 
-            // Effet de pulsation de la zone Bluetooth
-            btCircle.material.opacity = 0.2 + Math.abs(Math.sin(t * 2)) * 0.3;
+            // Chariot va-et-vient
+            chariot.position.set(0, 0.2, 4 + Math.sin(t) * 3);
+            const dist = chariot.position.distanceTo(btZone.position);
+            document.getElementById('btAlert').innerText = dist < 2 ? "DÉTECTION PALETTE" : "SCANNING RTLS...";
+            document.getElementById('btAlert').className = dist < 2 ? "alert bt-detect" : "alert ok";
 
-            // Chariot : mouvement va-et-vient
-            chariot.position.set(0, 0.15, 3 + Math.sin(t) * 2.5);
-            
-            // Détection de proximité
-            const dist = chariot.position.distanceTo(btGroup.position);
-            if(dist < 1.8) {
-                btAlert.innerText = "TAG DÉTECTÉ: PALETTE_OXY";
-                btAlert.className = "alert bt-detect";
-                btRing.material.color.setHex(0x00ff00); // Devient vert lors de la détection
-            } else {
-                btAlert.innerText = "SCANNING...";
-                btAlert.className = "alert ok";
-                btRing.material.color.setHex(0x00ffff);
-            }
+            // Air ventilé qui descend
+            pGroup.children.forEach(p => {
+                p.position.y -= 0.04;
+                if(p.position.y < 0.1) p.position.y = H - 0.5;
+            });
 
-            // UI et Alerte Charge
+            // Alerts
             document.getElementById('wDisp').innerText = wS.value + " kg/m²";
             document.getElementById('tDisp').innerText = tS.value + ".0°C";
             if(wS.value > 250) {
-                sysAlert.innerText = "ALERTE SURCHARGE"; sysAlert.className = "alert danger";
-                chamberMat.color.setHex(0xffaa00);
+                document.getElementById('sysAlert').innerText = "ALERTE SURCHARGE";
+                document.getElementById('sysAlert').className = "alert danger";
             } else {
-                sysAlert.innerText = "DENSITÉ OK"; sysAlert.className = "alert ok";
-                chamberMat.color.setHex(0x00aaff);
+                document.getElementById('sysAlert').innerText = "SYSTEME NOMINAL";
+                document.getElementById('sysAlert').className = "alert ok";
             }
 
             renderer.render(scene, camera);
