@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oxyone - Jumeau Numérique (Stockage & Palettes)</title>
+    <title>Oxyone - Jumeau Numérique Complet</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; }
         #desktop-panel {
@@ -59,7 +59,7 @@
         chamber.position.y = 4;
         scene.add(chamber);
 
-        // --- ARMATURE ---
+        // --- STRUCTURE ---
         const frameMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
         function addBeam(w, h, d, x, y, z) {
             const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
@@ -72,28 +72,44 @@
             addBeam(0.6, 0.6, 10.6, 5, y, 0); addBeam(0.6, 0.6, 10.6, -5, y, 0);
         });
 
-        // --- ÉTAGÈRES ---
+        // --- ÉTAGÈRES ET PALETTES INTERIEURES ---
         const shelfMat = new THREE.MeshStandardMaterial({ color: 0x777777 });
+        const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
         for(let h=2; h<7; h+=2) {
-            const s1 = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 8), shelfMat);
-            s1.position.set(-3, h, 0); scene.add(s1);
-            const s2 = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 8), shelfMat);
-            s2.position.set(3, h, 0); scene.add(s2);
+            // Etagères
+            addBeam(3, 0.1, 8, -3, h, 0); 
+            addBeam(3, 0.1, 8, 3, h, 0);
+            // Quelques palettes sur les étagères
+            const pal1 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 1.5), woodMat);
+            pal1.position.set(-3, h+0.2, -2); scene.add(pal1);
+            const pal2 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 1.5), woodMat);
+            pal2.position.set(3, h+0.2, 2); scene.add(pal2);
         }
 
-        // --- PALETTES & CHARIOT ---
-        const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 }); // Brun bois
-        function addPalette(x, y, z) {
-            const p = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.2, 1.2), woodMat);
-            p.position.set(x, y, z);
-            scene.add(p);
-        }
-        // Palettes au sol devant la porte
-        addPalette(-2, 0.1, 7); 
-        addPalette(-2, 0.35, 7); // Empilée
-        addPalette(2, 0.1, 7);
+        // --- PORTE ---
+        const door = new THREE.Mesh(new THREE.BoxGeometry(3.5, 6, 0.3), new THREE.MeshStandardMaterial({color: 0x111111}));
+        door.position.set(0, 3, 5);
+        scene.add(door);
 
-        // Chariot (Transpalette)
+        // --- MOTEUR EXTERIEUR (COMPLET) ---
+        const motorGroup = new THREE.Group();
+        const motorBox = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshStandardMaterial({color: 0x333333}));
+        const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x00aaff, side: 2}));
+        fanExt.position.set(0, 0, 1.01); 
+        motorGroup.add(motorBox, fanExt);
+        motorGroup.position.set(7, 1.5, 0);
+        scene.add(motorGroup);
+
+        // --- EVAPORATEUR INTERIEUR (COMPLET) ---
+        const evapGroup = new THREE.Group();
+        const evapBox = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 2), new THREE.MeshStandardMaterial({color: 0xdddddd}));
+        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x333333, side: 2}));
+        fanInt.position.set(0, 0, 1.01);
+        evapGroup.add(evapBox, fanInt);
+        evapGroup.position.set(0, 6.5, -3.5);
+        scene.add(evapGroup);
+
+        // --- CHARIOT ---
         const cart = new THREE.Group();
         const base = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 2.5), new THREE.MeshStandardMaterial({color: 0xffcc00}));
         const handle = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2, 0.1), new THREE.MeshStandardMaterial({color: 0x111111}));
@@ -101,18 +117,6 @@
         cart.add(base, handle);
         cart.position.set(0, 0.5, 9);
         scene.add(cart);
-
-        // --- PORTE ---
-        const door = new THREE.Mesh(new THREE.BoxGeometry(3.5, 6, 0.3), new THREE.MeshStandardMaterial({color: 0x111111}));
-        door.position.set(0, 3, 5);
-        scene.add(door);
-
-        // --- VENTILATEURS ---
-        const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x666666, side: 2}));
-        fanExt.position.set(6.5, 1.5, 1.01); scene.add(fanExt);
-        
-        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.5, 16), new THREE.MeshBasicMaterial({color: 0x333333, side: 2}));
-        fanInt.position.set(0, 7, -2.74); scene.add(fanInt);
 
         // --- LOGIQUE DASHBOARD ---
         const tS = document.getElementById('tempSlider');
@@ -136,7 +140,8 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            fanExt.rotation.z += 0.2; fanInt.rotation.z += 0.3;
+            fanExt.rotation.z += 0.2; 
+            fanInt.rotation.z += 0.3;
             controls.update();
             renderer.render(scene, camera);
         }
