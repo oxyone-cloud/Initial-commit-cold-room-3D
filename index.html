@@ -2,158 +2,119 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oxyone - Dashboard RTLS & Logistique</title>
+    <title>Oxyone - Jumeau Numérique Fix</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; }
-        
-        /* Panneau de Contrôle Gauche */
-        #desktop-panel {
+        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
+        #panel {
             position: absolute; top: 20px; left: 20px;
-            background: rgba(10, 10, 10, 0.95);
-            padding: 20px; border-radius: 12px; border: 2px solid #00aaff;
-            z-index: 1000; width: 260px; box-shadow: 0 0 15px rgba(0, 170, 255, 0.4);
+            background: rgba(15, 15, 15, 0.9); color: white;
+            padding: 20px; border-radius: 10px; border: 2px solid #00aaff;
+            z-index: 10; width: 250px;
         }
-
-        /* Graphique d'historique en bas */
-        #stats-panel {
-            position: absolute; bottom: 20px; left: 20px;
-            background: rgba(10, 10, 10, 0.9);
-            padding: 15px; border-radius: 10px; border: 1px solid #333;
-            width: 300px; z-index: 1000;
-        }
-
-        .label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px;}
+        .label { font-size: 11px; color: #888; text-transform: uppercase; }
         .value { font-size: 22px; font-weight: bold; color: #00aaff; margin-bottom: 10px; }
-        
-        .alert-box { padding: 10px; border-radius: 5px; background: #1a1a1a; font-weight: bold; text-align: center; margin-top: 10px; border: 1px solid #333; transition: 0.3s; }
-        .ok { color: #00ff88; }
-        .bt-active { color: #00aaff; border-color: #00aaff; background: rgba(0, 170, 255, 0.1); }
-
-        /* Style du Graphique */
-        .chart-container { display: flex; align-items: flex-end; height: 60px; gap: 4px; margin-top: 10px; }
-        .bar { flex: 1; background: #00aaff; min-height: 2px; transition: height 0.3s ease; border-radius: 2px 2px 0 0; opacity: 0.6; }
-
-        input[type=range] { width: 100%; cursor: pointer; margin-bottom: 10px; }
+        .alert { padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-top: 10px; border: 1px solid #333; }
+        .danger { background: rgba(255, 0, 0, 0.3); color: #ff4444; border-color: #ff4444; }
+        .ok { background: rgba(0, 255, 136, 0.1); color: #00ff88; }
+        input { width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div id="desktop-panel">
-        <div class="label">Statut Bluetooth RTLS</div>
-        <div id="btStatus" class="alert-box ok">SCANNING...</div>
+    <div id="panel">
+        <div class="label">Système Oxyone</div>
+        <div id="alertBox" class="alert ok">SYSTÈME OK</div>
         <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-        <div class="label">Température (°C)</div>
-        <div id="tempDisplay" class="value">4.0°C</div>
-        <input type="range" id="tempSlider" min="-20" max="20" value="4">
-        <div class="label">Charge (kg/m³)</div>
-        <div id="tonDisplay" class="value">150 kg/m³</div>
-        <input type="range" id="tonSlider" min="0" max="500" value="150">
-    </div>
-
-    <div id="stats-panel">
-        <div class="label">Historique Flux (Passages/min)</div>
-        <div class="chart-container" id="chart">
-            </div>
+        <div class="label">Température</div>
+        <div id="tVal" class="value">4.0°C</div>
+        <input type="range" id="tSlider" min="-20" max="40" value="4">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
-        // --- INITIALISATION ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(16, 14, 22);
+        camera.position.set(15, 15, 20);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(10, 20, 15); scene.add(light);
-        scene.add(new THREE.GridHelper(50, 50, 0x222222, 0x111111));
+        scene.add(new THREE.AmbientLight(0xffffff, 1));
+        const grid = new THREE.GridHelper(40, 40, 0x444444, 0x222222);
+        scene.add(grid);
 
-        // --- CHAMBRE ---
-        const chamber = new THREE.Mesh(
-            new THREE.BoxGeometry(10, 8, 10), 
-            new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.15, side: THREE.DoubleSide })
-        );
-        chamber.position.y = 4; scene.add(chamber);
+        // --- MATÉRIAUX ---
+        const blueMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
+        const greyMat = new THREE.MeshStandardMaterial({ color: 0x888888 });
+        const blackMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+        const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
 
-        // --- STRUCTURE ET PORTE ---
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x555555 });
-        function addBeam(w, h, d, x, y, z) {
-            const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
-            b.position.set(x, y, z); scene.add(b);
+        // --- CHAMBRE (CUBE BLEU) ---
+        const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), blueMat);
+        chamber.position.y = 4;
+        chamber.renderOrder = 2; // Dessiné en dernier pour voir à travers
+        scene.add(chamber);
+
+        // --- STRUCTURE GRISE (Angles) ---
+        function addPillar(x, z) {
+            const p = new THREE.Mesh(new THREE.BoxGeometry(0.6, 8.1, 0.6), greyMat);
+            p.position.set(x, 4, z);
+            p.renderOrder = 1; 
+            scene.add(p);
         }
-        // Angles verticaux
-        addBeam(0.4, 8, 0.4, 5, 4, 5); addBeam(0.4, 8, 0.4, -5, 4, 5);
-        addBeam(0.4, 8, 0.4, 5, 4, -5); addBeam(0.4, 8, 0.4, -5, 4, -5);
-        // Porte
-        const door = new THREE.Mesh(new THREE.BoxGeometry(3.5, 6, 0.5), new THREE.MeshStandardMaterial({color: 0x111111}));
-        door.position.set(0, 3, 5); scene.add(door);
+        addPillar(5, 5); addPillar(-5, 5); addPillar(5, -5); addPillar(-5, -5);
 
-        // --- EQUIPEMENTS ANIMES ---
-        const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x00aaff, side: 2}));
-        fanExt.position.set(7, 1.5, 1.05); scene.add(fanExt); // Hélice moteur
+        // --- PORTE NOIRE ---
+        const door = new THREE.Mesh(new THREE.BoxGeometry(4, 6, 0.4), blackMat);
+        door.position.set(0, 3, 5.1); // Un peu en avant du cube
+        door.renderOrder = 1;
+        scene.add(door);
 
-        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.5, 16), new THREE.MeshBasicMaterial({color: 0x222222, side: 2}));
-        fanInt.position.set(0, 7, -2.45); scene.add(fanInt); // Hélice évaporateur
+        // --- MOTEUR EXTÉRIEUR ---
+        const motor = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), blackMat);
+        motor.position.set(7, 1.5, 0);
+        motor.renderOrder = 1;
+        scene.add(motor);
 
-        // --- ZONE BLUETOOTH ET CHARIOT ---
-        const zone = new THREE.Mesh(new THREE.RingGeometry(2, 2.5, 32), new THREE.MeshBasicMaterial({ color: 0xff0000, side: 2, transparent: true, opacity: 0.5 }));
-        zone.rotation.x = Math.PI/2; zone.position.set(0, 0.05, 9); scene.add(zone);
+        // --- ÉVAPORATEUR INTÉRIEUR ---
+        const evap = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 2), whiteMat);
+        evap.position.set(0, 7, -3);
+        evap.renderOrder = 1;
+        scene.add(evap);
 
-        const cart = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.5, 2.5), new THREE.MeshStandardMaterial({color: 0xffcc00}));
-        scene.add(cart);
-
-        // --- LOGIQUE DU GRAPHIQUE ---
-        const chart = document.getElementById('chart');
-        const bars = [];
-        for(let i=0; i<15; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'bar';
-            bar.style.height = '10%';
-            chart.appendChild(bar);
-            bars.push(bar);
-        }
-
-        function updateChart(active) {
-            bars.shift().remove(); // Retire la plus ancienne
-            const newBar = document.createElement('div');
-            newBar.className = 'bar';
-            newBar.style.height = active ? '90%' : (10 + Math.random()*20) + '%';
-            if(active) newBar.style.opacity = '1';
-            chart.appendChild(newBar);
-            bars.push(newBar);
+        // --- ÉTAGÈRES ---
+        for(let h=2; h<7; h+=2.5) {
+            const sG = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 8), greyMat);
+            sG.position.set(-3.2, h, 0);
+            sG.renderOrder = 1;
+            scene.add(sG);
         }
 
-        // --- ANIMATION ---
-        let lastDetect = false;
-        setInterval(() => updateChart(lastDetect), 1000);
+        // --- LOGIQUE SLIDER ---
+        const slider = document.getElementById('tSlider');
+        const tVal = document.getElementById('tVal');
+        const alertBox = document.getElementById('alertBox');
+
+        slider.addEventListener('input', () => {
+            const v = slider.value;
+            tVal.innerText = v + ".0°C";
+            if(v > 15) {
+                alertBox.innerText = "ALERTE !";
+                alertBox.className = "alert danger";
+                blueMat.color.setHex(0xff0000);
+                blueMat.opacity = 0.5;
+            } else {
+                alertBox.innerText = "SYSTÈME OK";
+                alertBox.className = "alert ok";
+                blueMat.color.setHex(0x00aaff);
+                blueMat.opacity = 0.2;
+            }
+        });
 
         function animate() {
             requestAnimationFrame(animate);
-            fanExt.rotation.z += 0.2; fanInt.rotation.z += 0.3;
-            
-            // Mouvement Chariot
-            cart.position.z = 9 + Math.sin(Date.now()*0.0012) * 6;
-            const dist = cart.position.distanceTo(zone.position);
-            const bt = document.getElementById('btStatus');
-            
-            if(dist < 2.5) {
-                bt.innerText = "SIGNAL DETECTÉ"; bt.className = "alert-box bt-active";
-                zone.material.opacity = 1;
-                lastDetect = true;
-            } else {
-                bt.innerText = "SCANNING..."; bt.className = "alert-box ok";
-                zone.material.opacity = 0.3;
-                lastDetect = false;
-            }
-
-            document.getElementById('tempDisplay').innerText = document.getElementById('tempSlider').value + ".0°C";
-            document.getElementById('tonDisplay').innerText = document.getElementById('tonSlider').value + " kg/m³";
             renderer.render(scene, camera);
         }
         animate();
