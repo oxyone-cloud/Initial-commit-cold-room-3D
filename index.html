@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oxyone - Jumeau Numérique Complet</title>
+    <title>Oxyone - Jumeau Numérique Industriel</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: sans-serif; }
         #desktop-panel {
@@ -12,12 +12,12 @@
             padding: 20px; border-radius: 12px; border: 2px solid #00aaff;
             z-index: 1000; width: 260px;
         }
-        .label { font-size: 11px; color: #888; text-transform: uppercase; }
+        .label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 5px;}
         .value { font-size: 24px; font-weight: bold; color: #00aaff; margin-bottom: 10px; }
         .alert-box { padding: 10px; border-radius: 5px; background: #1a1a1a; font-weight: bold; text-align: center; margin-top: 10px; border: 1px solid #333; }
-        input[type=range] { width: 100%; cursor: pointer; }
+        input[type=range] { width: 100%; cursor: pointer; margin-bottom: 15px; }
         .ok { color: #00ff88; }
-        .bt-active { color: #00aaff; border-color: #00aaff; }
+        .bt-active { color: #00aaff; border-color: #00aaff; box-shadow: 0 0 10px #00aaff; }
     </style>
 </head>
 <body>
@@ -43,65 +43,84 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(15, 12, 20);
+        camera.position.set(18, 15, 22);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
         const sun = new THREE.DirectionalLight(0xffffff, 1);
         sun.position.set(10, 20, 10); scene.add(sun);
-        scene.add(new THREE.GridHelper(40, 40, 0x222222, 0x111111));
+        scene.add(new THREE.GridHelper(50, 50, 0x333333, 0x222222));
 
-        // --- CHAMBRE ---
-        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x0077be, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
-        const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), chamberMat);
+        // --- MATÉRIAUX ---
+        const wallMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x666666, metalness: 0.8, roughness: 0.2 });
+        const doorMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+        const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+        const metalMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+
+        // --- CHAMBRE (CUBE TRANSPARENT) ---
+        const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), wallMat);
         chamber.position.y = 4; scene.add(chamber);
 
-        // --- STRUCTURE ---
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
-        function addPart(w, h, d, x, y, z, mat) {
-            const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-            m.position.set(x, y, z); scene.add(m); return m;
+        // --- STRUCTURE (POUTRES GRISES) ---
+        function addBeam(w, h, d, x, y, z) {
+            const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
+            b.position.set(x, y, z); scene.add(b);
         }
-        // Poutres
-        [[-5,5], [5,5], [-5,-5], [5,-5]].forEach(p => addPart(0.6, 8, 0.6, p[0], 4, p[1], frameMat));
+        // 4 Poutres verticales
+        addBeam(0.6, 8, 0.6, 5, 4, 5); addBeam(0.6, 8, 0.6, -5, 4, 5);
+        addBeam(0.6, 8, 0.6, 5, 4, -5); addBeam(0.6, 8, 0.6, -5, 4, -5);
+        // Poutres horizontales (Haut)
+        addBeam(10.6, 0.6, 0.6, 0, 8, 5); addBeam(10.6, 0.6, 0.6, 0, 8, -5);
+        addBeam(0.6, 0.6, 10.6, 5, 8, 0); addBeam(0.6, 0.6, 10.6, -5, 8, 0);
+
+        // --- PORTE NOIRE ---
+        const door = new THREE.Mesh(new THREE.BoxGeometry(3.5, 6, 0.4), doorMat);
+        door.position.set(0, 3, 5); scene.add(door);
 
         // --- ÉTAGÈRES ET PALETTES ---
-        const shelfMat = new THREE.MeshStandardMaterial({ color: 0x777777 });
-        const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-        for(let h=2; h<7; h+=2) {
-            addPart(3, 0.1, 8, -3, h, 0, shelfMat); // Gauche
-            addPart(3, 0.1, 8, 3, h, 0, shelfMat);  // Droite
-            // Palettes
-            addPart(1.5, 0.2, 1.5, -3, h+0.2, -2, woodMat);
-            addPart(1.5, 0.2, 1.5, 3, h+0.2, 2, woodMat);
+        for(let h=2; h<7; h+=2.5) {
+            // Étagères gauches et droites
+            const sG = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 9), metalMat);
+            sG.position.set(-3.2, h, 0); scene.add(sG);
+            const sD = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 9), metalMat);
+            sD.position.set(3.2, h, 0); scene.add(sD);
+            // Palettes sur étagères
+            const p1 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 1.5), woodMat);
+            p1.position.set(-3.2, h+0.2, -2); scene.add(p1);
+            const p2 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 1.5), woodMat);
+            p2.position.set(3.2, h+0.2, 2); scene.add(p2);
         }
 
-        // --- MOTEUR EXTÉRIEUR (BLOC GRIS) ---
-        const motorBox = addPart(2, 2, 2, 7, 1.5, 0, new THREE.MeshStandardMaterial({color: 0x333333}));
+        // --- MOTEUR (EXTÉRIEUR DROITE) ---
+        const motorGroup = new THREE.Group();
+        motorGroup.add(new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshStandardMaterial({color: 0x333333})));
         const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x00aaff, side: 2}));
-        fanExt.position.set(7, 1.5, 1.01); scene.add(fanExt);
+        fanExt.position.set(0, 0, 1.01); motorGroup.add(fanExt);
+        motorGroup.position.set(7, 1.5, 0); scene.add(motorGroup);
 
-        // --- ÉVAPORATEUR INTÉRIEUR (BLOC BLANC) ---
-        const evapBox = addPart(4, 1.5, 2, 0, 6.5, -3.5, new THREE.MeshStandardMaterial({color: 0xeeeeee}));
-        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x333333, side: 2}));
-        fanInt.position.set(0, 6.5, -2.49); scene.add(fanInt);
+        // --- ÉVAPORATEUR (INTÉRIEUR FOND) ---
+        const evapGroup = new THREE.Group();
+        evapGroup.add(new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 2), new THREE.MeshStandardMaterial({color: 0xffffff})));
+        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x222222, side: 2}));
+        fanInt.position.set(0, 0, 1.01); evapGroup.add(fanInt);
+        evapGroup.position.set(0, 6.8, -3.5); scene.add(evapGroup);
 
-        // --- BLUETOOTH ZONE & DÉTECTEUR ---
-        addPart(1, 0.2, 1, 0, 7.9, 0, new THREE.MeshStandardMaterial({color: 0x111111})); // Dôme
+        // --- BLUETOOTH ZONE ---
         const zone = new THREE.Mesh(new THREE.RingGeometry(2.5, 3, 32), new THREE.MeshBasicMaterial({ color: 0xff0000, side: 2, transparent: true, opacity: 0.5 }));
         zone.rotation.x = Math.PI/2; zone.position.set(0, 0.1, 8); scene.add(zone);
 
         // --- CHARIOT ---
         const cart = new THREE.Group();
-        cart.add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 2.5), new THREE.MeshStandardMaterial({color: 0xffcc00})));
-        cart.position.set(0, 0.5, 12); scene.add(cart);
+        cart.add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.4, 2.5), new THREE.MeshStandardMaterial({color: 0xffcc00})));
+        cart.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 2, 0.1), doorMat)).position.set(0, 1, 1.2);
+        scene.add(cart);
 
-        // --- LOGIQUE ---
         function animate() {
             requestAnimationFrame(animate);
             fanExt.rotation.z += 0.2; fanInt.rotation.z += 0.3;
             
-            // Simulation mouvement chariot & Bluetooth
-            cart.position.z = 8 + Math.sin(Date.now()*0.001) * 5;
+            // Mouvement chariot
+            cart.position.z = 8 + Math.sin(Date.now()*0.001) * 6;
             const dist = cart.position.distanceTo(zone.position);
             const bt = document.getElementById('btStatus');
             if(dist < 3) {
@@ -115,6 +134,7 @@
             document.getElementById('tempDisplay').innerText = document.getElementById('tempSlider').value + ".0°C";
             document.getElementById('tonDisplay').innerText = document.getElementById('tonSlider').value + " kg/m³";
             
+            controls.update();
             renderer.render(scene, camera);
         }
         animate();
