@@ -2,34 +2,35 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oxyone - Digital Twin Cold Room</title>
+    <title>Oxyone - Jumeau Numérique Industriel</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; }
+        body { margin: 0; overflow: hidden; background: #020202; font-family: 'Segoe UI', sans-serif; color: white; }
         #ui-panel {
             position: absolute; top: 20px; left: 20px;
-            background: rgba(15, 15, 15, 0.95); padding: 20px; border-radius: 12px; 
+            background: rgba(10, 10, 10, 0.95); padding: 20px; border-radius: 12px; 
             border: 2px solid #00aaff; z-index: 100; width: 280px; box-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
         }
-        .label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
-        .value { font-size: 24px; font-weight: bold; color: #00aaff; margin-bottom: 15px; }
-        .alert { padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; border: 1px solid #333; margin-bottom: 15px; transition: 0.3s; }
-        .ok { background: rgba(0, 255, 136, 0.1); color: #00ff88; border-color: #00ff88; }
-        .danger { background: rgba(255, 0, 0, 0.2); color: #ff4444; border-color: #ff4444; }
-        input[type=range] { width: 100%; cursor: pointer; margin-bottom: 15px; accent-color: #00aaff; }
+        .label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .value { font-size: 22px; font-weight: bold; color: #00aaff; margin-bottom: 15px; }
+        .alert { padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; border: 1px solid #333; margin-bottom: 15px; }
+        .ok { color: #00ff88; border-color: #00ff88; }
+        .danger { color: #ff4444; border-color: #ff4444; background: rgba(255, 0, 0, 0.2); animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        input { width: 100%; cursor: pointer; margin-bottom: 10px; accent-color: #00aaff; }
     </style>
 </head>
 <body>
     <div id="ui-panel">
-        <div class="label">Statut Supervision</div>
-        <div id="alertStatus" class="alert ok">SYSTÈME NOMINAL</div>
+        <div class="label">Supervision Bluetooth & Charge</div>
+        <div id="alertBox" class="alert ok">SYSTÈME OK</div>
         
         <div class="label">Température (°C)</div>
         <div id="tDisp" class="value">4.0°C</div>
         <input type="range" id="tSlider" min="-20" max="40" value="4">
 
-        <div class="label">Charge Stockée (Tonnage)</div>
-        <div id="wDisp" class="value">200 kg</div>
-        <input type="range" id="wSlider" min="0" max="1000" value="200" step="100">
+        <div class="label">Tonnage (kg/m³)</div>
+        <div id="wDisp" class="value">10 kg/m³</div>
+        <input type="range" id="wSlider" min="0" max="100" value="10">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -42,81 +43,108 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(16, 12, 18);
+        camera.position.set(15, 12, 18);
 
         scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight.position.set(10, 20, 10); scene.add(dirLight);
-        scene.add(new THREE.GridHelper(40, 40, 0x222222, 0x111111));
+        const sun = new THREE.DirectionalLight(0xffffff, 1);
+        sun.position.set(10, 20, 10); scene.add(sun);
 
-        // --- MATÉRIAUX ---
+        // --- STRUCTURE COMPLÈTE ---
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x666666, metalness: 0.8 });
+        function addBeam(w, h, d, x, y, z) {
+            const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
+            b.position.set(x, y, z); scene.add(b);
+        }
+        // Piliers verticaux (4 coins)
+        addBeam(0.4, 8, 0.4, 5, 4, 5); addBeam(0.4, 8, 0.4, -5, 4, 5);
+        addBeam(0.4, 8, 0.4, 5, 4, -5); addBeam(0.4, 8, 0.4, -5, 4, -5);
+        // Traverses hautes (Cadre du haut)
+        addBeam(10.4, 0.4, 0.4, 0, 8, 5); addBeam(10.4, 0.4, 0.4, 0, 8, -5);
+        addBeam(0.4, 0.4, 10.4, 5, 8, 0); addBeam(0.4, 0.4, 10.4, -5, 8, 0);
+
+        // --- CHAMBRE TRANSPARENTE ---
         const chamberMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.15, side: 2 });
-        const metalMat = new THREE.MeshStandardMaterial({ color: 0x777777, metalness: 0.9, roughness: 0.2 });
-        const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-
-        // --- CHAMBRE ET STRUCTURE ---
         const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), chamberMat);
         chamber.position.y = 4; scene.add(chamber);
 
-        function createPart(w, h, d, x, y, z, mat) {
-            const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-            m.position.set(x, y, z); scene.add(m); return m;
-        }
-        // Piliers et traverses
-        createPart(0.4, 8, 0.4, 5, 4, 5, metalMat); createPart(0.4, 8, 0.4, -5, 4, 5, metalMat);
-        createPart(0.4, 8, 0.4, 5, 4, -5, metalMat); createPart(0.4, 8, 0.4, -5, 4, -5, metalMat);
-        createPart(10.4, 0.4, 0.4, 0, 8, 5, metalMat); createPart(0.4, 6, 4, 0, 3, 5, new THREE.MeshStandardMaterial({color: 0x111111})); // Porte
-
-        // --- MOTEUR & EVAPORATEUR ---
-        const motor = createPart(2, 2, 2, 7, 1, 0, new THREE.MeshStandardMaterial({color: 0x333333}));
-        const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x00aaff, side: 2}));
-        fanExt.position.set(7, 1, 1.05); scene.add(fanExt);
-
-        const evap = createPart(4, 1.5, 2, 0, 6.8, -3.5, new THREE.MeshStandardMaterial({color: 0xeeeeee}));
-        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x222222, side: 2}));
-        fanInt.position.set(0, 6.8, -2.45); scene.add(fanInt);
-
-        // --- SYSTEME DE TONNAGE (PALETTES) ---
-        const pallets = [];
-        for(let i=0; i<10; i++) {
-            const p = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.2, 1.5), woodMat);
-            p.position.set(i < 5 ? -3.5 : 3.5, 0.7 + (i % 5) * 1.5, Math.random() * 6 - 3);
-            p.visible = false;
-            scene.add(p);
-            pallets.push(p);
+        // --- ÉTAGÈRES INDUSTRIELLES ---
+        const metalMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.6 });
+        for(let h=2.5; h<8; h+=2.5) {
+            const shelf = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 9), metalMat);
+            shelf.position.set(-3.2, h, 0); scene.add(shelf);
+            const shelfR = shelf.clone(); shelfR.position.x = 3.2; scene.add(shelfR);
         }
 
-        // --- INTERACTION ---
+        // --- PORTE VERTICALE ---
+        const door = new THREE.Mesh(new THREE.BoxGeometry(3.5, 6, 0.3), new THREE.MeshStandardMaterial({color: 0x111111}));
+        door.position.set(0, 3, 5); scene.add(door);
+
+        // --- ZONE BLUETOOTH (Sol) ---
+        const btZone = new THREE.Mesh(new THREE.CircleGeometry(3, 32), new THREE.MeshBasicMaterial({color: 0x00aaff, transparent: true, opacity: 0.2, side: 2}));
+        btZone.rotation.x = -Math.PI/2; btZone.position.set(0, 0.05, 8); scene.add(btZone);
+
+        // --- ÉVAPORATEUR (HAUT) & MOTEUR (EXTÉRIEUR) ---
+        const evap = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 2), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
+        evap.position.set(0, 7.2, -3.5); scene.add(evap);
+        const fan = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x333333, side: 2}));
+        fan.position.set(0, 7.2, -2.49); scene.add(fan);
+
+        const motor = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshStandardMaterial({color: 0x333333}));
+        motor.position.set(7, 1.2, 0); scene.add(motor);
+
+        // --- SYSTÈME DE FLUX D'AIR (PARTICULES) ---
+        const particleCount = 50;
+        const particles = new THREE.Group();
+        const pGeo = new THREE.SphereGeometry(0.05, 8, 8);
+        const pMat = new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.6});
+        for(let i=0; i<particleCount; i++) {
+            const p = new THREE.Mesh(pGeo, pMat);
+            p.position.set(Math.random()*4-2, 7, -2.5);
+            particles.add(p);
+        }
+        scene.add(particles);
+
+        // --- LOGIQUE INTERACTIVE ---
         const tS = document.getElementById('tSlider');
         const wS = document.getElementById('wSlider');
+        const alertBox = document.getElementById('alertBox');
 
         function update() {
-            // Température
             const t = tS.value;
+            const w = wS.value;
             document.getElementById('tDisp').innerText = t + ".0°C";
-            if(t > 15) {
-                document.getElementById('alertStatus').innerText = "ALERTE CHALEUR";
-                document.getElementById('alertStatus').className = "alert danger";
+            document.getElementById('wDisp').innerText = w + " kg/m³";
+
+            // ALERTE TONNAGE (Seuil 25 kg/m³)
+            if(w > 25) {
+                alertBox.innerText = "ALERTE SURCHARGE !";
+                alertBox.className = "alert danger";
+                chamberMat.color.setHex(0xffaa00);
+            } else if(t > 15) {
+                alertBox.innerText = "ALERTE TEMPÉRATURE !";
+                alertBox.className = "alert danger";
                 chamberMat.color.setHex(0xff0000);
             } else {
-                document.getElementById('alertStatus').innerText = "SYSTÈME NOMINAL";
-                document.getElementById('alertStatus').className = "alert ok";
+                alertBox.innerText = "SYSTÈME OK";
+                alertBox.className = "alert ok";
                 chamberMat.color.setHex(0x00aaff);
             }
-            // Tonnage
-            const w = wS.value;
-            document.getElementById('wDisp').innerText = w + " kg";
-            pallets.forEach((p, i) => p.visible = i < (w / 100));
         }
-
         tS.addEventListener('input', update);
         wS.addEventListener('input', update);
-        update(); // Initialisation
 
         function animate() {
             requestAnimationFrame(animate);
-            fanExt.rotation.z += 0.2;
-            fanInt.rotation.z += 0.3;
+            fan.rotation.z += 0.3;
+            // Animation Flux d'air (Descend du haut vers le bas)
+            particles.children.forEach(p => {
+                p.position.y -= 0.05;
+                p.position.z += 0.02; // Effet de souffle
+                if(p.position.y < 0.2) {
+                    p.position.y = 7;
+                    p.position.z = -2.5;
+                }
+            });
             renderer.render(scene, camera);
         }
         animate();
