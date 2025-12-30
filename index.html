@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Chambre Froide Pro - Porte</title>
+    <title>Chambre Froide Pro - Équipement Complet</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: sans-serif; }
         #ui-controls {
@@ -34,50 +34,75 @@
         document.body.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(12, 10, 12);
+        camera.position.set(15, 12, 15);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-        scene.add(new THREE.GridHelper(20, 20, 0x333333, 0x222222));
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const light = new THREE.PointLight(0xffffff, 1);
+        light.position.set(10, 20, 10);
+        scene.add(light);
+        
+        scene.add(new THREE.GridHelper(30, 30, 0x333333, 0x222222));
 
-        // 1. LE CORPS DU CUBE (Parois Bleu Eau)
-        const geometry = new THREE.BoxGeometry(8, 5, 10);
+        // --- STRUCTURE PRINCIPALE ---
+        const geometry = new THREE.BoxGeometry(10, 8, 10);
         const material = new THREE.MeshStandardMaterial({ 
-            color: 0x0077be, // Bleu Eau
+            color: 0x0077be, 
             transparent: true, 
-            opacity: 0.4,
-            metalness: 0.5,
-            roughness: 0.2
+            opacity: 0.3,
+            metalness: 0.4,
+            roughness: 0.3
         });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.y = 2.5;
-        scene.add(mesh);
+        const chamber = new THREE.Mesh(geometry, material);
+        chamber.position.y = 4;
+        scene.add(chamber);
 
-        // 2. LES TRAITS ÉPAIS (Structure Grise)
-        const edges = new THREE.EdgesGeometry(geometry);
-        const lineMat = new THREE.LineBasicMaterial({ color: 0x888888, linewidth: 3 });
-        const wireframe = new THREE.LineSegments(edges, lineMat);
-        wireframe.position.y = 2.5;
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x888888, linewidth: 2 });
+        const wireframe = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), lineMat);
+        wireframe.position.y = 4;
         scene.add(wireframe);
 
-        // 3. LA PORTE (Sur la façade)
-        const doorGeo = new THREE.PlaneGeometry(2.5, 4); // Largeur 2.5, Hauteur 4
-        const doorMat = new THREE.MeshStandardMaterial({ 
-            color: 0x333333, // Gris foncé/Noir
-            side: THREE.DoubleSide,
-            metalness: 0.8
-        });
-        const door = new THREE.Mesh(doorGeo, doorMat);
-        // Positionner la porte sur la face avant (Z = 5.01 pour éviter le clignotement)
-        door.position.set(0, 2, 5.01); 
+        // --- LA PORTE ---
+        const door = new THREE.Mesh(
+            new THREE.PlaneGeometry(3, 6),
+            new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide })
+        );
+        door.position.set(0, 3, 5.01);
         scene.add(door);
 
-        // Cadre de la porte (Traits épais gris)
-        const doorFrameGeo = new THREE.EdgesGeometry(doorGeo);
-        const doorFrame = new THREE.LineSegments(doorFrameGeo, new THREE.LineBasicMaterial({ color: 0x888888, linewidth: 2 }));
-        doorFrame.position.set(0, 2, 5.02);
-        scene.add(doorFrame);
+        // --- ÉVAPORATEUR (Intérieur) ---
+        const evapGroup = new THREE.Group();
+        const evapBody = new THREE.Mesh(
+            new THREE.BoxGeometry(4, 1.5, 2),
+            new THREE.MeshStandardMaterial({ color: 0xcccccc })
+        );
+        evapGroup.add(evapBody);
+        
+        // Petits ventilos de l'évaporateur
+        for(let i = -1; i <= 1; i++) {
+            const fan = new THREE.Mesh(new THREE.CircleGeometry(0.5, 32), new THREE.MeshBasicMaterial({color: 0x333333}));
+            fan.position.set(i*1.2, 0, 1.01);
+            evapGroup.add(fan);
+        }
+        evapGroup.position.set(0, 6.5, -3);
+        scene.add(evapGroup);
 
-        // Logique Slider
+        // --- MOTEUR EXTÉRIEUR (Groupe Condenseur) ---
+        const motorGroup = new THREE.Group();
+        const motorBody = new THREE.Mesh(
+            new THREE.BoxGeometry(3, 3, 3),
+            new THREE.MeshStandardMaterial({ color: 0x444444 })
+        );
+        motorGroup.add(motorBody);
+        
+        const mainFan = new THREE.Mesh(new THREE.CircleGeometry(1.2, 32), new THREE.MeshBasicMaterial({color: 0x111111}));
+        mainFan.position.set(1.51, 0, 0);
+        mainFan.rotation.y = Math.PI / 2;
+        motorGroup.add(mainFan);
+
+        motorGroup.position.set(6.6, 1.5, 2);
+        scene.add(motorGroup);
+
+        // --- LOGIQUE INTERACTIVE ---
         const slider = document.getElementById('tempSlider');
         const display = document.getElementById('tempDisplay');
         const status = document.getElementById('status');
@@ -86,19 +111,23 @@
             const val = parseFloat(e.target.value);
             display.innerText = val.toFixed(1) + "°C";
             if(val > 7) {
-                lineMat.color.setHex(0xff4444); // Traits deviennent rouges
+                lineMat.color.setHex(0xff4444);
                 display.style.color = "#ff4444";
                 status.innerText = "ALERTE : TEMP. ÉLEVÉE";
                 status.style.color = "#ff4444";
             } else {
-                lineMat.color.setHex(0x888888); // Retour au gris
+                lineMat.color.setHex(0x888888);
                 display.style.color = "#00aaff";
                 status.innerText = "NORMAL";
                 status.style.color = "#00ff88";
             }
         });
 
-        function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+        function animate() { 
+            requestAnimationFrame(animate); 
+            controls.update(); 
+            renderer.render(scene, camera); 
+        }
         animate();
     </script>
 </body>
