@@ -3,42 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oxyone - Monitoring Bluetooth & Logistique</title>
+    <title>Oxyone - Jumeau Numérique Complet</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; overflow: hidden; background: #050505; font-family: sans-serif; }
         #desktop-panel {
             position: absolute; top: 20px; left: 20px;
             background: rgba(10, 10, 10, 0.95); color: white;
             padding: 20px; border-radius: 12px; border: 2px solid #00aaff;
-            z-index: 1000; width: 260px; box-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
+            z-index: 1000; width: 260px;
         }
-        .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .label { font-size: 11px; color: #888; text-transform: uppercase; }
         .value { font-size: 24px; font-weight: bold; color: #00aaff; margin-bottom: 10px; }
         .alert-box { padding: 10px; border-radius: 5px; background: #1a1a1a; font-weight: bold; text-align: center; margin-top: 10px; border: 1px solid #333; }
-        input[type=range] { width: 100%; cursor: pointer; margin-bottom: 15px; }
-        .danger { color: #ff4444 !important; border-color: #ff4444 !important; animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .ok { color: #00ff88 !important; }
-        .bt-active { color: #00aaff !important; border-color: #00aaff !important; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .ok { color: #00ff88; }
+        .bt-active { color: #00aaff; border-color: #00aaff; }
     </style>
 </head>
 <body>
     <div id="desktop-panel">
-        <div class="label">Supervision Bluetooth Oxyone</div>
-        <hr style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
-        
-        <div class="label">Statut Bluetooth</div>
+        <div class="label">Supervision Bluetooth</div>
         <div id="btStatus" class="alert-box ok">SCANNING...</div>
-        
-        <div style="margin-top:15px;" class="label">Température (°C)</div>
+        <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+        <div class="label">Température (°C)</div>
         <div id="tempDisplay" class="value">4.0°C</div>
-        <input type="range" id="tempSlider" min="-20" max="20" value="4" step="0.5">
-        
+        <input type="range" id="tempSlider" min="-20" max="20" value="4">
         <div class="label">Tonnage (kg/m³)</div>
         <div id="tonDisplay" class="value">150 kg/m³</div>
-        <input type="range" id="tonSlider" min="0" max="500" value="150" step="10">
-
-        <div id="alertBox" class="alert-box ok">SYSTÈME OK</div>
+        <input type="range" id="tonSlider" min="0" max="500" value="150">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -50,100 +42,79 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-        
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         camera.position.set(15, 12, 20);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
         const sun = new THREE.DirectionalLight(0xffffff, 1);
-        sun.position.set(10, 20, 10);
-        scene.add(sun);
+        sun.position.set(10, 20, 10); scene.add(sun);
         scene.add(new THREE.GridHelper(40, 40, 0x222222, 0x111111));
 
-        // --- CHAMBRE FROIDE ---
+        // --- CHAMBRE ---
         const chamberMat = new THREE.MeshStandardMaterial({ color: 0x0077be, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
         const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), chamberMat);
-        chamber.position.y = 4;
-        scene.add(chamber);
+        chamber.position.y = 4; scene.add(chamber);
 
         // --- STRUCTURE ---
         const frameMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
-        function addBeam(w, h, d, x, y, z) {
-            const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
-            b.position.set(x, y, z);
-            scene.add(b);
+        function addPart(w, h, d, x, y, z, mat) {
+            const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            m.position.set(x, y, z); scene.add(m); return m;
         }
-        [[-5,5], [5,5], [-5,-5], [5,-5]].forEach(p => addBeam(0.6, 8, 0.6, p[0], 4, p[1]));
-        [0, 8].forEach(y => {
-            addBeam(10.6, 0.6, 0.6, 0, y, 5); addBeam(10.6, 0.6, 0.6, 0, y, -5);
-            addBeam(0.6, 0.6, 10.6, 5, y, 0); addBeam(0.6, 0.6, 10.6, -5, y, 0);
-        });
+        // Poutres
+        [[-5,5], [5,5], [-5,-5], [5,-5]].forEach(p => addPart(0.6, 8, 0.6, p[0], 4, p[1], frameMat));
 
-        // --- DÉTECTEUR BLUETOOTH (Dôme au plafond) ---
-        const btDetector = new THREE.Group();
-        const dome = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({color: 0x333333}));
-        const btLight = new THREE.PointLight(0x00aaff, 2, 10);
-        btDetector.add(dome, btLight);
-        btDetector.position.set(0, 7.9, 0);
-        scene.add(btDetector);
+        // --- ÉTAGÈRES ET PALETTES ---
+        const shelfMat = new THREE.MeshStandardMaterial({ color: 0x777777 });
+        const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+        for(let h=2; h<7; h+=2) {
+            addPart(3, 0.1, 8, -3, h, 0, shelfMat); // Gauche
+            addPart(3, 0.1, 8, 3, h, 0, shelfMat);  // Droite
+            // Palettes
+            addPart(1.5, 0.2, 1.5, -3, h+0.2, -2, woodMat);
+            addPart(1.5, 0.2, 1.5, 3, h+0.2, 2, woodMat);
+        }
 
-        // --- ZONE ROUGE (ALERTE BLUETOOTH) ---
-        const zoneGeo = new THREE.RingGeometry(2.5, 3, 32);
-        const zoneMat = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
-        const zone = new THREE.Mesh(zoneGeo, zoneMat);
-        zone.rotation.x = Math.PI / 2;
-        zone.position.set(0, 0.05, 8);
-        scene.add(zone);
-
-        // --- CHARIOT (Mobile) ---
-        const cart = new THREE.Group();
-        cart.add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 2.5), new THREE.MeshStandardMaterial({color: 0xffcc00})));
-        cart.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 2, 0.1), new THREE.MeshStandardMaterial({color: 0x111111})));
-        cart.position.set(0, 0.5, 12);
-        scene.add(cart);
-
-        // --- MOTEUR & EVAPORATEUR ---
+        // --- MOTEUR EXTÉRIEUR (BLOC GRIS) ---
+        const motorBox = addPart(2, 2, 2, 7, 1.5, 0, new THREE.MeshStandardMaterial({color: 0x333333}));
         const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x00aaff, side: 2}));
         fanExt.position.set(7, 1.5, 1.01); scene.add(fanExt);
+
+        // --- ÉVAPORATEUR INTÉRIEUR (BLOC BLANC) ---
+        const evapBox = addPart(4, 1.5, 2, 0, 6.5, -3.5, new THREE.MeshStandardMaterial({color: 0xeeeeee}));
         const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x333333, side: 2}));
         fanInt.position.set(0, 6.5, -2.49); scene.add(fanInt);
 
-        // --- LOGIQUE DASHBOARD ---
-        const tS = document.getElementById('tempSlider');
-        const wS = document.getElementById('tonSlider');
-        const btStatus = document.getElementById('btStatus');
+        // --- BLUETOOTH ZONE & DÉTECTEUR ---
+        addPart(1, 0.2, 1, 0, 7.9, 0, new THREE.MeshStandardMaterial({color: 0x111111})); // Dôme
+        const zone = new THREE.Mesh(new THREE.RingGeometry(2.5, 3, 32), new THREE.MeshBasicMaterial({ color: 0xff0000, side: 2, transparent: true, opacity: 0.5 }));
+        zone.rotation.x = Math.PI/2; zone.position.set(0, 0.1, 8); scene.add(zone);
 
+        // --- CHARIOT ---
+        const cart = new THREE.Group();
+        cart.add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 2.5), new THREE.MeshStandardMaterial({color: 0xffcc00})));
+        cart.position.set(0, 0.5, 12); scene.add(cart);
+
+        // --- LOGIQUE ---
         function animate() {
             requestAnimationFrame(animate);
+            fanExt.rotation.z += 0.2; fanInt.rotation.z += 0.3;
             
-            // Animation Ventilateurs
-            fanExt.rotation.z += 0.2; 
-            fanInt.rotation.z += 0.3;
-
-            // Déplacement automatique du chariot pour tester le Bluetooth
-            const time = Date.now() * 0.001;
-            cart.position.z = 8 + Math.sin(time) * 5;
-
-            // Détection de zone (Collision simple)
-            const distance = cart.position.distanceTo(zone.position);
-            if(distance < 3) {
-                btStatus.innerText = "SIGNAL DETECTÉ : TAG_01";
-                btStatus.className = "alert-box bt-active";
-                zoneMat.opacity = 1;
-                btLight.intensity = 5;
+            // Simulation mouvement chariot & Bluetooth
+            cart.position.z = 8 + Math.sin(Date.now()*0.001) * 5;
+            const dist = cart.position.distanceTo(zone.position);
+            const bt = document.getElementById('btStatus');
+            if(dist < 3) {
+                bt.innerText = "SIGNAL DETECTÉ"; bt.className = "alert-box bt-active";
+                zone.material.opacity = 1;
             } else {
-                btStatus.innerText = "SCANNING...";
-                btStatus.className = "alert-box ok";
-                zoneMat.opacity = 0.3;
-                btLight.intensity = 1;
+                bt.innerText = "SCANNING..."; bt.className = "alert-box ok";
+                zone.material.opacity = 0.3;
             }
 
-            // Mise à jour Temp/Poids
-            const t = parseFloat(tS.value); const w = parseInt(wS.value);
-            document.getElementById('tempDisplay').innerText = t.toFixed(1) + "°C";
-            document.getElementById('tonDisplay').innerText = w + " kg/m³";
+            document.getElementById('tempDisplay').innerText = document.getElementById('tempSlider').value + ".0°C";
+            document.getElementById('tonDisplay').innerText = document.getElementById('tonSlider').value + " kg/m³";
             
-            controls.update();
             renderer.render(scene, camera);
         }
         animate();
