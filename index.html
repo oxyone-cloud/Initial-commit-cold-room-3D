@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oxyone - Jumeau Numérique Complet</title>
+    <title>Oxyone - Monitoring Bluetooth & Logistique</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; }
         #desktop-panel {
@@ -19,18 +19,25 @@
         .danger { color: #ff4444 !important; border-color: #ff4444 !important; animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .ok { color: #00ff88 !important; }
+        .bt-active { color: #00aaff !important; border-color: #00aaff !important; }
     </style>
 </head>
 <body>
     <div id="desktop-panel">
-        <div class="label">Supervision Réseau Oxyone</div>
-        <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
-        <div class="label">Température (°C)</div>
+        <div class="label">Supervision Bluetooth Oxyone</div>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
+        
+        <div class="label">Statut Bluetooth</div>
+        <div id="btStatus" class="alert-box ok">SCANNING...</div>
+        
+        <div style="margin-top:15px;" class="label">Température (°C)</div>
         <div id="tempDisplay" class="value">4.0°C</div>
         <input type="range" id="tempSlider" min="-20" max="20" value="4" step="0.5">
+        
         <div class="label">Tonnage (kg/m³)</div>
         <div id="tonDisplay" class="value">150 kg/m³</div>
         <input type="range" id="tonSlider" min="0" max="500" value="150" step="10">
+
         <div id="alertBox" class="alert-box ok">SYSTÈME OK</div>
     </div>
 
@@ -47,14 +54,14 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         camera.position.set(15, 12, 20);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
         const sun = new THREE.DirectionalLight(0xffffff, 1);
         sun.position.set(10, 20, 10);
         scene.add(sun);
         scene.add(new THREE.GridHelper(40, 40, 0x222222, 0x111111));
 
         // --- CHAMBRE FROIDE ---
-        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x0077be, transparent: true, opacity: 0.25, side: THREE.DoubleSide });
+        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x0077be, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
         const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), chamberMat);
         chamber.position.y = 4;
         scene.add(chamber);
@@ -72,76 +79,70 @@
             addBeam(0.6, 0.6, 10.6, 5, y, 0); addBeam(0.6, 0.6, 10.6, -5, y, 0);
         });
 
-        // --- ÉTAGÈRES ET PALETTES INTERIEURES ---
-        const shelfMat = new THREE.MeshStandardMaterial({ color: 0x777777 });
-        const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-        for(let h=2; h<7; h+=2) {
-            // Etagères
-            addBeam(3, 0.1, 8, -3, h, 0); 
-            addBeam(3, 0.1, 8, 3, h, 0);
-            // Quelques palettes sur les étagères
-            const pal1 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 1.5), woodMat);
-            pal1.position.set(-3, h+0.2, -2); scene.add(pal1);
-            const pal2 = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 1.5), woodMat);
-            pal2.position.set(3, h+0.2, 2); scene.add(pal2);
-        }
+        // --- DÉTECTEUR BLUETOOTH (Dôme au plafond) ---
+        const btDetector = new THREE.Group();
+        const dome = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({color: 0x333333}));
+        const btLight = new THREE.PointLight(0x00aaff, 2, 10);
+        btDetector.add(dome, btLight);
+        btDetector.position.set(0, 7.9, 0);
+        scene.add(btDetector);
 
-        // --- PORTE ---
-        const door = new THREE.Mesh(new THREE.BoxGeometry(3.5, 6, 0.3), new THREE.MeshStandardMaterial({color: 0x111111}));
-        door.position.set(0, 3, 5);
-        scene.add(door);
+        // --- ZONE ROUGE (ALERTE BLUETOOTH) ---
+        const zoneGeo = new THREE.RingGeometry(2.5, 3, 32);
+        const zoneMat = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+        const zone = new THREE.Mesh(zoneGeo, zoneMat);
+        zone.rotation.x = Math.PI / 2;
+        zone.position.set(0, 0.05, 8);
+        scene.add(zone);
 
-        // --- MOTEUR EXTERIEUR (COMPLET) ---
-        const motorGroup = new THREE.Group();
-        const motorBox = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshStandardMaterial({color: 0x333333}));
-        const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x00aaff, side: 2}));
-        fanExt.position.set(0, 0, 1.01); 
-        motorGroup.add(motorBox, fanExt);
-        motorGroup.position.set(7, 1.5, 0);
-        scene.add(motorGroup);
-
-        // --- EVAPORATEUR INTERIEUR (COMPLET) ---
-        const evapGroup = new THREE.Group();
-        const evapBox = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 2), new THREE.MeshStandardMaterial({color: 0xdddddd}));
-        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x333333, side: 2}));
-        fanInt.position.set(0, 0, 1.01);
-        evapGroup.add(evapBox, fanInt);
-        evapGroup.position.set(0, 6.5, -3.5);
-        scene.add(evapGroup);
-
-        // --- CHARIOT ---
+        // --- CHARIOT (Mobile) ---
         const cart = new THREE.Group();
-        const base = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 2.5), new THREE.MeshStandardMaterial({color: 0xffcc00}));
-        const handle = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2, 0.1), new THREE.MeshStandardMaterial({color: 0x111111}));
-        handle.position.set(0, 1, 1.2);
-        cart.add(base, handle);
-        cart.position.set(0, 0.5, 9);
+        cart.add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 2.5), new THREE.MeshStandardMaterial({color: 0xffcc00})));
+        cart.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 2, 0.1), new THREE.MeshStandardMaterial({color: 0x111111})));
+        cart.position.set(0, 0.5, 12);
         scene.add(cart);
+
+        // --- MOTEUR & EVAPORATEUR ---
+        const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x00aaff, side: 2}));
+        fanExt.position.set(7, 1.5, 1.01); scene.add(fanExt);
+        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x333333, side: 2}));
+        fanInt.position.set(0, 6.5, -2.49); scene.add(fanInt);
 
         // --- LOGIQUE DASHBOARD ---
         const tS = document.getElementById('tempSlider');
         const wS = document.getElementById('tonSlider');
-        const alertBox = document.getElementById('alertBox');
-
-        function update() {
-            const t = parseFloat(tS.value); const w = parseInt(wS.value);
-            document.getElementById('tempDisplay').innerText = t.toFixed(1) + "°C";
-            document.getElementById('tonDisplay').innerText = w + " kg/m³";
-            if (t > 7 || w > 250) {
-                alertBox.className = "alert-box danger";
-                alertBox.innerText = (t > 7 && w > 250) ? "DANGER GLOBAL" : (t > 7 ? "ALERTE TEMP" : "ALERTE CHARGE");
-                chamberMat.color.setHex(0xff0000);
-            } else {
-                alertBox.className = "alert-box ok"; alertBox.innerText = "SYSTÈME OK";
-                chamberMat.color.setHex(0x0077be);
-            }
-        }
-        tS.addEventListener('input', update); wS.addEventListener('input', update);
+        const btStatus = document.getElementById('btStatus');
 
         function animate() {
             requestAnimationFrame(animate);
+            
+            // Animation Ventilateurs
             fanExt.rotation.z += 0.2; 
             fanInt.rotation.z += 0.3;
+
+            // Déplacement automatique du chariot pour tester le Bluetooth
+            const time = Date.now() * 0.001;
+            cart.position.z = 8 + Math.sin(time) * 5;
+
+            // Détection de zone (Collision simple)
+            const distance = cart.position.distanceTo(zone.position);
+            if(distance < 3) {
+                btStatus.innerText = "SIGNAL DETECTÉ : TAG_01";
+                btStatus.className = "alert-box bt-active";
+                zoneMat.opacity = 1;
+                btLight.intensity = 5;
+            } else {
+                btStatus.innerText = "SCANNING...";
+                btStatus.className = "alert-box ok";
+                zoneMat.opacity = 0.3;
+                btLight.intensity = 1;
+            }
+
+            // Mise à jour Temp/Poids
+            const t = parseFloat(tS.value); const w = parseInt(wS.value);
+            document.getElementById('tempDisplay').innerText = t.toFixed(1) + "°C";
+            document.getElementById('tonDisplay').innerText = w + " kg/m³";
+            
             controls.update();
             renderer.render(scene, camera);
         }
