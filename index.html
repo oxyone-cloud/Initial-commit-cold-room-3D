@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Chambre Froide - Finition Pro</title>
+    <title>Chambre Froide - Finition Totale</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: sans-serif; }
         #ui-controls {
             position: absolute; top: 20px; left: 20px;
-            background: rgba(0, 0, 0, 0.85); color: white;
+            background: rgba(0, 0, 0, 0.9); color: white;
             padding: 20px; border-radius: 10px; border: 2px solid #fff;
             z-index: 1000; width: 220px;
         }
@@ -20,7 +20,7 @@
         <div style="font-size: 11px; color: #aaa;">MONITORING INDUSTRIEL</div>
         <div id="tempDisplay" class="temp-val">4.0°C</div>
         <input type="range" id="tempSlider" min="-20" max="20" value="4" step="0.5">
-        <div id="status" style="color:#00ff88; font-weight:bold; margin-top:10px;">NORMAL</div>
+        <div id="status" style="color:#00ff88; font-weight:bold; margin-top:10px;">SYSTÈME OK</div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -36,7 +36,7 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         camera.position.set(15, 12, 15);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
         const light = new THREE.PointLight(0xffffff, 1);
         light.position.set(10, 20, 10);
         scene.add(light);
@@ -44,58 +44,59 @@
         scene.add(new THREE.GridHelper(30, 30, 0x333333, 0x222222));
 
         // --- CHAMBRE (Parois Bleu Eau) ---
-        const chamberGeo = new THREE.BoxGeometry(10, 8, 10);
         const chamberMat = new THREE.MeshStandardMaterial({ 
-            color: 0x0077be, transparent: true, opacity: 0.35, metalness: 0.3
+            color: 0x0077be, transparent: true, opacity: 0.3, metalness: 0.3
         });
-        const chamber = new THREE.Mesh(chamberGeo, chamberMat);
+        const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), chamberMat);
         chamber.position.y = 4;
         scene.add(chamber);
 
-        // --- STRUCTURE EXTÉRIEURE ÉPAISSE (Gris) ---
-        // On utilise des cylindres ou des boites fines pour simuler des traits épais
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x555555 });
+        // --- STRUCTURE EXTÉRIEURE TRÈS ÉPAISSE (Gris Foncé) ---
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
         function addBar(w, h, d, x, y, z) {
             const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
             bar.position.set(x, y, z);
             scene.add(bar);
         }
-        // Montants verticaux épais
-        addBar(0.4, 8, 0.4, 5, 4, 5); addBar(0.4, 8, 0.4, -5, 4, 5);
-        addBar(0.4, 8, 0.4, 5, 4, -5); addBar(0.4, 8, 0.4, -5, 4, -5);
+        // Montants verticaux (angles)
+        addBar(0.6, 8, 0.6, 5, 4, 5); addBar(0.6, 8, 0.6, -5, 4, 5);
+        addBar(0.6, 8, 0.6, 5, 4, -5); addBar(0.6, 8, 0.6, -5, 4, -5);
+        // Barres horizontales (haut et bas)
+        addBar(10, 0.6, 0.6, 0, 8, 5); addBar(10, 0.6, 0.6, 0, 0, 5);
+        addBar(10, 0.6, 0.6, 0, 8, -5); addBar(10, 0.6, 0.6, 0, 0, -5);
+        addBar(0.6, 0.6, 10, 5, 8, 0); addBar(0.6, 0.6, 10, 5, 0, 0);
+        addBar(0.6, 0.6, 10, -5, 8, 0); addBar(0.6, 0.6, 10, -5, 0, 0);
 
-        // --- COINS BLANCS INTÉRIEURS (Profilés 90°) ---
+        // --- TOUS LES COINS BLANCS INTÉRIEURS (Profilés sanitaires) ---
         const cornerMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-        function addCorner(x, z) {
-            const c = new THREE.Mesh(new THREE.BoxGeometry(0.2, 7.8, 0.2), cornerMat);
-            c.position.set(x, 4, z);
+        function addInnerLine(w, h, d, x, y, z) {
+            const c = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), cornerMat);
+            c.position.set(x, y, z);
             scene.add(c);
         }
-        addCorner(4.8, 4.8); addCorner(-4.8, 4.8);
-        addCorner(4.8, -4.8); addCorner(-4.8, -4.8);
+        // Coins Verticaux
+        addInnerLine(0.2, 7.6, 0.2, 4.7, 4, 4.7); addInnerLine(0.2, 7.6, 0.2, -4.7, 4, 4.7);
+        addInnerLine(0.2, 7.6, 0.2, 4.7, 4, -4.7); addInnerLine(0.2, 7.6, 0.2, -4.7, 4, -4.7);
+        // Coins Horizontaux Plafond
+        addInnerLine(9.4, 0.2, 0.2, 0, 7.7, 4.7); addInnerLine(9.4, 0.2, 0.2, 0, 7.7, -4.7);
+        addInnerLine(0.2, 0.2, 9.4, 4.7, 7.7, 0); addInnerLine(0.2, 0.2, 9.4, -4.7, 7.7, 0);
+        // Coins Horizontaux Sol
+        addInnerLine(9.4, 0.2, 0.2, 0, 0.3, 4.7); addInnerLine(9.4, 0.2, 0.2, 0, 0.3, -4.7);
+        addInnerLine(0.2, 0.2, 9.4, 4.7, 0.3, 0); addInnerLine(0.2, 0.2, 9.4, -4.7, 0.3, 0);
 
         // --- PORTE ---
-        const door = new THREE.Mesh(
-            new THREE.BoxGeometry(3, 6, 0.2),
-            new THREE.MeshStandardMaterial({ color: 0x222222 })
-        );
+        const door = new THREE.Mesh(new THREE.BoxGeometry(3, 6, 0.2), new THREE.MeshStandardMaterial({ color: 0x222222 }));
         door.position.set(0, 3, 5);
         scene.add(door);
 
-        // --- ÉVAPORATEUR UNIQUE ---
-        const evap = new THREE.Mesh(
-            new THREE.BoxGeometry(4, 1.2, 1.5),
-            new THREE.MeshStandardMaterial({ color: 0xeeeeee })
-        );
+        // --- ÉVAPORATEUR ---
+        const evap = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 1.5), new THREE.MeshStandardMaterial({ color: 0xeeeeee }));
         evap.position.set(0, 6.8, -3.5);
         scene.add(evap);
 
         // --- MOTEUR EXTÉRIEUR ---
-        const motor = new THREE.Mesh(
-            new THREE.BoxGeometry(2.5, 2.5, 2.5),
-            new THREE.MeshStandardMaterial({ color: 0x333333 })
-        );
-        motor.position.set(6.5, 1.5, 0);
+        const motor = new THREE.Mesh(new THREE.BoxGeometry(2.5, 2.5, 2.5), new THREE.MeshStandardMaterial({ color: 0x333333 }));
+        motor.position.set(6.8, 1.5, 0);
         scene.add(motor);
 
         // --- LOGIQUE SLIDER ---
@@ -113,7 +114,7 @@
                 chamberMat.color.setHex(0xff3333);
             } else {
                 display.style.color = "#00aaff";
-                status.innerText = "NORMAL";
+                status.innerText = "SYSTÈME OK";
                 status.style.color = "#00ff88";
                 chamberMat.color.setHex(0x0077be);
             }
