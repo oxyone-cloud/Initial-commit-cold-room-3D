@@ -2,31 +2,34 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oxyone - Jumeau Numérique Fix</title>
+    <title>Oxyone - Digital Twin Cold Room</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
-        #panel {
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; }
+        #ui-panel {
             position: absolute; top: 20px; left: 20px;
-            background: rgba(15, 15, 15, 0.9); color: white;
-            padding: 20px; border-radius: 10px; border: 2px solid #00aaff;
-            z-index: 10; width: 250px;
+            background: rgba(15, 15, 15, 0.95); padding: 20px; border-radius: 12px; 
+            border: 2px solid #00aaff; z-index: 100; width: 280px; box-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
         }
-        .label { font-size: 11px; color: #888; text-transform: uppercase; }
-        .value { font-size: 22px; font-weight: bold; color: #00aaff; margin-bottom: 10px; }
-        .alert { padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-top: 10px; border: 1px solid #333; }
-        .danger { background: rgba(255, 0, 0, 0.3); color: #ff4444; border-color: #ff4444; }
-        .ok { background: rgba(0, 255, 136, 0.1); color: #00ff88; }
-        input { width: 100%; cursor: pointer; }
+        .label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .value { font-size: 24px; font-weight: bold; color: #00aaff; margin-bottom: 15px; }
+        .alert { padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; border: 1px solid #333; margin-bottom: 15px; transition: 0.3s; }
+        .ok { background: rgba(0, 255, 136, 0.1); color: #00ff88; border-color: #00ff88; }
+        .danger { background: rgba(255, 0, 0, 0.2); color: #ff4444; border-color: #ff4444; }
+        input[type=range] { width: 100%; cursor: pointer; margin-bottom: 15px; accent-color: #00aaff; }
     </style>
 </head>
 <body>
-    <div id="panel">
-        <div class="label">Système Oxyone</div>
-        <div id="alertBox" class="alert ok">SYSTÈME OK</div>
-        <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-        <div class="label">Température</div>
-        <div id="tVal" class="value">4.0°C</div>
+    <div id="ui-panel">
+        <div class="label">Statut Supervision</div>
+        <div id="alertStatus" class="alert ok">SYSTÈME NOMINAL</div>
+        
+        <div class="label">Température (°C)</div>
+        <div id="tDisp" class="value">4.0°C</div>
         <input type="range" id="tSlider" min="-20" max="40" value="4">
+
+        <div class="label">Charge Stockée (Tonnage)</div>
+        <div id="wDisp" class="value">200 kg</div>
+        <input type="range" id="wSlider" min="0" max="1000" value="200" step="100">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -39,82 +42,81 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(15, 15, 20);
+        camera.position.set(16, 12, 18);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 1));
-        const grid = new THREE.GridHelper(40, 40, 0x444444, 0x222222);
-        scene.add(grid);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(10, 20, 10); scene.add(dirLight);
+        scene.add(new THREE.GridHelper(40, 40, 0x222222, 0x111111));
 
         // --- MATÉRIAUX ---
-        const blueMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
-        const greyMat = new THREE.MeshStandardMaterial({ color: 0x888888 });
-        const blackMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
-        const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const chamberMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.15, side: 2 });
+        const metalMat = new THREE.MeshStandardMaterial({ color: 0x777777, metalness: 0.9, roughness: 0.2 });
+        const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
 
-        // --- CHAMBRE (CUBE BLEU) ---
-        const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), blueMat);
-        chamber.position.y = 4;
-        chamber.renderOrder = 2; // Dessiné en dernier pour voir à travers
-        scene.add(chamber);
+        // --- CHAMBRE ET STRUCTURE ---
+        const chamber = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 10), chamberMat);
+        chamber.position.y = 4; scene.add(chamber);
 
-        // --- STRUCTURE GRISE (Angles) ---
-        function addPillar(x, z) {
-            const p = new THREE.Mesh(new THREE.BoxGeometry(0.6, 8.1, 0.6), greyMat);
-            p.position.set(x, 4, z);
-            p.renderOrder = 1; 
+        function createPart(w, h, d, x, y, z, mat) {
+            const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            m.position.set(x, y, z); scene.add(m); return m;
+        }
+        // Piliers et traverses
+        createPart(0.4, 8, 0.4, 5, 4, 5, metalMat); createPart(0.4, 8, 0.4, -5, 4, 5, metalMat);
+        createPart(0.4, 8, 0.4, 5, 4, -5, metalMat); createPart(0.4, 8, 0.4, -5, 4, -5, metalMat);
+        createPart(10.4, 0.4, 0.4, 0, 8, 5, metalMat); createPart(0.4, 6, 4, 0, 3, 5, new THREE.MeshStandardMaterial({color: 0x111111})); // Porte
+
+        // --- MOTEUR & EVAPORATEUR ---
+        const motor = createPart(2, 2, 2, 7, 1, 0, new THREE.MeshStandardMaterial({color: 0x333333}));
+        const fanExt = new THREE.Mesh(new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({color: 0x00aaff, side: 2}));
+        fanExt.position.set(7, 1, 1.05); scene.add(fanExt);
+
+        const evap = createPart(4, 1.5, 2, 0, 6.8, -3.5, new THREE.MeshStandardMaterial({color: 0xeeeeee}));
+        const fanInt = new THREE.Mesh(new THREE.CircleGeometry(0.6, 16), new THREE.MeshBasicMaterial({color: 0x222222, side: 2}));
+        fanInt.position.set(0, 6.8, -2.45); scene.add(fanInt);
+
+        // --- SYSTEME DE TONNAGE (PALETTES) ---
+        const pallets = [];
+        for(let i=0; i<10; i++) {
+            const p = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.2, 1.5), woodMat);
+            p.position.set(i < 5 ? -3.5 : 3.5, 0.7 + (i % 5) * 1.5, Math.random() * 6 - 3);
+            p.visible = false;
             scene.add(p);
-        }
-        addPillar(5, 5); addPillar(-5, 5); addPillar(5, -5); addPillar(-5, -5);
-
-        // --- PORTE NOIRE ---
-        const door = new THREE.Mesh(new THREE.BoxGeometry(4, 6, 0.4), blackMat);
-        door.position.set(0, 3, 5.1); // Un peu en avant du cube
-        door.renderOrder = 1;
-        scene.add(door);
-
-        // --- MOTEUR EXTÉRIEUR ---
-        const motor = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), blackMat);
-        motor.position.set(7, 1.5, 0);
-        motor.renderOrder = 1;
-        scene.add(motor);
-
-        // --- ÉVAPORATEUR INTÉRIEUR ---
-        const evap = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 2), whiteMat);
-        evap.position.set(0, 7, -3);
-        evap.renderOrder = 1;
-        scene.add(evap);
-
-        // --- ÉTAGÈRES ---
-        for(let h=2; h<7; h+=2.5) {
-            const sG = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 8), greyMat);
-            sG.position.set(-3.2, h, 0);
-            sG.renderOrder = 1;
-            scene.add(sG);
+            pallets.push(p);
         }
 
-        // --- LOGIQUE SLIDER ---
-        const slider = document.getElementById('tSlider');
-        const tVal = document.getElementById('tVal');
-        const alertBox = document.getElementById('alertBox');
+        // --- INTERACTION ---
+        const tS = document.getElementById('tSlider');
+        const wS = document.getElementById('wSlider');
 
-        slider.addEventListener('input', () => {
-            const v = slider.value;
-            tVal.innerText = v + ".0°C";
-            if(v > 15) {
-                alertBox.innerText = "ALERTE !";
-                alertBox.className = "alert danger";
-                blueMat.color.setHex(0xff0000);
-                blueMat.opacity = 0.5;
+        function update() {
+            // Température
+            const t = tS.value;
+            document.getElementById('tDisp').innerText = t + ".0°C";
+            if(t > 15) {
+                document.getElementById('alertStatus').innerText = "ALERTE CHALEUR";
+                document.getElementById('alertStatus').className = "alert danger";
+                chamberMat.color.setHex(0xff0000);
             } else {
-                alertBox.innerText = "SYSTÈME OK";
-                alertBox.className = "alert ok";
-                blueMat.color.setHex(0x00aaff);
-                blueMat.opacity = 0.2;
+                document.getElementById('alertStatus').innerText = "SYSTÈME NOMINAL";
+                document.getElementById('alertStatus').className = "alert ok";
+                chamberMat.color.setHex(0x00aaff);
             }
-        });
+            // Tonnage
+            const w = wS.value;
+            document.getElementById('wDisp').innerText = w + " kg";
+            pallets.forEach((p, i) => p.visible = i < (w / 100));
+        }
+
+        tS.addEventListener('input', update);
+        wS.addEventListener('input', update);
+        update(); // Initialisation
 
         function animate() {
             requestAnimationFrame(animate);
+            fanExt.rotation.z += 0.2;
+            fanInt.rotation.z += 0.3;
             renderer.render(scene, camera);
         }
         animate();
