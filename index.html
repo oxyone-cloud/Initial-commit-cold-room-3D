@@ -1,76 +1,69 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Simulation Chambre Froide 3D</title>
+    <title>Chambre Froide Dashboard</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #111; }
-        #ui {
+        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
+        #ui-controls {
             position: absolute; top: 20px; left: 20px;
-            color: white; font-family: sans-serif;
-            background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px;
+            background: rgba(0, 0, 0, 0.85); color: white;
+            padding: 20px; border-radius: 10px; border: 2px solid #00aaff;
+            z-index: 1000; width: 220px;
         }
+        .temp-val { font-size: 32px; font-weight: bold; color: #00aaff; margin: 10px 0; }
+        input[type=range] { width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div id="ui">
-        <h2>Chambre Froide 3D</h2>
-        <p>Utilisez la souris pour pivoter et zoomer</p>
+    <div id="ui-controls">
+        <div style="font-size: 12px; color: #888;">CONTRÔLE SYSTÈME</div>
+        <div id="tempDisplay" class="temp-val">4.0°C</div>
+        <input type="range" id="tempSlider" min="-20" max="20" value="4" step="0.5">
+        <div id="status" style="color:#00ff88; font-weight:bold; margin-top:10px;">NORMAL</div>
+        <div style="font-size: 10px; color: #555; margin-top: 10px;">Souris : Pivoter / Zoomer</div>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
     <script>
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
-        // Lumières
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(5, 10, 7);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x404040));
-
-        // Sol (Grille)
-        const grid = new THREE.GridHelper(20, 20, 0x888888, 0x444444);
-        scene.add(grid);
-
-        // La Chambre Froide (Structure)
-        const geometry = new THREE.BoxGeometry(4, 3, 5);
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x00aaff, 
-            transparent: true, 
-            opacity: 0.4,
-            side: THREE.DoubleSide
-        });
-        const room = new THREE.Mesh(geometry, material);
-        room.position.y = 1.5; // Posée sur le sol
-        scene.add(room);
-
-        // Bordures de la chambre
-        const edges = new THREE.EdgesGeometry(geometry);
-        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
-        line.position.y = 1.5;
-        scene.add(line);
-
-        camera.position.set(6, 5, 8);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.set(12, 10, 12);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        scene.add(new THREE.GridHelper(20, 20, 0x444444, 0x222222));
+        const geometry = new THREE.BoxGeometry(8, 5, 10);
+        const material = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.3 });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.y = 2.5;
+        scene.add(mesh);
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x00aaff });
+        const wireframe = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), lineMat);
+        wireframe.position.y = 2.5;
+        scene.add(wireframe);
+        const slider = document.getElementById('tempSlider');
+        const display = document.getElementById('tempDisplay');
+        const status = document.getElementById('status');
+        slider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            display.innerText = val.toFixed(1) + "°C";
+            if(val > 7) {
+                lineMat.color.setHex(0xff4444);
+                display.style.color = "#ff4444";
+                status.innerText = "ALERTE : TEMP. ÉLEVÉE";
+                status.style.color = "#ff4444";
+            } else {
+                lineMat.color.setHex(0x00aaff);
+                display.style.color = "#00aaff";
+                status.innerText = "NORMAL";
+                status.style.color = "#00ff88";
+            }
         });
+        function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+        animate();
     </script>
 </body>
 </html>
