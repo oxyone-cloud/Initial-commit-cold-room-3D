@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oxyone - Hypermarket Logistics Hub</title>
+    <title>Oxyone - Digital Twin Hypermarché</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; }
         #ui-panel {
@@ -13,8 +13,8 @@
         .control-group { margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; }
         .label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
         .value { font-size: 20px; font-weight: bold; color: #00aaff; margin-bottom: 5px; }
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .unit-indicator { font-size: 9px; padding: 5px; border-radius: 4px; text-align: center; border: 1px solid #333; }
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .unit-indicator { font-size: 10px; padding: 6px; border-radius: 4px; text-align: center; border: 1px solid #333; font-weight: bold; }
         .ok { color: #00ff88; border-color: #00ff88; background: rgba(0,255,136,0.1); }
         .warn { color: #ff4444; border-color: #ff4444; background: rgba(255,68,68,0.2); animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
@@ -24,25 +24,25 @@
 </head>
 <body>
     <div id="ui-panel">
-        <h2>Supervision Flotte Oxyone</h2>
+        <h2>Oxyone Fleet Manager</h2>
         
         <div class="control-group">
-            <div class="label">Température Consigne (°C)</div>
+            <div class="label">Température Flotte (°C)</div>
             <div id="tVal" class="value">2.0°C</div>
             <input type="range" id="tSlider" min="-10" max="25" value="2">
         </div>
 
         <div class="control-group">
-            <div class="label">Densité de Stockage (kg/m²)</div>
+            <div class="label">Densité Moyenne (kg/m²)</div>
             <div id="wVal" class="value">120 kg/m²</div>
             <input type="range" id="wSlider" min="0" max="500" value="120">
         </div>
 
-        <div class="label">État des Unités</div>
+        <div class="label">Statut Temps Réel</div>
         <div class="status-grid">
-            <div id="u1" class="unit-indicator ok">U-01</div>
-            <div id="u2" class="unit-indicator ok">U-02</div>
-            <div id="u3" class="unit-indicator ok">U-03</div>
+            <div id="u1" class="unit-indicator ok">UNIT-01</div>
+            <div id="u2" class="unit-indicator ok">UNIT-02</div>
+            <div id="u3" class="unit-indicator ok">UNIT-03</div>
         </div>
     </div>
 
@@ -56,125 +56,124 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(15, 10, 15);
+        camera.position.set(12, 10, 15);
 
-        // Lumières style entrepôt
-        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-        const light1 = new THREE.PointLight(0xffffff, 1); light1.position.set(0, 10, 0); scene.add(light1);
-        const light2 = new THREE.PointLight(0xffffff, 0.8); light2.position.set(15, 10, 15); scene.add(light2);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const light = new THREE.DirectionalLight(0xffffff, 1); light.position.set(10, 20, 10); scene.add(light);
 
-        // --- ENVIRONNEMENT HYPERMARCHÉ ---
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({color: 0x111111}));
+        // --- SOL ET GRILLE ---
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({color: 0x151515}));
         floor.rotation.x = -Math.PI/2; scene.add(floor);
-        scene.add(new THREE.GridHelper(100, 50, 0x222222, 0x222222));
+        scene.add(new THREE.GridHelper(100, 50, 0x333333, 0x222222));
 
-        function createWarehouseRack(x, z) {
+        // --- RACKS EXTERIEURS (ENTREPOT) ---
+        function createLargeRack(x, z) {
             const group = new THREE.Group();
-            const metalMat = new THREE.MeshStandardMaterial({color: 0x444444, metalness: 0.8});
-            // Montants
+            const frameMat = new THREE.MeshStandardMaterial({color: 0x444444, metalness: 0.8});
             for(let i=0; i<2; i++) {
-                const p = new THREE.Mesh(new THREE.BoxGeometry(0.1, 6, 0.1), metalMat);
-                p.position.set(i*3 - 1.5, 3, 0); group.add(p);
+                const post = new THREE.Mesh(new THREE.BoxGeometry(0.15, 6, 0.15), frameMat);
+                post.position.set(i*4-2, 3, 0); group.add(post);
             }
-            // Niveaux (Lisses)
             for(let h=1.5; h<=6; h+=2) {
-                const beam = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.1, 1), metalMat);
-                beam.position.y = h; group.add(beam);
-                // Palettes fictives
-                const pal = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: Math.random()*0xffffff}));
-                pal.position.set((Math.random()-0.5)*2, h+0.3, 0); group.add(pal);
+                const shelf = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.1, 1.2), frameMat);
+                shelf.position.y = h; group.add(shelf);
+                // Palettes sur les racks
+                const pal = new THREE.Mesh(new THREE.BoxGeometry(1, 0.7, 1), new THREE.MeshStandardMaterial({color: Math.random()*0xffffff}));
+                pal.position.set((Math.random()-0.5)*3, h+0.4, 0); group.add(pal);
             }
             group.position.set(x, 0, z); scene.add(group);
         }
-        // Génération des allées
-        for(let i=-15; i<=15; i+=10) {
-            for(let j=-10; j<=10; j+=5) {
-                if(Math.abs(i) > 5) createWarehouseRack(i, j);
-            }
-        }
+        for(let x=-15; x<=15; x+=10) { if(Math.abs(x)>4) createLargeRack(x, -5); createLargeRack(x, 5); }
 
-        // --- PARAMÈTRES UNITÉ ---
+        // --- PARAMÈTRES OXYONE ---
         const L = 2.74, W = 1.83, H = 2.0;
-        const units = [];
+        const fleet = [];
 
-        function createOxyoneUnit(posX, id) {
-            const group = new THREE.Group();
+        function createUnit(posX, id) {
+            const unitGroup = new THREE.Group();
             
-            // Structure
-            const frameMat = new THREE.MeshStandardMaterial({color: 0x777777, metalness: 0.9});
+            // 1. Structure (Squelette)
+            const metalMat = new THREE.MeshStandardMaterial({color: 0x888888, metalness: 0.9});
             const beam = (w,h,d,x,y,z) => {
-                const b = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), frameMat);
-                b.position.set(x,y,z); group.add(b);
+                const b = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), metalMat);
+                b.position.set(x,y,z); unitGroup.add(b);
             };
             [[-L/2, W/2], [L/2, W/2], [-L/2, -W/2], [L/2, -W/2]].forEach(p => beam(0.1, H, 0.1, p[0], H/2, p[1]));
-            beam(L, 0.1, 0.1, 0, H, W/2); beam(L, 0.1, 0.1, 0, 0, W/2); // Cadre porte
+            beam(L, 0.1, 0.1, 0, H, W/2); beam(L, 0.1, 0.1, 0, H, -W/2);
 
-            // Chambre (Vitre)
+            // 2. Chambre Froide (Transparente)
             const chamberMat = new THREE.MeshStandardMaterial({color: 0x00aaff, transparent: true, opacity: 0.2});
             const body = new THREE.Mesh(new THREE.BoxGeometry(L, H, W), chamberMat);
-            body.position.y = H/2; group.add(body);
+            body.position.y = H/2; unitGroup.add(body);
 
-            // Évaporateur & Air
-            const evap = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 0.6), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
-            evap.position.set(0, H-0.2, -W/2+0.5); group.add(evap);
+            // 3. LA PORTE (Enfin visible !)
+            const doorGroup = new THREE.Group();
+            const doorMain = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.85, 0.12), new THREE.MeshStandardMaterial({color: 0x2a2a2a, metalness: 0.5}));
+            const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.4, 0.05), new THREE.MeshStandardMaterial({color: 0xcccccc}));
+            handle.position.set(0.35, 0, 0.1); doorMain.add(handle);
+            doorGroup.add(doorMain);
+            doorGroup.position.set(0, 0.95, W/2 + 0.05);
+            unitGroup.add(doorGroup);
+
+            // 4. Etagères Internes
+            for(let h=0.4; h<H; h+=0.6) {
+                const shelf = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.05, W*0.8), metalMat);
+                shelf.position.set(-L/2 + 0.45, h, 0); unitGroup.add(shelf);
+            }
+
+            // 5. Evaporateur & Airflow
+            const evap = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 0.7), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
+            evap.position.set(0, H - 0.3, -W/2 + 0.45); unitGroup.add(evap);
             
             const particles = new THREE.Group();
             for(let i=0; i<30; i++) {
                 const p = new THREE.Mesh(new THREE.SphereGeometry(0.02), new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.5}));
-                p.position.set(Math.random()*1-0.5, Math.random()*H, -W/2+0.5);
+                p.position.set((Math.random()-0.5), Math.random()*H, -W/2+0.6);
                 particles.add(p);
             }
-            group.add(particles);
+            unitGroup.add(particles);
 
-            // Étagères Internes
-            for(let h=0.5; h<H; h+=0.6) {
-                const s = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.05, W*0.8), frameMat);
-                s.position.set(-L/2+0.4, h, 0); group.add(s);
-            }
-
-            // Zone BT (Ultra-visible)
+            // 6. Zone Bluetooth au sol
             const btZone = new THREE.Mesh(
-                new THREE.RingGeometry(1.4, 1.5, 32),
-                new THREE.MeshBasicMaterial({color: 0x00aaff, transparent: true, opacity: 0.8, side: 2})
+                new THREE.RingGeometry(1.4, 1.6, 32),
+                new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.6, side: 2})
             );
-            btZone.rotation.x = -Math.PI/2; btZone.position.set(0, 0.05, W/2 + 2.5);
-            group.add(btZone);
+            btZone.rotation.x = -Math.PI/2; btZone.position.set(0, 0.06, W/2 + 2.5);
+            unitGroup.add(btZone);
 
-            group.position.x = posX;
-            scene.add(group);
-            units.push({group, particles, chamberMat, btZone, id});
+            unitGroup.position.x = posX;
+            scene.add(unitGroup);
+            fleet.push({group: unitGroup, particles, chamberMat, btZone, id});
         }
 
-        // Création des 3 cubes
-        createOxyoneUnit(-5, 'u1');
-        createOxyoneUnit(0, 'u2');
-        createOxyoneUnit(5, 'u3');
+        // Créer les 3 unités alignées
+        createUnit(-6, 'u1'); createUnit(0, 'u2'); createUnit(6, 'u3');
 
-        // --- LOGIQUE INTERFACE ---
-        const tS = document.getElementById('tSlider');
-        const wS = document.getElementById('wSlider');
+        // --- ANIMATION ET UI ---
+        const tSlider = document.getElementById('tSlider');
+        const wSlider = document.getElementById('wSlider');
 
         function animate() {
             requestAnimationFrame(animate);
-            const time = Date.now() * 0.001;
-            
-            document.getElementById('tVal').innerText = tS.value + ".0°C";
-            document.getElementById('wVal').innerText = wS.value + " kg/m²";
+            const t = Date.now() * 0.001;
 
-            units.forEach((u, i) => {
-                // Animation Air
+            document.getElementById('tVal').innerText = tSlider.value + ".0°C";
+            document.getElementById('wVal').innerText = wSlider.value + " kg/m²";
+
+            fleet.forEach((u, i) => {
+                // Flux d'air descendant
                 u.particles.children.forEach(p => {
-                    p.position.y -= 0.03;
-                    if(p.position.y < 0.1) p.position.y = H - 0.2;
+                    p.position.y -= 0.035;
+                    if(p.position.y < 0.1) p.position.y = H - 0.4;
                 });
 
-                // Pulsation BT
-                u.btZone.material.opacity = 0.3 + Math.abs(Math.sin(time * 2 + i)) * 0.5;
+                // Pulsation Zone BT
+                u.btZone.material.opacity = 0.2 + Math.abs(Math.sin(t * 1.5 + i)) * 0.6;
 
-                // Check Alertes
+                // Gestion des Alertes
                 const indicator = document.getElementById(u.id);
-                if(wS.value > 250 || tS.value > 15) {
-                    u.chamberMat.color.setHex(0xff4444);
+                if(wSlider.value > 250 || tSlider.value > 15) {
+                    u.chamberMat.color.setHex(0xff3333);
                     indicator.className = "unit-indicator warn";
                 } else {
                     u.chamberMat.color.setHex(0x00aaff);
