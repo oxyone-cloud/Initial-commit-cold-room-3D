@@ -2,47 +2,47 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oxyone - Multi-Unit Digital Twin</title>
+    <title>Oxyone - Hypermarket Logistics Hub</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; }
         #ui-panel {
             position: absolute; top: 20px; left: 20px;
             background: rgba(10, 10, 10, 0.95); padding: 20px; border-radius: 12px; 
-            border: 2px solid #00aaff; z-index: 100; width: 300px;
+            border: 2px solid #00aaff; z-index: 100; width: 320px; box-shadow: 0 0 20px rgba(0,170,255,0.4);
         }
-        .unit-status { padding: 8px; border-radius: 5px; background: #111; margin-bottom: 10px; border-left: 4px solid #00aaff; }
-        .label { font-size: 10px; color: #888; text-transform: uppercase; }
-        .value { font-size: 18px; font-weight: bold; color: #00aaff; margin-bottom: 5px; }
-        .alert { padding: 5px; border-radius: 4px; text-align: center; font-weight: bold; font-size: 11px; margin-top: 5px; }
-        .ok { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid #00ff88; }
-        .danger { background: rgba(255, 68, 68, 0.2); color: #ff4444; border: 1px solid #ff4444; animation: blink 1s infinite; }
+        .control-group { margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+        .value { font-size: 20px; font-weight: bold; color: #00aaff; margin-bottom: 5px; }
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
+        .unit-indicator { font-size: 9px; padding: 5px; border-radius: 4px; text-align: center; border: 1px solid #333; }
+        .ok { color: #00ff88; border-color: #00ff88; background: rgba(0,255,136,0.1); }
+        .warn { color: #ff4444; border-color: #ff4444; background: rgba(255,68,68,0.2); animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
         input { width: 100%; cursor: pointer; accent-color: #00aaff; }
-        h3 { margin: 0 0 15px 0; color: #00aaff; font-size: 16px; text-align: center; }
+        h2 { margin: 0 0 15px 0; font-size: 16px; color: #00aaff; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; }
     </style>
 </head>
 <body>
     <div id="ui-panel">
-        <h3>CENTRAL DE SUPERVISION</h3>
+        <h2>Supervision Flotte Oxyone</h2>
         
-        <div id="unit-ctrl">
-            <div class="label">Contrôle Global Flotte</div>
-            <div class="value" id="globalWeight">100 kg/m²</div>
-            <input type="range" id="wSlider" min="0" max="500" value="100">
+        <div class="control-group">
+            <div class="label">Température Consigne (°C)</div>
+            <div id="tVal" class="value">2.0°C</div>
+            <input type="range" id="tSlider" min="-10" max="25" value="2">
         </div>
-        <hr style="border: 0.5px solid #333; margin: 15px 0;">
-        
-        <div class="unit-status">
-            <div class="label">UNITÉ 01 - ZONE A</div>
-            <div id="st1" class="alert ok">NOMINAL</div>
+
+        <div class="control-group">
+            <div class="label">Densité de Stockage (kg/m²)</div>
+            <div id="wVal" class="value">120 kg/m²</div>
+            <input type="range" id="wSlider" min="0" max="500" value="120">
         </div>
-        <div class="unit-status">
-            <div class="label">UNITÉ 02 - ZONE B</div>
-            <div id="st2" class="alert ok">NOMINAL</div>
-        </div>
-        <div class="unit-status">
-            <div class="label">UNITÉ 03 - ZONE C</div>
-            <div id="st3" class="alert ok">NOMINAL</div>
+
+        <div class="label">État des Unités</div>
+        <div class="status-grid">
+            <div id="u1" class="unit-indicator ok">U-01</div>
+            <div id="u2" class="unit-indicator ok">U-02</div>
+            <div id="u3" class="unit-indicator ok">U-03</div>
         </div>
     </div>
 
@@ -56,113 +56,130 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(15, 12, 20);
+        camera.position.set(15, 10, 15);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-        const sun = new THREE.DirectionalLight(0xffffff, 1);
-        sun.position.set(20, 30, 10); scene.add(sun);
+        // Lumières style entrepôt
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+        const light1 = new THREE.PointLight(0xffffff, 1); light1.position.set(0, 10, 0); scene.add(light1);
+        const light2 = new THREE.PointLight(0xffffff, 0.8); light2.position.set(15, 10, 15); scene.add(light2);
 
-        // --- ENVIRONNEMENT ---
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({color: 0x1a1a1a}));
+        // --- ENVIRONNEMENT HYPERMARCHÉ ---
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({color: 0x111111}));
         floor.rotation.x = -Math.PI/2; scene.add(floor);
-        scene.add(new THREE.GridHelper(100, 40, 0x333333, 0x222222));
+        scene.add(new THREE.GridHelper(100, 50, 0x222222, 0x222222));
 
-        // --- PARAMETRES ---
+        function createWarehouseRack(x, z) {
+            const group = new THREE.Group();
+            const metalMat = new THREE.MeshStandardMaterial({color: 0x444444, metalness: 0.8});
+            // Montants
+            for(let i=0; i<2; i++) {
+                const p = new THREE.Mesh(new THREE.BoxGeometry(0.1, 6, 0.1), metalMat);
+                p.position.set(i*3 - 1.5, 3, 0); group.add(p);
+            }
+            // Niveaux (Lisses)
+            for(let h=1.5; h<=6; h+=2) {
+                const beam = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.1, 1), metalMat);
+                beam.position.y = h; group.add(beam);
+                // Palettes fictives
+                const pal = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.8), new THREE.MeshStandardMaterial({color: Math.random()*0xffffff}));
+                pal.position.set((Math.random()-0.5)*2, h+0.3, 0); group.add(pal);
+            }
+            group.position.set(x, 0, z); scene.add(group);
+        }
+        // Génération des allées
+        for(let i=-15; i<=15; i+=10) {
+            for(let j=-10; j<=10; j+=5) {
+                if(Math.abs(i) > 5) createWarehouseRack(i, j);
+            }
+        }
+
+        // --- PARAMÈTRES UNITÉ ---
         const L = 2.74, W = 1.83, H = 2.0;
-        const rooms = [];
+        const units = [];
 
-        function createColdRoom(posX) {
+        function createOxyoneUnit(posX, id) {
             const group = new THREE.Group();
             
-            // 1. Chambre
-            const mat = new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.2 });
-            const chamber = new THREE.Mesh(new THREE.BoxGeometry(L, H, W), mat);
-            chamber.position.y = H/2; group.add(chamber);
-
-            // 2. Structure Métallique
-            const metal = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.8 });
-            function beam(w, h, d, x, y, z) {
-                const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), metal);
-                b.position.set(x, y, z); group.add(b);
-            }
+            // Structure
+            const frameMat = new THREE.MeshStandardMaterial({color: 0x777777, metalness: 0.9});
+            const beam = (w,h,d,x,y,z) => {
+                const b = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), frameMat);
+                b.position.set(x,y,z); group.add(b);
+            };
             [[-L/2, W/2], [L/2, W/2], [-L/2, -W/2], [L/2, -W/2]].forEach(p => beam(0.1, H, 0.1, p[0], H/2, p[1]));
-            beam(L, 0.1, 0.1, 0, H, W/2); beam(L, 0.1, 0.1, 0, H, -W/2);
-            beam(L, 0.05, 0.05, 0, 0, W/2); // Base
+            beam(L, 0.1, 0.1, 0, H, W/2); beam(L, 0.1, 0.1, 0, 0, W/2); // Cadre porte
 
-            // 3. Porte & Evaporateur
-            const door = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.8, 0.1), new THREE.MeshStandardMaterial({color: 0x111111}));
-            door.position.set(0, 0.9, W/2); group.add(door);
-            
+            // Chambre (Vitre)
+            const chamberMat = new THREE.MeshStandardMaterial({color: 0x00aaff, transparent: true, opacity: 0.2});
+            const body = new THREE.Mesh(new THREE.BoxGeometry(L, H, W), chamberMat);
+            body.position.y = H/2; group.add(body);
+
+            // Évaporateur & Air
             const evap = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 0.6), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
-            evap.position.set(0, H - 0.3, -W/2 + 0.4); group.add(evap);
-
-            // 4. Etagères
-            for(let h=0.5; h<H; h+=0.6) {
-                const sL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.05, W*0.8), metal);
-                sL.position.set(-L/2 + 0.4, h, 0); group.add(sL);
-            }
-
-            // 5. Air (Particules)
+            evap.position.set(0, H-0.2, -W/2+0.5); group.add(evap);
+            
             const particles = new THREE.Group();
             for(let i=0; i<30; i++) {
                 const p = new THREE.Mesh(new THREE.SphereGeometry(0.02), new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.5}));
-                p.position.set(Math.random()*0.8-0.4, Math.random()*H, -W/2+0.5);
+                p.position.set(Math.random()*1-0.5, Math.random()*H, -W/2+0.5);
                 particles.add(p);
             }
             group.add(particles);
 
-            // 6. Zone Bluetooth
-            const bt = new THREE.Mesh(new THREE.CircleGeometry(1.5, 32), new THREE.MeshBasicMaterial({color: 0x00aaff, transparent: true, opacity: 0.3, side: 2}));
-            bt.rotation.x = -Math.PI/2; bt.position.set(0, 0.05, W/2 + 2); group.add(bt);
+            // Étagères Internes
+            for(let h=0.5; h<H; h+=0.6) {
+                const s = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.05, W*0.8), frameMat);
+                s.position.set(-L/2+0.4, h, 0); group.add(s);
+            }
+
+            // Zone BT (Ultra-visible)
+            const btZone = new THREE.Mesh(
+                new THREE.RingGeometry(1.4, 1.5, 32),
+                new THREE.MeshBasicMaterial({color: 0x00aaff, transparent: true, opacity: 0.8, side: 2})
+            );
+            btZone.rotation.x = -Math.PI/2; btZone.position.set(0, 0.05, W/2 + 2.5);
+            group.add(btZone);
 
             group.position.x = posX;
             scene.add(group);
-            return { group, particles, mat, bt };
+            units.push({group, particles, chamberMat, btZone, id});
         }
 
-        // Créer les 3 cubes
-        rooms.push(createColdRoom(-6));
-        rooms.push(createColdRoom(0));
-        rooms.push(createColdRoom(6));
+        // Création des 3 cubes
+        createOxyoneUnit(-5, 'u1');
+        createOxyoneUnit(0, 'u2');
+        createOxyoneUnit(5, 'u3');
 
-        // --- RACKS EXTERIEURS ---
-        function addWarehouseRack(x, z) {
-            const rack = new THREE.Mesh(new THREE.BoxGeometry(4, 5, 1.5), new THREE.MeshStandardMaterial({color: 0x333333, wireframe: true}));
-            rack.position.set(x, 2.5, z); scene.add(rack);
-        }
-        for(let i=-10; i<=10; i+=10) addWarehouseRack(i, -8);
-
-        // --- ANIMATION & LOGIQUE ---
-        const slider = document.getElementById('wSlider');
-        const weightLabel = document.getElementById('globalWeight');
+        // --- LOGIQUE INTERFACE ---
+        const tS = document.getElementById('tSlider');
+        const wS = document.getElementById('wSlider');
 
         function animate() {
             requestAnimationFrame(animate);
             const time = Date.now() * 0.001;
-            const w = slider.value;
-            weightLabel.innerText = w + " kg/m²";
+            
+            document.getElementById('tVal').innerText = tS.value + ".0°C";
+            document.getElementById('wVal').innerText = wS.value + " kg/m²";
 
-            rooms.forEach((room, index) => {
-                // Animation air
-                room.particles.children.forEach(p => {
+            units.forEach((u, i) => {
+                // Animation Air
+                u.particles.children.forEach(p => {
                     p.position.y -= 0.03;
                     if(p.position.y < 0.1) p.position.y = H - 0.2;
                 });
 
-                // Alerte individuelle
-                const statusDiv = document.getElementById(`st${index+1}`);
-                if(w > 250) {
-                    statusDiv.innerText = "ALERTE SURCHARGE";
-                    statusDiv.className = "alert danger";
-                    room.mat.color.setHex(0xff4444);
+                // Pulsation BT
+                u.btZone.material.opacity = 0.3 + Math.abs(Math.sin(time * 2 + i)) * 0.5;
+
+                // Check Alertes
+                const indicator = document.getElementById(u.id);
+                if(wS.value > 250 || tS.value > 15) {
+                    u.chamberMat.color.setHex(0xff4444);
+                    indicator.className = "unit-indicator warn";
                 } else {
-                    statusDiv.innerText = "NOMINAL";
-                    statusDiv.className = "alert ok";
-                    room.mat.color.setHex(0x00aaff);
+                    u.chamberMat.color.setHex(0x00aaff);
+                    indicator.className = "unit-indicator ok";
                 }
-                
-                // Effet zone BT
-                room.bt.material.opacity = 0.2 + Math.abs(Math.sin(time + index)) * 0.2;
             });
 
             renderer.render(scene, camera);
