@@ -2,208 +2,151 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oxyone - Hypermarket Digital Twin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oxyone - Fleet Manager</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #080808; font-family: 'Segoe UI', sans-serif; color: white; }
-        
-        /* Panel Supervision (Gauche) */
-        #ui-panel {
-            position: absolute; top: 20px; left: 20px;
-            background: rgba(10, 10, 10, 0.95); padding: 20px; border-radius: 12px; 
-            border: 2px solid #00aaff; z-index: 100; width: 320px;
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url(''); /* Remplace par l'URL de l'image de fond si disponible */
+            background-size: cover;
         }
-        
-        /* Contact & Label (Droite) */
-        #contact-info {
-            position: absolute; top: 20px; right: 20px;
-            text-align: right; background: rgba(0, 0, 0, 0.8); padding: 15px;
-            border-radius: 8px; border-right: 4px solid #00aaff; z-index: 100;
+        .container {
+            position: relative;
+            width: 90%;
+            max-width: 1200px;
         }
-        .contact-text { font-size: 13px; color: #00aaff; font-weight: bold; margin-bottom: 3px; }
-        .startup-label { font-size: 11px; color: #888; margin-top: 8px; font-style: italic; }
-
-        .control-group { margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; }
-        .label { font-size: 10px; color: #aaa; text-transform: uppercase; }
-        .value { font-size: 20px; font-weight: bold; color: #00aaff; margin-bottom: 5px; }
-        .status-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .unit-indicator { font-size: 10px; padding: 6px; border-radius: 4px; text-align: center; border: 1px solid #333; }
-        .ok { color: #00ff88; border-color: #00ff88; background: rgba(0,255,136,0.1); }
-        .warn { color: #ff4444; border-color: #ff4444; background: rgba(255,68,68,0.2); animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-        input { width: 100%; cursor: pointer; accent-color: #00aaff; }
-        h2 { margin: 0; font-size: 16px; color: #00aaff; text-transform: uppercase; }
-        .sub-h2 { font-size: 9px; color: #888; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .overlay-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 150, 200, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid cyan;
+            box-shadow: 0 0 20px cyan;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .gauge {
+            margin-bottom: 15px;
+        }
+        .gauge-label {
+            font-size: 16px;
+        }
+        .gauge-bar {
+            height: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 5px;
+        }
+        .gauge-fill {
+            height: 100%;
+            background-color: cyan;
+            position: absolute;
+            left: 0;
+        }
+        .gauge-value {
+            position: absolute;
+            right: 10px;
+            top: 0;
+            line-height: 20px;
+            font-weight: bold;
+        }
+        .units {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .unit-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .unit-01 { background-color: cyan; color: black; }
+        .unit-02 { background-color: green; color: white; }
+        .unit-03 { background-color: red; color: white; }
+        .contact {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            font-size: 14px;
+        }
+        .startup {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: cyan;
+        }
     </style>
 </head>
 <body>
-    <div id="ui-panel">
-        <h2>Oxyone Fleet Manager</h2>
-        <div class="sub-h2">Architecture Grande Distribution - Hypermarché</div>
-        
-        <div class="control-group">
-            <div class="label">Température Moyenne (°C)</div>
-            <div id="tVal" class="value">2.0°C</div>
-            <input type="range" id="tSlider" min="-10" max="25" value="2">
+    <div class="container">
+        <!-- L'image principale est l'image uploadée, mais comme c'est statique, on peut la mettre en background ou <img> -->
+        <img src="URL_DE_VOTRE_IMAGE_ICI" alt="Architecture Grande Distribution - Hypermarché" style="width:100%; border-radius: 10px;">
+
+        <div class="overlay-panel">
+            <div class="title">Oxyone - Fleet Manager</div>
+            <div class="subtitle">Architecture Grande Distribution - Hypermarché</div>
+
+            <div class="gauge">
+                <div class="gauge-label">Température Moyenne (°C)</div>
+                <div class="gauge-bar">
+                    <div class="gauge-fill" style="width: 70%;"></div>
+                    <div class="gauge-value">-10°C ——— 2.0°C</div>
+                </div>
+            </div>
+
+            <div class="gauge">
+                <div class="gauge-label">Valeur:</div>
+                <div class="gauge-bar">
+                    <div class="gauge-fill" style="width: 60%;"></div>
+                    <div class="gauge-value">120 kg/m³</div>
+                </div>
+            </div>
+
+            <div class="gauge">
+                <div class="gauge-label">wSlider (kg/m³)</div>
+                <div class="gauge-bar">
+                    <div class="gauge-fill" style="width: 50%;"></div>
+                    <div class="gauge-value">500°3</div>
+                </div>
+            </div>
+
+            <div class="gauge-label">Statut des RTLs :</div>
+            <div class="units">
+                <div class="unit-btn unit-01">UNIT-01</div>
+                <div class="unit-btn unit-02">UNIT-02</div>
+                <div class="unit-btn unit-03">WAN-03</div>
+            </div>
         </div>
 
-        <div class="control-group">
-            <div class="label">Charge Volumique (kg/m³)</div>
-            <div id="wVal" class="value">120 kg/m³</div>
-            <input type="range" id="wSlider" min="0" max="500" value="120">
+        <div class="contact">
+            benhamamouchothman@gmail.com<br>
+            +23 782 09 02 81
         </div>
 
-        <div class="label">Statut Modules RTLS</div>
-        <div class="status-grid">
-            <div id="u1" class="unit-indicator ok">UNIT-01</div>
-            <div id="u2" class="unit-indicator ok">UNIT-02</div>
-            <div id="u3" class="unit-indicator ok">UNIT-03</div>
+        <div class="startup">
+            Startup Labellisée @ 2021
         </div>
     </div>
-
-    <div id="contact-info">
-        <div class="contact-text">benhamamouchothman@gmail.com</div>
-        <div class="contact-text">+213 782 09 02 81</div>
-        <div class="startup-label">Startup Labellisée @ 2021</div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
-    <script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        camera.position.set(18, 12, 18);
-
-        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-        const sun = new THREE.DirectionalLight(0xffffff, 1); sun.position.set(20, 30, 20); scene.add(sun);
-
-        // --- SOL ---
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({color: 0x111111}));
-        floor.rotation.x = -Math.PI/2; scene.add(floor);
-        scene.add(new THREE.GridHelper(100, 50, 0x222222, 0x222222));
-
-        // --- FONCTION : RAYONNAGE FRIGORIFIQUE (SUR LES CÔTÉS) ---
-        function createFridgeRack(x, z) {
-            const group = new THREE.Group();
-            const mat = new THREE.MeshStandardMaterial({color: 0x333333});
-            const glow = new THREE.MeshBasicMaterial({color: 0x00aaff, transparent: true, opacity: 0.3});
-            
-            // Structure arrière
-            const back = new THREE.Mesh(new THREE.BoxGeometry(0.1, 3, 5), mat);
-            back.position.set(-0.5, 1.5, 0); group.add(back);
-            
-            // Etagères
-            for(let h=0.2; h<3; h+=0.8) {
-                const shelf = new THREE.Mesh(new THREE.BoxGeometry(1, 0.05, 5), mat);
-                shelf.position.y = h; group.add(shelf);
-                // Lumière de froid
-                const light = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.02, 4.8), glow);
-                light.position.set(0, h+0.05, 0); group.add(light);
-            }
-            group.position.set(x, 0, z);
-            scene.add(group);
-        }
-        createFridgeRack(-12, 0); createFridgeRack(12, 0); // Rayonnages aux extrémités
-
-        // --- FONCTION : TRANSPALETTE + PALETTE ---
-        function createTranspalette(x, z, rot) {
-            const group = new THREE.Group();
-            // Palette en bois
-            const pal = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.15, 0.8), new THREE.MeshStandardMaterial({color: 0x8b4513}));
-            pal.position.y = 0.1; group.add(pal);
-            // Fourches et corps
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.8, 0.3), new THREE.MeshStandardMaterial({color: 0xffcc00}));
-            body.position.set(-0.8, 0.5, 0); group.add(body);
-            const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1), new THREE.MeshStandardMaterial({color: 0x111111}));
-            handle.position.set(-0.8, 1, 0); group.add(handle);
-
-            group.position.set(x, 0, z);
-            group.rotation.y = rot;
-            scene.add(group);
-        }
-        createTranspalette(-3, 6, Math.PI/4);
-        createTranspalette(4, 8, -Math.PI/6);
-
-        // --- CHAMBRES FROIDES OXYONE ---
-        const L = 2.74, W = 1.83, H = 2.0;
-        const fleet = [];
-
-        function createOxyone(posX, id) {
-            const group = new THREE.Group();
-            // Structure
-            const metal = new THREE.MeshStandardMaterial({color: 0x888888, metalness: 0.8});
-            const beam = (w,h,d,x,y,z) => {
-                const b = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), metal);
-                b.position.set(x,y,z); group.add(b);
-            };
-            [[-L/2, W/2], [L/2, W/2], [-L/2, -W/2], [L/2, -W/2]].forEach(p => beam(0.1, H, 0.1, p[0], H/2, p[1]));
-            beam(L, 0.1, 0.1, 0, H, W/2); 
-
-            // Vitre
-            const mat = new THREE.MeshStandardMaterial({color: 0x00aaff, transparent: true, opacity: 0.2});
-            const chamber = new THREE.Mesh(new THREE.BoxGeometry(L, H, W), mat);
-            chamber.position.y = H/2; group.add(chamber);
-
-            // Porte
-            const door = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.85, 0.12), new THREE.MeshStandardMaterial({color: 0x222222}));
-            door.position.set(0, 0.92, W/2 + 0.05); group.add(door);
-
-            // Evaporateur & Air
-            const evap = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.4, 0.6), new THREE.MeshStandardMaterial({color: 0xeeeeee}));
-            evap.position.set(0, H-0.2, -W/2+0.5); group.add(evap);
-            
-            const particles = new THREE.Group();
-            for(let i=0; i<30; i++) {
-                const p = new THREE.Mesh(new THREE.SphereGeometry(0.02), new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.6}));
-                p.position.set((Math.random()-0.5), Math.random()*H, -W/2+0.6);
-                particles.add(p);
-            }
-            group.add(particles);
-
-            // Zone BT
-            const bt = new THREE.Mesh(new THREE.RingGeometry(1.2, 1.4, 32), new THREE.MeshBasicMaterial({color: 0x00ffff, transparent: true, opacity: 0.8, side: 2}));
-            bt.rotation.x = -Math.PI/2; bt.position.set(0, 0.05, W/2 + 2.5);
-            group.add(bt);
-
-            group.position.x = posX;
-            scene.add(group);
-            fleet.push({particles, mat, bt, id});
-        }
-
-        createOxyone(-6, 'u1'); createOxyone(0, 'u2'); createOxyone(6, 'u3');
-
-        // --- ANIMATION ---
-        const tS = document.getElementById('tSlider');
-        const wS = document.getElementById('wSlider');
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const time = Date.now() * 0.001;
-            document.getElementById('tVal').innerText = tS.value + ".0°C";
-            document.getElementById('wVal').innerText = wS.value + " kg/m³";
-
-            fleet.forEach((u, i) => {
-                u.particles.children.forEach(p => {
-                    p.position.y -= 0.035;
-                    if(p.position.y < 0.1) p.position.y = H - 0.2;
-                });
-                u.bt.material.opacity = 0.3 + Math.abs(Math.sin(time * 2 + i)) * 0.5;
-                const ind = document.getElementById(u.id);
-                if(wS.value > 250 || tS.value > 15) {
-                    u.mat.color.setHex(0xff3333);
-                    ind.className = "unit-indicator warn";
-                } else {
-                    u.mat.color.setHex(0x00aaff);
-                    ind.className = "unit-indicator ok";
-                }
-            });
-            renderer.render(scene, camera);
-        }
-        animate();
-    </script>
 </body>
 </html>
