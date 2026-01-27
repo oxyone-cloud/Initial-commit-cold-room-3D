@@ -3,7 +3,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:17-jdk
-COPY --from=build /target/*.jar app.jar
+# On utilise un astérisque pour prendre le JAR qui contient les dépendances
+COPY --from=build /target/*-shaded.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-Dspark.port=8080","-jar","/app.jar"]
-# Mise a jour OxyONE v1.1
