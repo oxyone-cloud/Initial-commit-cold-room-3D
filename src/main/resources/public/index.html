@@ -1,29 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OxyONE - Test 3D</title>
-    <style>body { margin: 0; background: #1a1a1a; color: white; text-align: center; font-family: sans-serif; }</style>
+    <title>OxyONE - Vision 3D</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #1a1a1a; color: white; font-family: sans-serif; }
+        #info { position: absolute; top: 10px; width: 100%; text-align: center; z-index: 100; }
+        #motor-view { position: absolute; bottom: 20px; right: 20px; width: 300px; height: 200px; border: 2px solid #00ff00; background: #000; }
+    </style>
 </head>
 <body>
-    <h1>OxyONE - Simulation 3D en cours</h1>
-    <p>Si vous voyez le cube tourner, le moteur Three.js est actif.</p>
+    <div id="info">
+        <h1>OxyONE : Usine du Futur</h1>
+        <p>Statut : <span id="temp" style="color:#00ff00">Système Actif</span></p>
+    </div>
+    <div id="motor-view">
+        <img id="motor-img" src="https://placehold.co/300x200?text=Attente+Flux+Wi-Fi" width="100%">
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+        // La Chambre Froide en 3D
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ccff, wireframe: true });
         const cube = new THREE.Mesh(geometry, material);
         scene.add(cube);
         camera.position.z = 5;
 
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
             renderer.render(scene, camera);
         }
