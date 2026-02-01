@@ -2,25 +2,36 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | L'Usine du Futur</title>
+    <title>OxyONE | Console de Pilotage</title>
     <style>
-        body { margin: 0; background-color: #050505; color: #00d2ff; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
-        #overlay { position: absolute; top: 30px; left: 30px; z-index: 10; background: rgba(0, 20, 40, 0.7); 
-                   padding: 20px; border-left: 4px solid #00d2ff; backdrop-filter: blur(5px); border-radius: 0 10px 10px 0; }
-        h1 { margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 3px; color: white; }
-        .data { font-family: 'Courier New', monospace; font-size: 14px; margin-top: 10px; }
-        .tag { color: #888; font-size: 10px; text-transform: uppercase; }
+        body { margin: 0; background-color: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #overlay { position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(0, 20, 40, 0.7); 
+                   padding: 15px; border-left: 4px solid #00d2ff; backdrop-filter: blur(5px); }
+        
+        /* Style du Clavier de manipulation */
+        #controls { position: absolute; bottom: 30px; right: 30px; z-index: 10; display: grid; 
+                    grid-template-columns: repeat(3, 50px); grid-gap: 10px; }
+        .btn { width: 50px; height: 50px; background: rgba(0, 210, 255, 0.2); border: 1px solid #00d2ff; 
+               color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; 
+               user-select: none; font-weight: bold; }
+        .btn:hover { background: rgba(0, 210, 255, 0.5); }
+        .btn:active { background: #00d2ff; color: black; }
+        .stop { grid-column: 2; background: rgba(255, 0, 0, 0.2); border-color: #ff4444; }
     </style>
 </head>
 <body>
     <div id="overlay">
-        <div class="tag">Système Monitoré</div>
-        <h1>OxyONE v1.0</h1>
-        <div class="data">
-            > SECTEUR: FROID INDUSTRIEL<br>
-            > STATUT: CRYOGÉNIE ACTIVE<br>
-            > BREVET: CONVENTION DE BERNE
-        </div>
+        <h1>OxyONE v1.1</h1>
+        <p>> MODE: MANUEL ACTIVE</p>
+        <p id="coords">ROTATION: X:0, Y:0</p>
+    </div>
+
+    <div id="controls">
+        <div style="grid-column: 2" class="btn" onclick="move('up')">▲</div>
+        <div class="btn" onclick="move('left')">◀</div>
+        <div class="btn stop" onclick="move('stop')">■</div>
+        <div class="btn" onclick="move('right')">▶</div>
+        <div style="grid-column: 2" class="btn" onclick="move('down')">▼</div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -31,46 +42,42 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Ajout d'une grille de sol pour l'effet "Usine"
-        const grid = new THREE.GridHelper(20, 20, 0x00d2ff, 0x002244);
-        scene.add(grid);
-
-        // Le Cube (Représentation de la Chambre Froide)
+        // Cube et Grille
         const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x00d2ff, 
-            wireframe: false,
-            transparent: true,
-            opacity: 0.8
-        });
+        const material = new THREE.MeshPhongMaterial({ color: 0x00d2ff, wireframe: true });
         const cube = new THREE.Mesh(geometry, material);
-        cube.position.y = 1; // Posé sur la grille
         scene.add(cube);
+        scene.add(new THREE.GridHelper(20, 20, 0x00d2ff, 0x002244));
+        scene.add(new THREE.PointLight(0xffffff, 1, 100).clone().set(5,5,5));
+        camera.position.z = 5;
 
-        // Arête du cube (pour le look technique)
-        const edges = new THREE.EdgesGeometry(geometry);
-        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff }));
-        cube.add(line);
+        let speedX = 0;
+        let speedY = 0;
 
-        // Lumières
-        const light = new THREE.PointLight(0xffffff, 1, 100);
-        light.position.set(5, 5, 5);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x404040));
+        function move(dir) {
+            if(dir === 'up') speedX -= 0.02;
+            if(dir === 'down') speedX += 0.02;
+            if(dir === 'left') speedY -= 0.02;
+            if(dir === 'right') speedY += 0.02;
+            if(dir === 'stop') { speedX = 0; speedY = 0; }
+        }
 
-        camera.position.set(3, 3, 5);
-        camera.lookAt(0, 1, 0);
+        // Ecoute du clavier physique
+        window.addEventListener('keydown', (e) => {
+            if(e.key === "ArrowUp") move('up');
+            if(e.key === "ArrowDown") move('down');
+            if(e.key === "ArrowLeft") move('left');
+            if(e.key === "ArrowRight") move('right');
+            if(e.key === " ") move('stop');
+        });
 
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.y += 0.005;
+            cube.rotation.x += speedX;
+            cube.rotation.y += speedY;
+            document.getElementById('coords').innerText = `ROTATION: X:${speedX.toFixed(2)}, Y:${speedY.toFixed(2)}`;
             renderer.render(scene, camera);
         }
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
         animate();
     </script>
 </body>
