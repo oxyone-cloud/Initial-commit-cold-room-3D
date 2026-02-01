@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.oxyone</groupId>
-    <artifactId>cold-room-3d</artifactId>
+    <artifactId>app</artifactId>
     <version>1.0</version>
 
     <properties>
