@@ -2,13 +2,14 @@ FROM maven:3.8.5-openjdk-17
 WORKDIR /app
 COPY . .
 
-# 1. Compilation
-RUN mvn clean package -DskipTests
+# 1. On compile et on affiche le résultat de target
+RUN mvn clean package -DskipTests && ls -l target/
 
-# 2. On identifie le plus gros JAR et on le renomme en app.jar
-RUN ls -S target/*.jar | head -n 1 | xargs -I {} mv {} app.jar
+# 2. On cherche le fichier JAR (le plus gros) et on le déplace
+RUN JARDER=target/simulation-3d-1.0-SNAPSHOT.jar && cp $JARDER app.jar
+
+# 3. Vérification finale avant lancement
+RUN ls -lh app.jar
 
 EXPOSE 8080
-
-# Lancement avec configuration du port pour Spark
 ENTRYPOINT ["java", "-Dspark.port=8080", "-jar", "app.jar"]
