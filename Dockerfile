@@ -2,10 +2,10 @@ FROM maven:3.8.5-openjdk-17
 WORKDIR /app
 COPY . .
 
-# 1. On compile
+# 1. Compilation
 RUN mvn clean package -DskipTests
 
-# 2. On liste le contenu de target pour le log et on copie avec un joker
+# 2. On liste pour voir et on copie le JAR avec le joker
 RUN ls -l target/ && cp target/*-shaded.jar app.jar || cp target/*.jar app.jar
 
 EXPOSE 8080
