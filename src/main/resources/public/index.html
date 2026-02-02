@@ -2,83 +2,145 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Console de Pilotage</title>
+    <title>OxyONE | Pilotage & Configuration</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { margin: 0; background-color: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #overlay { position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(0, 20, 40, 0.7); 
-                   padding: 15px; border-left: 4px solid #00d2ff; backdrop-filter: blur(5px); }
-        
-        /* Style du Clavier de manipulation */
-        #controls { position: absolute; bottom: 30px; right: 30px; z-index: 10; display: grid; 
-                    grid-template-columns: repeat(3, 50px); grid-gap: 10px; }
-        .btn { width: 50px; height: 50px; background: rgba(0, 210, 255, 0.2); border: 1px solid #00d2ff; 
-               color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; 
-               user-select: none; font-weight: bold; }
-        .btn:hover { background: rgba(0, 210, 255, 0.5); }
-        .btn:active { background: #00d2ff; color: black; }
-        .stop { grid-column: 2; background: rgba(255, 0, 0, 0.2); border-color: #ff4444; }
+        body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.85); padding: 20px; border-left: 4px solid #00d2ff; width: 280px; z-index: 100; backdrop-filter: blur(5px); }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.85em; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #00d2ff; }
+        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; color: #050505; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 15px #00d2ff; }
+        #info { position: absolute; bottom: 20px; left: 20px; font-size: 0.75em; opacity: 0.6; pointer-events: none; }
     </style>
 </head>
 <body>
-    <div id="overlay">
-        <h1>OxyONE v1.1</h1>
-        <p>> MODE: MANUEL ACTIVE</p>
-        <p id="coords">ROTATION: X:0, Y:0</p>
-    </div>
 
-    <div id="controls">
-        <div style="grid-column: 2" class="btn" onclick="move('up')">▲</div>
-        <div class="btn" onclick="move('left')">◀</div>
-        <div class="btn stop" onclick="move('stop')">■</div>
-        <div class="btn" onclick="move('right')">▶</div>
-        <div style="grid-column: 2" class="btn" onclick="move('down')">▼</div>
+<div id="gui">
+    <h2 style="margin-top:0">OxyONE v1.2</h2>
+    <div class="control-group">
+        <label>Largeur (m) : <span id="val-w">4</span></label>
+        <input type="range" id="width" min="1" max="15" step="0.5" value="4">
     </div>
+    <div class="control-group">
+        <label>Hauteur (m) : <span id="val-h">3</span></label>
+        <input type="range" id="height" min="1" max="10" step="0.5" value="3">
+    </div>
+    <div class="control-group">
+        <label>Profondeur (m) : <span id="val-d">6</span></label>
+        <input type="range" id="depth" min="1" max="20" step="0.5" value="6">
+    </div>
+    <hr style="border: 0.5px solid #00d2ff; opacity: 0.3">
+    <button onclick="exportTechnicalPDF()">TÉLÉCHARGER RAPPORT PDF</button>
+    <p style="font-size: 0.7em; margin-top: 15px; line-height: 1.4;">
+        Utilisez les <b>flèches</b> pour pivoter.<br>
+        Utilisez les <b>curseurs</b> pour dimensionner.
+    </p>
+</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+<div id="info">OxyONE - Propriété protégée par la Convention de Berne</div>
+
+<script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Lumières industrielles
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
+    scene.add(new THREE.AmbientLight(0x404040, 2));
+
+    // Chambre Froide (Cube Dynamique)
+    const material = new THREE.MeshPhongMaterial({ 
+        color: 0x00d2ff, 
+        wireframe: true, 
+        transparent: true, 
+        opacity: 0.8 
+    });
+    let geometry = new THREE.BoxGeometry(1, 1, 1);
+    let cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    // Grille de référence
+    const grid = new THREE.GridHelper(30, 30, 0x00d2ff, 0x002244);
+    scene.add(grid);
+
+    camera.position.set(8, 8, 8);
+    camera.lookAt(0, 0, 0);
+
+    // Mise à jour temps réel des dimensions
+    function updateLayout() {
+        const w = document.getElementById('width').value;
+        const h = document.getElementById('height').value;
+        const d = document.getElementById('depth').value;
+        
+        cube.scale.set(w, h, d);
+        cube.position.y = h / 2; // Pose le cube sur la grille
+        
+        document.getElementById('val-w').innerText = w;
+        document.getElementById('val-h').innerText = h;
+        document.getElementById('val-d').innerText = d;
+    }
+
+    document.querySelectorAll('input').forEach(input => input.addEventListener('input', updateLayout));
+    updateLayout();
+
+    // Contrôles Clavier (Flèches)
+    window.addEventListener('keydown', (e) => {
+        if(e.key === "ArrowLeft") cube.rotation.y -= 0.1;
+        if(e.key === "ArrowRight") cube.rotation.y += 0.1;
+        if(e.key === "ArrowUp") cube.rotation.x -= 0.1;
+        if(e.key === "ArrowDown") cube.rotation.x += 0.1;
+    });
+
+    // Génération du Rapport PDF
+    function exportTechnicalPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const w = document.getElementById('width').value;
+        const h = document.getElementById('height').value;
+        const d = document.getElementById('depth').value;
+
+        doc.setFillColor(0, 20, 40);
+        doc.rect(0, 0, 210, 40, 'F');
+        
+        doc.setTextColor(0, 210, 255);
+        doc.setFontSize(22);
+        doc.text("RAPPORT TECHNIQUE OxyONE", 20, 25);
+        
+        doc.setTextColor(40, 40, 40);
+        doc.setFontSize(14);
+        doc.text("Spécifications de la Chambre Froide :", 20, 55);
+        
+        doc.setFontSize(12);
+        doc.text("- Largeur : " + w + " mètres", 30, 70);
+        doc.text("- Hauteur : " + h + " mètres", 30, 80);
+        doc.text("- Profondeur : " + d + " mètres", 30, 90);
+        doc.text("- Volume Total : " + (w*h*d).toFixed(2) + " m3", 30, 105);
+        
+        doc.setFont("helvetica", "italic");
+        doc.text("Ce projet et son contenu sont protégés par la Convention de Berne.", 20, 140);
+        doc.text("Auteur : L'Usine du Futur dans le Secteur du Froid", 20, 150);
+
+        doc.save("OxyONE_Configuration.pdf");
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Cube et Grille
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshPhongMaterial({ color: 0x00d2ff, wireframe: true });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-        scene.add(new THREE.GridHelper(20, 20, 0x00d2ff, 0x002244));
-        scene.add(new THREE.PointLight(0xffffff, 1, 100).clone().set(5,5,5));
-        camera.position.z = 5;
-
-        let speedX = 0;
-        let speedY = 0;
-
-        function move(dir) {
-            if(dir === 'up') speedX -= 0.02;
-            if(dir === 'down') speedX += 0.02;
-            if(dir === 'left') speedY -= 0.02;
-            if(dir === 'right') speedY += 0.02;
-            if(dir === 'stop') { speedX = 0; speedY = 0; }
-        }
-
-        // Ecoute du clavier physique
-        window.addEventListener('keydown', (e) => {
-            if(e.key === "ArrowUp") move('up');
-            if(e.key === "ArrowDown") move('down');
-            if(e.key === "ArrowLeft") move('left');
-            if(e.key === "ArrowRight") move('right');
-            if(e.key === " ") move('stop');
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            cube.rotation.x += speedX;
-            cube.rotation.y += speedY;
-            document.getElementById('coords').innerText = `ROTATION: X:${speedX.toFixed(2)}, Y:${speedY.toFixed(2)}`;
-            renderer.render(scene, camera);
-        }
-        animate();
-    </script>
+    });
+</script>
 </body>
 </html>
