@@ -1,14 +1,15 @@
-# Utilisation d'une image unique et stable
 FROM maven:3.8.5-openjdk-17
 WORKDIR /app
 COPY . .
 
-# Compilation et renommage immédiat pour éviter toute confusion
-RUN mvn clean package -DskipTests &&     mv target/*.jar app.jar
+# 1. Compilation
+RUN mvn clean package -DskipTests
 
-# Vérification visuelle dans les logs
-RUN ls -lh app.jar
+# 2. On déplace UNIQUEMENT le JAR complet (shaded) vers app.jar
+RUN mv target/*-shaded.jar app.jar
+
+# 3. On nettoie le reste pour être léger
+RUN rm -rf target
 
 EXPOSE 8080
-# Lancement direct
 ENTRYPOINT ["java", "-Dspark.port=8080", "-jar", "app.jar"]
