@@ -2,112 +2,118 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Pilotage Intégral</title>
+    <title>OxyONE | Real-3D Industrial</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        /* Menu Configuration */
-        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 260px; z-index: 100; }
-        
-        /* Pavé de Flèches Visuelles */
-        #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 50px); grid-gap: 5px; z-index: 100; }
-        .nav-btn { width: 50px; height: 50px; background: rgba(0, 210, 255, 0.1); border: 1px solid #00d2ff; color: #00d2ff; 
-                   display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; transition: 0.2s; user-select: none; }
-        .nav-btn:hover { background: rgba(0, 210, 255, 0.4); box-shadow: 0 0 10px #00d2ff; }
-        .nav-btn:active { background: #00d2ff; color: #050505; }
-
-        .control-group { margin-bottom: 12px; }
-        input[type=range] { width: 100%; cursor: pointer; }
-        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        #legal { position: absolute; bottom: 10px; left: 10px; font-size: 0.7em; opacity: 0.5; }
+        body { margin: 0; background: #111; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 260px; z-index: 100; border-radius: 0 10px 10px 0; }
+        #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 55px); grid-gap: 8px; z-index: 100; }
+        .nav-btn { width: 55px; height: 55px; background: rgba(0, 210, 255, 0.1); border: 2px solid #00d2ff; color: #00d2ff; 
+                   display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; border-radius: 5px; }
+        .nav-btn:active { background: #00d2ff; color: #111; }
+        .control-group { margin-bottom: 15px; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #00d2ff; }
+        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <div id="gui">
-    <h3 style="margin:0 0 10px 0;">OxyONE MOTEUR 3D</h3>
+    <h3 style="margin:0 0 10px 0;">OxyONE REAL-3D</h3>
     <div class="control-group">
-        <label>Température : <span id="t-val">10</span>°C</label>
-        <input type="range" id="tp" min="1" max="20" value="10" oninput="upT(this.value, 'p')">
-        <input type="range" id="tn" min="-18" max="0" value="0" oninput="upT(this.value, 'n')">
+        <label>Température : <span id="t-val">4</span>°C</label>
+        <input type="range" id="tp" min="1" max="20" value="4" oninput="updateThermal(this.value, 'p')">
+        <input type="range" id="tn" min="-18" max="0" value="0" oninput="updateThermal(this.value, 'n')">
     </div>
     <div class="control-group">
         <label>Dimensions (m)</label>
-        <input type="range" id="rw" min="1" max="10" value="4" oninput="upD()">
-        <input type="range" id="rh" min="1" max="10" value="3" oninput="upD()">
-        <input type="range" id="rd" min="1" max="10" value="6" oninput="upD()">
+        <input type="range" id="rw" min="2" max="15" value="6" oninput="updateDim()">
+        <input type="range" id="rh" min="2" max="6" value="3" oninput="updateDim()">
+        <input type="range" id="rd" min="2" max="15" value="5" oninput="updateDim()">
     </div>
-    <button onclick="genPDF()">EXPORT RAPPORT PDF</button>
+    <button onclick="generatePDF()">RAPPORT TECHNIQUE PDF</button>
 </div>
 
 <div id="nav-pad">
-    <div style="grid-column: 2" class="nav-btn" onmousedown="startRot('up')" onmouseup="stopRot()" ontouchstart="startRot('up')" ontouchend="stopRot()">▲</div>
-    <div class="nav-btn" onmousedown="startRot('left')" onmouseup="stopRot()" ontouchstart="startRot('left')" ontouchend="stopRot()">◀</div>
-    <div class="nav-btn" style="font-size: 12px;" onclick="resetRot()">RESET</div>
-    <div class="nav-btn" onmousedown="startRot('right')" onmouseup="stopRot()" ontouchstart="startRot('right')" ontouchend="stopRot()">▶</div>
-    <div style="grid-column: 2" class="nav-btn" onmousedown="startRot('down')" onmouseup="stopRot()" ontouchstart="startRot('down')" ontouchend="stopRot()">▼</div>
+    <div style="grid-column: 2" class="nav-btn" onmousedown="move('up')">▲</div>
+    <div class="nav-btn" onmousedown="move('left')">◀</div>
+    <div class="nav-btn" onclick="reset()">R</div>
+    <div class="nav-btn" onmousedown="move('right')">▶</div>
+    <div style="grid-column: 2" class="nav-btn" onmousedown="move('down')">▼</div>
 </div>
-
-<div id="legal">© OxyONE - Protection Convention de Berne</div>
 
 <script>
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    scene.background = new THREE.Color(0x050505);
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    const mat = new THREE.MeshPhongMaterial({ color: 0xff0000, wireframe: true });
-    const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mat);
-    scene.add(cube);
-    scene.add(new THREE.GridHelper(20, 20, 0x444444, 0x222222));
-    const l = new THREE.PointLight(0xffffff, 1, 100); l.position.set(10,10,10); scene.add(l);
-    camera.position.set(8,8,8); camera.lookAt(0,0,0);
+    // Lumières pour le relief
+    const ambient = new THREE.AmbientLight(0xffffff, 0.4); scene.add(ambient);
+    const spot = new THREE.SpotLight(0xffffff, 0.8); spot.position.set(10, 20, 10); spot.castShadow = true; scene.add(spot);
 
-    let moveX = 0, moveY = 0;
+    // Structure Chambre Froide
+    const group = new THREE.Group();
+    
+    // Matériau Panneau Isotherme (Gris métal avec brillance)
+    const panelMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.6, roughness: 0.3 });
+    const chamber = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), panelMat);
+    chamber.castShadow = true;
+    group.add(chamber);
 
-    function startRot(dir) {
-        if(dir==='up') moveX = -0.05;
-        if(dir==='down') moveX = 0.05;
-        if(dir==='left') moveY = -0.05;
-        if(dir==='right') moveY = 0.05;
+    // Ajout d'une porte visuelle
+    const doorMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.7, 0.4), doorMat);
+    door.position.set(0.51, -0.1, 0); // Plaquée sur le côté
+    group.add(door);
+
+    scene.add(group);
+
+    // Sol Industriel
+    const grid = new THREE.GridHelper(40, 40, 0x00d2ff, 0x222222);
+    scene.add(grid);
+
+    camera.position.set(10, 8, 10);
+    camera.lookAt(0, 0, 0);
+
+    let vX = 0, vY = 0;
+    function move(d) {
+        if(d==='up') vX = -0.05; if(d==='down') vX = 0.05;
+        if(d==='left') vY = -0.05; if(d==='right') vY = 0.05;
+        window.addEventListener('mouseup', () => { vX = 0; vY = 0; }, {once: true});
     }
-    function stopRot() { moveX = 0; moveY = 0; }
-    function resetRot() { cube.rotation.set(0,0,0); stopRot(); }
+    function reset() { group.rotation.set(0,0,0); }
 
-    window.addEventListener('keydown', (e) => {
-        if(e.key === "ArrowUp") startRot('up');
-        if(e.key === "ArrowDown") startRot('down');
-        if(e.key === "ArrowLeft") startRot('left');
-        if(e.key === "ArrowRight") startRot('right');
-    });
-    window.addEventListener('keyup', stopRot);
-
-    function upT(v, t) {
+    function updateThermal(v, t) {
         document.getElementById('t-val').innerText = v;
-        if(t==='p') cube.material.color.setRGB(1, 1-(v/20), 0);
-        else cube.material.color.setRGB(1-(Math.abs(v)/18), 1, 1);
+        if(t==='p') chamber.material.color.setHSL(0, 0, 0.8 - (v/100)); // Plus sombre si chaud
+        else chamber.material.color.setRGB(0.8, 0.9, 1); // Bleuté si froid
     }
-    function upD() {
-        const w=document.getElementById('rw').value, h=document.getElementById('rh').value, d=document.getElementById('rd').value;
-        cube.scale.set(w,h,d); cube.position.y = h/2;
+
+    function updateDim() {
+        const w = document.getElementById('rw').value, h = document.getElementById('rh').value, d = document.getElementById('rd').value;
+        group.scale.set(w, h, d);
+        group.position.y = h/2; // Toujours posé au sol
     }
-    function genPDF() {
+
+    function generatePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.text("RAPPORT OXYONE - PROJET PROTEGE", 20, 20);
-        doc.text("Dimensions: "+document.getElementById('rw').value+"x"+document.getElementById('rh').value, 20, 40);
-        doc.save("OxyONE_Report.pdf");
+        doc.setFontSize(20); doc.text("OxyONE - FICHE TECHNIQUE", 20, 20);
+        doc.setFontSize(12); doc.text("Chambre Froide Industrielle Protegee (Berne)", 20, 40);
+        doc.text("Volume: " + (document.getElementById('rw').value * document.getElementById('rh').value * document.getElementById('rd').value) + " m3", 20, 60);
+        doc.save("OxyONE_Fiche.pdf");
     }
 
     function animate() {
         requestAnimationFrame(animate);
-        cube.rotation.x += moveX;
-        cube.rotation.y += moveY;
+        group.rotation.x += vX; group.rotation.y += vY;
         renderer.render(scene, camera);
     }
-    animate(); upD();
+    animate(); updateDim();
 </script>
 </body>
 </html>
