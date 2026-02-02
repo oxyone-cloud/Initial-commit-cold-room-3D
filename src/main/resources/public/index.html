@@ -2,45 +2,48 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Pilotage & Configuration</title>
+    <title>OxyONE | Pilotage Thermique & 3D</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.85); padding: 20px; border-left: 4px solid #00d2ff; width: 280px; z-index: 100; backdrop-filter: blur(5px); }
-        .control-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85em; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        input[type=range] { width: 100%; cursor: pointer; accent-color: #00d2ff; }
-        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; color: #050505; margin-top: 10px; transition: 0.3s; }
-        button:hover { background: #fff; box-shadow: 0 0 15px #00d2ff; }
-        #info { position: absolute; bottom: 20px; left: 20px; font-size: 0.75em; opacity: 0.6; pointer-events: none; }
+        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.85); padding: 20px; border-left: 4px solid #00d2ff; width: 300px; z-index: 100; backdrop-filter: blur(5px); }
+        .control-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75em; margin-bottom: 5px; text-transform: uppercase; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .temp-pos { accent-color: #ff4444; }
+        .temp-neg { accent-color: #4444ff; }
+        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        #status { font-family: monospace; font-size: 0.9em; margin-top: 10px; color: #fff; }
     </style>
 </head>
 <body>
 
 <div id="gui">
-    <h2 style="margin-top:0">OxyONE v1.2</h2>
+    <h2 style="margin:0 0 10px 0; font-size: 1.2em;">OxyONE THERMAL-3D</h2>
+    
     <div class="control-group">
-        <label>Largeur (m) : <span id="val-w">4</span></label>
-        <input type="range" id="width" min="1" max="15" step="0.5" value="4">
+        <label>Température Positive (1° à 20°C) : <span id="val-pos">10</span>°C</label>
+        <input type="range" id="tempPos" min="1" max="20" value="10" class="temp-pos">
     </div>
-    <div class="control-group">
-        <label>Hauteur (m) : <span id="val-h">3</span></label>
-        <input type="range" id="height" min="1" max="10" step="0.5" value="3">
-    </div>
-    <div class="control-group">
-        <label>Profondeur (m) : <span id="val-d">6</span></label>
-        <input type="range" id="depth" min="1" max="20" step="0.5" value="6">
-    </div>
-    <hr style="border: 0.5px solid #00d2ff; opacity: 0.3">
-    <button onclick="exportTechnicalPDF()">TÉLÉCHARGER RAPPORT PDF</button>
-    <p style="font-size: 0.7em; margin-top: 15px; line-height: 1.4;">
-        Utilisez les <b>flèches</b> pour pivoter.<br>
-        Utilisez les <b>curseurs</b> pour dimensionner.
-    </p>
-</div>
 
-<div id="info">OxyONE - Propriété protégée par la Convention de Berne</div>
+    <div class="control-group">
+        <label>Température Négative (0° à -18°C) : <span id="val-neg">0</span>°C</label>
+        <input type="range" id="tempNeg" min="-18" max="0" value="0" class="temp-neg">
+    </div>
+
+    <hr style="border:0.5px solid #00d2ff; opacity:0.2">
+    
+    <div class="control-group">
+        <label>Dimensions : L x H x P</label>
+        <input type="range" id="width" min="1" max="10" step="0.5" value="4">
+        <input type="range" id="height" min="1" max="10" step="0.5" value="3">
+        <input type="range" id="depth" min="1" max="10" step="0.5" value="6">
+    </div>
+
+    <button onclick="exportTechnicalPDF()">EXPORT RAPPORT TECHNIQUE</button>
+    <div id="status">> SYSTEME OPERATIONNEL</div>
+</div>
 
 <script>
     const scene = new THREE.Scene();
@@ -49,48 +52,44 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Lumières industrielles
-    const pointLight = new THREE.PointLight(0xffffff, 1);
-    pointLight.position.set(10, 10, 10);
-    scene.add(pointLight);
-    scene.add(new THREE.AmbientLight(0x404040, 2));
-
-    // Chambre Froide (Cube Dynamique)
-    const material = new THREE.MeshPhongMaterial({ 
-        color: 0x00d2ff, 
-        wireframe: true, 
-        transparent: true, 
-        opacity: 0.8 
-    });
-    let geometry = new THREE.BoxGeometry(1, 1, 1);
-    let cube = new THREE.Mesh(geometry, material);
+    const material = new THREE.MeshPhongMaterial({ color: 0x00d2ff, wireframe: true, transparent: true, opacity: 0.8 });
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
+    scene.add(new THREE.GridHelper(20, 20, 0x00d2ff, 0x002244));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const light = new THREE.PointLight(0xffffff, 1);
+    light.position.set(5, 5, 5);
+    scene.add(light);
 
-    // Grille de référence
-    const grid = new THREE.GridHelper(30, 30, 0x00d2ff, 0x002244);
-    scene.add(grid);
-
-    camera.position.set(8, 8, 8);
+    camera.position.set(7, 7, 7);
     camera.lookAt(0, 0, 0);
 
-    // Mise à jour temps réel des dimensions
-    function updateLayout() {
+    function updateLogic() {
+        // Dimensions
         const w = document.getElementById('width').value;
         const h = document.getElementById('height').value;
         const d = document.getElementById('depth').value;
-        
         cube.scale.set(w, h, d);
-        cube.position.y = h / 2; // Pose le cube sur la grille
-        
-        document.getElementById('val-w').innerText = w;
-        document.getElementById('val-h').innerText = h;
-        document.getElementById('val-d').innerText = d;
+        cube.position.y = h/2;
+
+        // Températures
+        const tP = document.getElementById('tempPos').value;
+        const tN = document.getElementById('tempNeg').value;
+        document.getElementById('val-pos').innerText = tP;
+        document.getElementById('val-neg').innerText = tN;
+
+        // Changement de couleur dynamique : si l'utilisateur touche au curseur négatif, le cube devient plus froid
+        if(tN < 0) {
+            cube.material.color.setRGB(0.5 + (tN/36), 0.7, 1);
+        } else {
+            cube.material.color.setRGB(1, 0.8 - (tP/40), 0.8 - (tP/40));
+        }
     }
 
-    document.querySelectorAll('input').forEach(input => input.addEventListener('input', updateLayout));
-    updateLayout();
+    document.querySelectorAll('input').forEach(i => i.addEventListener('input', updateLogic));
 
-    // Contrôles Clavier (Flèches)
+    // Contrôles Flèches Clavier
     window.addEventListener('keydown', (e) => {
         if(e.key === "ArrowLeft") cube.rotation.y -= 0.1;
         if(e.key === "ArrowRight") cube.rotation.y += 0.1;
@@ -98,49 +97,20 @@
         if(e.key === "ArrowDown") cube.rotation.x += 0.1;
     });
 
-    // Génération du Rapport PDF
     function exportTechnicalPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const w = document.getElementById('width').value;
-        const h = document.getElementById('height').value;
-        const d = document.getElementById('depth').value;
-
-        doc.setFillColor(0, 20, 40);
-        doc.rect(0, 0, 210, 40, 'F');
-        
-        doc.setTextColor(0, 210, 255);
-        doc.setFontSize(22);
-        doc.text("RAPPORT TECHNIQUE OxyONE", 20, 25);
-        
-        doc.setTextColor(40, 40, 40);
-        doc.setFontSize(14);
-        doc.text("Spécifications de la Chambre Froide :", 20, 55);
-        
-        doc.setFontSize(12);
-        doc.text("- Largeur : " + w + " mètres", 30, 70);
-        doc.text("- Hauteur : " + h + " mètres", 30, 80);
-        doc.text("- Profondeur : " + d + " mètres", 30, 90);
-        doc.text("- Volume Total : " + (w*h*d).toFixed(2) + " m3", 30, 105);
-        
-        doc.setFont("helvetica", "italic");
-        doc.text("Ce projet et son contenu sont protégés par la Convention de Berne.", 20, 140);
-        doc.text("Auteur : L'Usine du Futur dans le Secteur du Froid", 20, 150);
-
-        doc.save("OxyONE_Configuration.pdf");
+        doc.text("RAPPORT OXYONE - CONFIGURATION THERMIQUE", 20, 20);
+        doc.text("Dimensions : " + document.getElementById('width').value + "x" + document.getElementById('height').value + "x" + document.getElementById('depth').value, 20, 40);
+        doc.text("Consigne Positive : " + document.getElementById('tempPos').value + " C", 20, 50);
+        doc.text("Consigne Negative : " + document.getElementById('tempNeg').value + " C", 20, 60);
+        doc.text("Mention : Protege par la Convention de Berne", 20, 80);
+        doc.save("OxyONE_Export.pdf");
     }
 
-    function animate() {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-    }
+    function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
     animate();
-
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    updateLogic();
 </script>
 </body>
 </html>
