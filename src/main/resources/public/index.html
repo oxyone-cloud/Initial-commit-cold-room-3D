@@ -92,9 +92,9 @@
     // Contrôles Flèches Clavier
     window.addEventListener('keydown', (e) => {
         if(e.key === "ArrowLeft") cube.rotation.y -= 0.1;
-        if(e.key === "ArrowRight") cube.rotation.y += 0.1;
+        if(e.key === "ArrowRight") cube.rotation.y += 0.05;
         if(e.key === "ArrowUp") cube.rotation.x -= 0.1;
-        if(e.key === "ArrowDown") cube.rotation.x += 0.1;
+        if(e.key === "ArrowDown") cube.rotation.x += 0.05;
     });
 
     function exportTechnicalPDF() {
