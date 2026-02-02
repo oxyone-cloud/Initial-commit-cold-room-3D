@@ -2,20 +2,27 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Calculateur Volumétrique</title>
+    <title>OxyONE | Console Thermique et Volumétrique</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 280px; z-index: 100; border-radius: 0 10px 10px 0; }
+        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 300px; z-index: 100; border-radius: 0 10px 10px 0; max-height: 90vh; overflow-y: auto; }
         
-        .volume-display { font-size: 1.8em; font-weight: bold; text-align: center; margin: 10px 0; color: #fff; text-shadow: 0 0 10px #00d2ff; }
-        .control-group { margin-bottom: 15px; border-bottom: 1px solid rgba(0,210,255,0.2); padding-bottom: 10px; }
-        .val-badge { float: right; background: #00d2ff; color: #050505; padding: 2px 6px; border-radius: 4px; font-weight: bold; min-width: 45px; text-align: center; }
+        .display-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; border: 1px solid rgba(0,210,255,0.2); }
+        .main-val { font-size: 1.5em; font-weight: bold; color: #fff; }
+        .sub-label { font-size: 0.7em; text-transform: uppercase; opacity: 0.7; }
+
+        .control-group { margin-bottom: 12px; }
+        .val-badge { float: right; background: #00d2ff; color: #050505; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
+        .val-badge.temp { background: #ff4444; color: white; }
+        .val-badge.temp-n { background: #4444ff; color: white; }
         
-        input[type=range] { width: 100%; cursor: pointer; accent-color: #00d2ff; margin-top: 8px; }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #00d2ff; margin-top: 5px; }
+        input#tp { accent-color: #ff4444; }
+        input#tn { accent-color: #4444ff; }
+        
         button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; }
-        
         #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 50px); grid-gap: 5px; }
         .nav-btn { width: 50px; height: 50px; border: 1px solid #00d2ff; color: #00d2ff; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,210,255,0.1); }
     </style>
@@ -23,23 +30,43 @@
 <body>
 
 <div id="gui">
-    <h3 style="margin:0; font-size: 0.9em; opacity: 0.7;">CALCULATEUR OXYONE</h3>
-    <div class="volume-display"><span id="total-v">0.00</span> m³</div>
+    <h3 style="margin:0 0 10px 0; font-size: 1em;">CONSOLE OXYONE</h3>
     
-    <div class="control-group">
-        <label>Largeur <span class="val-badge" id="v-w">6.0</span></label>
-        <input type="range" id="rw" min="1" max="20" step="0.1" value="6" oninput="calculate()">
-    </div>
-    <div class="control-group">
-        <label>Hauteur <span class="val-badge" id="v-h">3.0</span></label>
-        <input type="range" id="rh" min="1" max="10" step="0.1" value="3" oninput="calculate()">
-    </div>
-    <div class="control-group">
-        <label>Profondeur <span class="val-badge" id="v-d">5.0</span></label>
-        <input type="range" id="rd" min="1" max="20" step="0.1" value="5" oninput="calculate()">
+    <div class="display-box">
+        <div class="sub-label">Volume Total</div>
+        <div class="main-val"><span id="total-v">0.00</span> m³</div>
     </div>
 
-    <button onclick="generatePDF()">GÉNÉRER RAPPORT PDF</button>
+    <div class="display-box" style="border-color: #ff4444;">
+        <div class="sub-label">Consigne Température</div>
+        <div class="main-val" id="main-t">4°C</div>
+    </div>
+    
+    <div class="control-group">
+        <label>Temp. Positive <span class="val-badge temp" id="v-tp">4°C</span></label>
+        <input type="range" id="tp" min="1" max="20" step="1" value="4" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label>Temp. Négative <span class="val-badge temp-n" id="v-tn">0°C</span></label>
+        <input type="range" id="tn" min="-18" max="0" step="1" value="0" oninput="calculate()">
+    </div>
+
+    <hr style="opacity:0.2">
+
+    <div class="control-group">
+        <label>Largeur <span class="val-badge" id="v-w">6.0m</span></label>
+        <input type="range" id="rw" min="1" max="20" step="0.5" value="6" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label>Hauteur <span class="val-badge" id="v-h">3.0m</span></label>
+        <input type="range" id="rh" min="1" max="10" step="0.5" value="3" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label>Profondeur <span class="val-badge" id="v-d">5.0m</span></label>
+        <input type="range" id="rd" min="1" max="20" step="0.5" value="5" oninput="calculate()">
+    </div>
+
+    <button onclick="generatePDF()">GÉNÉRER RAPPORT TECHNIQUE</button>
 </div>
 
 <div id="nav-pad">
@@ -57,16 +84,15 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.5); scene.add(ambient);
-    const point = new THREE.PointLight(0xffffff, 1); point.position.set(10,20,10); scene.add(point);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const light = new THREE.PointLight(0xffffff, 1); light.position.set(10,20,10); scene.add(light);
 
     const group = new THREE.Group();
-    const panelMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.5, roughness: 0.4 });
-    const chamber = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), panelMat);
+    const material = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.5, roughness: 0.4 });
+    const chamber = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
     group.add(chamber);
     
-    // Ajout d'une porte pour l'échelle
-    const door = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.7, 0.35), new THREE.MeshStandardMaterial({color: 0x222222}));
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.7, 0.3), new THREE.MeshStandardMaterial({color: 0x222222}));
     door.position.set(0.51, -0.1, 0);
     group.add(door);
     
@@ -83,36 +109,46 @@
     function reset() { group.rotation.set(0,0,0); }
 
     function calculate() {
+        // Dimensions
         const w = parseFloat(document.getElementById('rw').value);
         const h = parseFloat(document.getElementById('rh').value);
         const d = parseFloat(document.getElementById('rd').value);
-        
-        // Affichage des chiffres individuels
         document.getElementById('v-w').innerText = w.toFixed(1) + "m";
         document.getElementById('v-h').innerText = h.toFixed(1) + "m";
         document.getElementById('v-d').innerText = d.toFixed(1) + "m";
         
-        // Calcul du volume total
         const vol = w * h * d;
         document.getElementById('total-v').innerText = vol.toFixed(2);
-        
-        // Mise à jour 3D
         group.scale.set(w, h, d);
         group.position.y = h/2;
+
+        // Températures
+        const tp = document.getElementById('tp').value;
+        const tn = document.getElementById('tn').value;
+        document.getElementById('v-tp').innerText = tp + "°C";
+        document.getElementById('v-tn').innerText = tn + "°C";
+
+        // Affichage principal (Priorité au négatif si activé)
+        if(tn < 0) {
+            document.getElementById('main-t').innerText = tn + "°C";
+            document.getElementById('main-t').parentElement.style.borderColor = "#4444ff";
+            chamber.material.color.setRGB(0.7, 0.8, 1); // Teinte froide
+        } else {
+            document.getElementById('main-t').innerText = tp + "°C";
+            document.getElementById('main-t').parentElement.style.borderColor = "#ff4444";
+            chamber.material.color.setRGB(1, 0.9 - (tp/40), 0.8 - (tp/40)); // Teinte chaude
+        }
     }
 
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const vol = document.getElementById('total-v').innerText;
-        doc.setFontSize(20); doc.text("OxyONE - RAPPORT VOLUMÉTRIQUE", 20, 20);
-        doc.setFontSize(12); doc.text("Projet protégé par la Convention de Berne", 20, 30);
-        doc.text("--------------------------------------------------", 20, 35);
-        doc.text("Largeur : " + document.getElementById('rw').value + " m", 20, 50);
-        doc.text("Hauteur : " + document.getElementById('rh').value + " m", 20, 60);
-        doc.text("Profondeur : " + document.getElementById('rd').value + " m", 20, 70);
-        doc.setFontSize(14); doc.text("VOLUME TOTAL : " + vol + " m3", 20, 90);
-        doc.save("OxyONE_Volume.pdf");
+        doc.text("RAPPORT TECHNIQUE OxyONE", 20, 20);
+        doc.text("Propriete protegée - Convention de Berne", 20, 30);
+        doc.text("-------------------------------------------", 20, 35);
+        doc.text("Volume : " + document.getElementById('total-v').innerText + " m3", 20, 50);
+        doc.text("Temperature choisie : " + document.getElementById('main-t').innerText, 20, 60);
+        doc.save("OxyONE_Config_Complete.pdf");
     }
 
     function animate() {
