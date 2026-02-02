@@ -5,11 +5,10 @@ COPY . .
 # 1. Compilation
 RUN mvn clean package -DskipTests
 
-# 2. On trouve le fichier JAR le plus gros dans target/ et on le renomme en app.jar
-# Cela évite de se tromper de nom (shaded ou pas)
+# 2. On cherche le JAR le plus lourd et on le renomme (évite les erreurs de nommage)
 RUN find target/ -name "*.jar" -type f -exec ls -S {} + | head -n 1 | xargs -I {} cp {} app.jar
 
-# 3. Vérification pour le log de Render
+# 3. Vérification de sécurité
 RUN ls -lh app.jar
 
 EXPOSE 8080
