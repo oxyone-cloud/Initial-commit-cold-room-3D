@@ -2,53 +2,46 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Console Thermique et Volumétrique</title>
+    <title>OxyONE | Console Startup Labellisée</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 300px; z-index: 100; border-radius: 0 10px 10px 0; max-height: 90vh; overflow-y: auto; }
-        
         .display-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; border: 1px solid rgba(0,210,255,0.2); }
         .main-val { font-size: 1.5em; font-weight: bold; color: #fff; }
         .sub-label { font-size: 0.7em; text-transform: uppercase; opacity: 0.7; }
-
         .control-group { margin-bottom: 12px; }
         .val-badge { float: right; background: #00d2ff; color: #050505; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
-        .val-badge.temp { background: #ff4444; color: white; }
-        .val-badge.temp-n { background: #4444ff; color: white; }
-        
         input[type=range] { width: 100%; cursor: pointer; accent-color: #00d2ff; margin-top: 5px; }
-        input#tp { accent-color: #ff4444; }
-        input#tn { accent-color: #4444ff; }
-        
         button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; }
         #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 50px); grid-gap: 5px; }
-        .nav-btn { width: 50px; height: 50px; border: 1px solid #00d2ff; color: #00d2ff; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,210,255,0.1); }
+        .nav-btn { width: 50px; height: 50px; border: 1px solid #00d2ff; color: #00d2ff; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,210,255,0.1); font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="gui">
-    <h3 style="margin:0 0 10px 0; font-size: 1em;">CONSOLE OXYONE</h3>
+    <h3 style="margin:0 0 5px 0; font-size: 0.8em;">OxyONE SYSTEM</h3>
+    <p style="font-size: 0.6em; margin: 0 0 10px 0; opacity: 0.6;">Startup labellisée@2021 par le Ministère de l'Économie</p>
     
     <div class="display-box">
         <div class="sub-label">Volume Total</div>
-        <div class="main-val"><span id="total-v">0.00</span> m³</div>
+        <div class="main-val"><span id="total-v">90.00</span> m³</div>
     </div>
 
-    <div class="display-box" style="border-color: #ff4444;">
+    <div class="display-box" id="temp-frame" style="border-color: #ff4444;">
         <div class="sub-label">Consigne Température</div>
         <div class="main-val" id="main-t">4°C</div>
     </div>
     
     <div class="control-group">
-        <label>Temp. Positive <span class="val-badge temp" id="v-tp">4°C</span></label>
-        <input type="range" id="tp" min="1" max="20" step="1" value="4" oninput="calculate()">
+        <label>Temp. Positive <span class="val-badge" style="background:#ff4444" id="v-tp">4°C</span></label>
+        <input type="range" id="tp" min="1" max="20" value="4" oninput="calculate()">
     </div>
     <div class="control-group">
-        <label>Temp. Négative <span class="val-badge temp-n" id="v-tn">0°C</span></label>
-        <input type="range" id="tn" min="-18" max="0" step="1" value="0" oninput="calculate()">
+        <label>Temp. Négative <span class="val-badge" style="background:#4444ff" id="v-tn">0°C</span></label>
+        <input type="range" id="tn" min="-18" max="0" value="0" oninput="calculate()">
     </div>
 
     <hr style="opacity:0.2">
@@ -70,11 +63,11 @@
 </div>
 
 <div id="nav-pad">
-    <div style="grid-column: 2" class="nav-btn" onmousedown="move('up')">▲</div>
-    <div class="nav-btn" onmousedown="move('left')">◀</div>
-    <div class="nav-btn" onclick="reset()">R</div>
-    <div class="nav-btn" onmousedown="move('right')">▶</div>
-    <div style="grid-column: 2" class="nav-btn" onmousedown="move('down')">▼</div>
+    <div style="grid-column: 2" class="nav-btn" onmousedown="move('up')" onmouseup="stop()">▲</div>
+    <div class="nav-btn" onmousedown="move('left')" onmouseup="stop()">◀</div>
+    <div class="nav-btn" onclick="fullReset()" title="Réinitialiser tout">RESTART</div>
+    <div class="nav-btn" onmousedown="move('right')" onmouseup="stop()">▶</div>
+    <div style="grid-column: 2" class="nav-btn" onmousedown="move('down')" onmouseup="stop()">▼</div>
 </div>
 
 <script>
@@ -104,51 +97,65 @@
     function move(d) {
         if(d==='up') vX = -0.05; if(d==='down') vX = 0.05;
         if(d==='left') vY = -0.05; if(d==='right') vY = 0.05;
-        window.addEventListener('mouseup', () => { vX=0; vY=0; }, {once:true});
     }
-    function reset() { group.rotation.set(0,0,0); }
+    function stop() { vX = 0; vY = 0; }
+
+    // FONCTION RESTART AMÉLIORÉE
+    function fullReset() {
+        // Reset 3D
+        group.rotation.set(0,0,0);
+        vX = 0; vY = 0;
+        
+        // Reset Curseurs
+        document.getElementById('tp').value = 4;
+        document.getElementById('tn').value = 0;
+        document.getElementById('rw').value = 6;
+        document.getElementById('rh').value = 3;
+        document.getElementById('rd').value = 5;
+        
+        // Relancer le calcul
+        calculate();
+        console.log("Système OxyONE réinitialisé");
+    }
 
     function calculate() {
-        // Dimensions
         const w = parseFloat(document.getElementById('rw').value);
         const h = parseFloat(document.getElementById('rh').value);
         const d = parseFloat(document.getElementById('rd').value);
+        const tp = document.getElementById('tp').value;
+        const tn = document.getElementById('tn').value;
+
         document.getElementById('v-w').innerText = w.toFixed(1) + "m";
         document.getElementById('v-h').innerText = h.toFixed(1) + "m";
         document.getElementById('v-d').innerText = d.toFixed(1) + "m";
-        
-        const vol = w * h * d;
-        document.getElementById('total-v').innerText = vol.toFixed(2);
-        group.scale.set(w, h, d);
-        group.position.y = h/2;
-
-        // Températures
-        const tp = document.getElementById('tp').value;
-        const tn = document.getElementById('tn').value;
         document.getElementById('v-tp').innerText = tp + "°C";
         document.getElementById('v-tn').innerText = tn + "°C";
 
-        // Affichage principal (Priorité au négatif si activé)
+        document.getElementById('total-v').innerText = (w * h * d).toFixed(2);
+        group.scale.set(w, h, d);
+        group.position.y = h/2;
+
         if(tn < 0) {
             document.getElementById('main-t').innerText = tn + "°C";
-            document.getElementById('main-t').parentElement.style.borderColor = "#4444ff";
-            chamber.material.color.setRGB(0.7, 0.8, 1); // Teinte froide
+            document.getElementById('temp-frame').style.borderColor = "#4444ff";
+            chamber.material.color.setRGB(0.7, 0.8, 1);
         } else {
             document.getElementById('main-t').innerText = tp + "°C";
-            document.getElementById('main-t').parentElement.style.borderColor = "#ff4444";
-            chamber.material.color.setRGB(1, 0.9 - (tp/40), 0.8 - (tp/40)); // Teinte chaude
+            document.getElementById('temp-frame').style.borderColor = "#ff4444";
+            chamber.material.color.setRGB(1, 0.9, 0.8);
         }
     }
 
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.text("RAPPORT TECHNIQUE OxyONE", 20, 20);
-        doc.text("Startup labellisée@2021 par le Ministère de l'Économie de la connaissance, des starts-up et des micro-entreprises", 20, 30);
-        doc.text("-------------------------------------------", 20, 35);
+        doc.setFontSize(18); doc.text("RAPPORT TECHNIQUE OxyONE", 20, 20);
+        doc.setFontSize(10); doc.text("Startup labellisée@2021 par le Ministère de l'Économie de la connaissance,", 20, 30);
+        doc.text("des starts-up et des micro-entreprises.", 20, 35);
+        doc.setFontSize(12);
         doc.text("Volume : " + document.getElementById('total-v').innerText + " m3", 20, 50);
-        doc.text("Temperature choisie : " + document.getElementById('main-t').innerText, 20, 60);
-        doc.save("OxyONE_Config_Complete.pdf");
+        doc.text("Consigne : " + document.getElementById('main-t').innerText, 20, 60);
+        doc.save("OxyONE_Labellisee_2021.pdf");
     }
 
     function animate() {
