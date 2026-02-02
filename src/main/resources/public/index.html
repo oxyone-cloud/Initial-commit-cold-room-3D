@@ -144,7 +144,7 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.text("RAPPORT TECHNIQUE OxyONE", 20, 20);
-        doc.text("Propriete protegée - Convention de Berne", 20, 30);
+        doc.text("Startup labellisée@2021 par le Ministère de l'Économie de la connaissance, des starts-up et des micro-entreprises", 20, 30);
         doc.text("-------------------------------------------", 20, 35);
         doc.text("Volume : " + document.getElementById('total-v').innerText + " m3", 20, 50);
         doc.text("Temperature choisie : " + document.getElementById('main-t').innerText, 20, 60);
