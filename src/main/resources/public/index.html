@@ -2,38 +2,55 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Pilotage 3D Total</title>
+    <title>OxyONE | Pilotage Intégral</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 280px; z-index: 100; }
+        
+        /* Menu Configuration */
+        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 260px; z-index: 100; }
+        
+        /* Pavé de Flèches Visuelles */
+        #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 50px); grid-gap: 5px; z-index: 100; }
+        .nav-btn { width: 50px; height: 50px; background: rgba(0, 210, 255, 0.1); border: 1px solid #00d2ff; color: #00d2ff; 
+                   display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; transition: 0.2s; user-select: none; }
+        .nav-btn:hover { background: rgba(0, 210, 255, 0.4); box-shadow: 0 0 10px #00d2ff; }
+        .nav-btn:active { background: #00d2ff; color: #050505; }
+
         .control-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.75em; margin-bottom: 5px; color: #00d2ff; }
         input[type=range] { width: 100%; cursor: pointer; }
-        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; color: #050505; }
-        #instructions { font-size: 0.7em; margin-top: 10px; color: #fff; border: 1px dashed #00d2ff; padding: 5px; }
+        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        #legal { position: absolute; bottom: 10px; left: 10px; font-size: 0.7em; opacity: 0.5; }
     </style>
 </head>
 <body>
 
 <div id="gui">
-    <h2 style="margin:0 0 10px 0;">OxyONE v1.3</h2>
-    <div id="instructions">FLÈCHES : Rotation manuelle<br>AUTO : Activé</div>
-    <br>
+    <h3 style="margin:0 0 10px 0;">OxyONE MOTEUR 3D</h3>
     <div class="control-group">
-        <label>Température : <span id="temp-val">10</span>°C</label>
-        <input type="range" id="tPos" min="1" max="20" value="10" oninput="updateT(this.value, 'pos')">
-        <input type="range" id="tNeg" min="-18" max="0" value="0" oninput="updateT(this.value, 'neg')">
+        <label>Température : <span id="t-val">10</span>°C</label>
+        <input type="range" id="tp" min="1" max="20" value="10" oninput="upT(this.value, 'p')">
+        <input type="range" id="tn" min="-18" max="0" value="0" oninput="upT(this.value, 'n')">
     </div>
     <div class="control-group">
-        <label>Volume (L/H/P)</label>
-        <input type="range" id="w" min="1" max="10" value="4" oninput="upDim()">
-        <input type="range" id="h" min="1" max="10" value="3" oninput="upDim()">
-        <input type="range" id="d" min="1" max="10" value="6" oninput="upDim()">
+        <label>Dimensions (m)</label>
+        <input type="range" id="rw" min="1" max="10" value="4" oninput="upD()">
+        <input type="range" id="rh" min="1" max="10" value="3" oninput="upD()">
+        <input type="range" id="rd" min="1" max="10" value="6" oninput="upD()">
     </div>
-    <button onclick="savePDF()">EXPORT PDF</button>
+    <button onclick="genPDF()">EXPORT RAPPORT PDF</button>
 </div>
+
+<div id="nav-pad">
+    <div style="grid-column: 2" class="nav-btn" onmousedown="startRot('up')" onmouseup="stopRot()" ontouchstart="startRot('up')" ontouchend="stopRot()">▲</div>
+    <div class="nav-btn" onmousedown="startRot('left')" onmouseup="stopRot()" ontouchstart="startRot('left')" ontouchend="stopRot()">◀</div>
+    <div class="nav-btn" style="font-size: 12px;" onclick="resetRot()">RESET</div>
+    <div class="nav-btn" onmousedown="startRot('right')" onmouseup="stopRot()" ontouchstart="startRot('right')" ontouchend="stopRot()">▶</div>
+    <div style="grid-column: 2" class="nav-btn" onmousedown="startRot('down')" onmouseup="stopRot()" ontouchstart="startRot('down')" ontouchend="stopRot()">▼</div>
+</div>
+
+<div id="legal">© OxyONE - Protection Convention de Berne</div>
 
 <script>
     const scene = new THREE.Scene();
@@ -42,61 +59,55 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Cube OxyONE
-    const material = new THREE.MeshPhongMaterial({ color: 0xff0000, wireframe: true });
-    const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+    const mat = new THREE.MeshPhongMaterial({ color: 0xff0000, wireframe: true });
+    const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mat);
     scene.add(cube);
     scene.add(new THREE.GridHelper(20, 20, 0x444444, 0x222222));
-    const light = new THREE.PointLight(0xffffff, 1, 100);
-    light.position.set(10, 10, 10);
-    scene.add(light);
-    camera.position.set(8, 8, 8);
-    camera.lookAt(0, 0, 0);
+    const l = new THREE.PointLight(0xffffff, 1, 100); l.position.set(10,10,10); scene.add(l);
+    camera.position.set(8,8,8); camera.lookAt(0,0,0);
 
-    let rotY = 0.005; // Rotation automatique de base
-    let rotX = 0;
+    let moveX = 0, moveY = 0;
 
-    // CAPTURE DU CLAVIER AMÉLIORÉE
+    function startRot(dir) {
+        if(dir==='up') moveX = -0.05;
+        if(dir==='down') moveX = 0.05;
+        if(dir==='left') moveY = -0.05;
+        if(dir==='right') moveY = 0.05;
+    }
+    function stopRot() { moveX = 0; moveY = 0; }
+    function resetRot() { cube.rotation.set(0,0,0); stopRot(); }
+
     window.addEventListener('keydown', (e) => {
-        rotY = 0; rotX = 0; // Arrête l'auto-rotation au toucher
-        if(e.key === "ArrowLeft") cube.rotation.y -= 0.15;
-        if(e.key === "ArrowRight") cube.rotation.y += 0.15;
-        if(e.key === "ArrowUp") cube.rotation.x -= 0.15;
-        if(e.key === "ArrowDown") cube.rotation.x += 0.15;
-        console.log("Touche pressée : " + e.key);
+        if(e.key === "ArrowUp") startRot('up');
+        if(e.key === "ArrowDown") startRot('down');
+        if(e.key === "ArrowLeft") startRot('left');
+        if(e.key === "ArrowRight") startRot('right');
     });
+    window.addEventListener('keyup', stopRot);
 
-    function updateT(v, type) {
-        document.getElementById('temp-val').innerText = v;
-        if(type==='pos') cube.material.color.setRGB(1, 1-(v/20), 0);
+    function upT(v, t) {
+        document.getElementById('t-val').innerText = v;
+        if(t==='p') cube.material.color.setRGB(1, 1-(v/20), 0);
         else cube.material.color.setRGB(1-(Math.abs(v)/18), 1, 1);
     }
-
-    function upDim() {
-        const wv = document.getElementById('w').value;
-        const hv = document.getElementById('h').value;
-        const dv = document.getElementById('d').value;
-        cube.scale.set(wv, hv, dv);
-        cube.position.y = hv/2;
+    function upD() {
+        const w=document.getElementById('rw').value, h=document.getElementById('rh').value, d=document.getElementById('rd').value;
+        cube.scale.set(w,h,d); cube.position.y = h/2;
     }
-
-    function savePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("OxyONE REPORT - Convention de Berne", 20, 20);
-        doc.text("Temp: " + document.getElementById('temp-val').innerText + "C", 20, 40);
-        doc.save("OxyONE.pdf");
+    function genPDF() {
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
+        doc.text("RAPPORT OXYONE - PROJET PROTEGE", 20, 20);
+        doc.text("Dimensions: "+document.getElementById('rw').value+"x"+document.getElementById('rh').value, 20, 40);
+        doc.save("OxyONE_Report.pdf");
     }
 
     function animate() {
         requestAnimationFrame(animate);
-        cube.rotation.y += rotY; // Applique la rotation automatique ou manuelle
-        cube.rotation.x += rotX;
+        cube.rotation.x += moveX;
+        cube.rotation.y += moveY;
         renderer.render(scene, camera);
     }
-    
-    animate();
-    upDim();
+    animate(); upD();
 </script>
 </body>
 </html>
