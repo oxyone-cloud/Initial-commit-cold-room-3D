@@ -2,47 +2,47 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Pilotage Thermique & 3D</title>
+    <title>OxyONE | Monitoring Thermique</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.85); padding: 20px; border-left: 4px solid #00d2ff; width: 300px; z-index: 100; backdrop-filter: blur(5px); }
-        .control-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.75em; margin-bottom: 5px; text-transform: uppercase; }
+        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 300px; z-index: 100; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.8em; margin-bottom: 5px; color: #00d2ff; font-weight: bold; }
         input[type=range] { width: 100%; cursor: pointer; }
         .temp-pos { accent-color: #ff4444; }
         .temp-neg { accent-color: #4444ff; }
-        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        #status { font-family: monospace; font-size: 0.9em; margin-top: 10px; color: #fff; }
+        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; color: #050505; transition: 0.3s; }
+        button:hover { background: #fff; }
+        #thermostat { font-size: 1.5em; text-align: center; margin: 10px 0; font-family: monospace; }
     </style>
 </head>
 <body>
 
 <div id="gui">
-    <h2 style="margin:0 0 10px 0; font-size: 1.2em;">OxyONE THERMAL-3D</h2>
+    <h2 style="margin:0 0 10px 0;">OxyONE CONTROL</h2>
     
+    <div id="thermostat"><span id="display-temp">10</span>°C</div>
+
     <div class="control-group">
-        <label>Température Positive (1° à 20°C) : <span id="val-pos">10</span>°C</label>
-        <input type="range" id="tempPos" min="1" max="20" value="10" class="temp-pos">
+        <label>Zone Positive (1° à 20°C)</label>
+        <input type="range" id="tempPos" min="1" max="20" value="10" class="temp-pos" oninput="updateThermal(this.value, 'pos')">
     </div>
 
     <div class="control-group">
-        <label>Température Négative (0° à -18°C) : <span id="val-neg">0</span>°C</label>
-        <input type="range" id="tempNeg" min="-18" max="0" value="0" class="temp-neg">
+        <label>Zone Négative (0° à -18°C)</label>
+        <input type="range" id="tempNeg" min="-18" max="0" value="0" class="temp-neg" oninput="updateThermal(this.value, 'neg')">
     </div>
 
-    <hr style="border:0.5px solid #00d2ff; opacity:0.2">
-    
     <div class="control-group">
-        <label>Dimensions : L x H x P</label>
-        <input type="range" id="width" min="1" max="10" step="0.5" value="4">
-        <input type="range" id="height" min="1" max="10" step="0.5" value="3">
-        <input type="range" id="depth" min="1" max="10" step="0.5" value="6">
+        <label>Dimensions (L/H/P)</label>
+        <input type="range" id="width" min="1" max="10" value="4" oninput="updateDim()">
+        <input type="range" id="height" min="1" max="10" value="3" oninput="updateDim()">
+        <input type="range" id="depth" min="1" max="10" value="6" oninput="updateDim()">
     </div>
 
-    <button onclick="exportTechnicalPDF()">EXPORT RAPPORT TECHNIQUE</button>
-    <div id="status">> SYSTEME OPERATIONNEL</div>
+    <button onclick="exportPDF()">ARCHIVER RAPPORT PDF</button>
 </div>
 
 <script>
@@ -52,65 +52,66 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    const material = new THREE.MeshPhongMaterial({ color: 0x00d2ff, wireframe: true, transparent: true, opacity: 0.8 });
+    // Cube OxyONE
     const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshPhongMaterial({ color: 0xff0000, wireframe: true, transparent: true, opacity: 0.8 });
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
-    scene.add(new THREE.GridHelper(20, 20, 0x00d2ff, 0x002244));
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const light = new THREE.PointLight(0xffffff, 1);
-    light.position.set(5, 5, 5);
+    
+    scene.add(new THREE.GridHelper(20, 20, 0x444444, 0x222222));
+    const light = new THREE.PointLight(0xffffff, 1, 100);
+    light.position.set(10, 10, 10);
     scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040));
 
-    camera.position.set(7, 7, 7);
+    camera.position.set(6, 6, 6);
     camera.lookAt(0, 0, 0);
 
-    function updateLogic() {
-        // Dimensions
+    function updateThermal(val, type) {
+        document.getElementById('display-temp').innerText = val;
+        
+        if (type === 'pos') {
+            // Du Jaune (basse intensité positive) au Rouge vif (20°C)
+            const ratio = val / 20;
+            cube.material.color.setRGB(1, 1 - ratio, 0); 
+            document.getElementById('tempNeg').value = 0;
+        } else {
+            // Du Bleu clair au Blanc givré (-18°C)
+            const ratio = Math.abs(val) / 18;
+            cube.material.color.setRGB(1 - ratio, 1, 1);
+            document.getElementById('tempPos').value = 1;
+        }
+    }
+
+    function updateDim() {
         const w = document.getElementById('width').value;
         const h = document.getElementById('height').value;
         const d = document.getElementById('depth').value;
         cube.scale.set(w, h, d);
         cube.position.y = h/2;
-
-        // Températures
-        const tP = document.getElementById('tempPos').value;
-        const tN = document.getElementById('tempNeg').value;
-        document.getElementById('val-pos').innerText = tP;
-        document.getElementById('val-neg').innerText = tN;
-
-        // Changement de couleur dynamique : si l'utilisateur touche au curseur négatif, le cube devient plus froid
-        if(tN < 0) {
-            cube.material.color.setRGB(0.5 + (tN/36), 0.7, 1);
-        } else {
-            cube.material.color.setRGB(1, 0.8 - (tP/40), 0.8 - (tP/40));
-        }
     }
 
-    document.querySelectorAll('input').forEach(i => i.addEventListener('input', updateLogic));
-
-    // Contrôles Flèches Clavier
+    // Flèches Clavier
     window.addEventListener('keydown', (e) => {
         if(e.key === "ArrowLeft") cube.rotation.y -= 0.1;
-        if(e.key === "ArrowRight") cube.rotation.y += 0.05;
+        if(e.key === "ArrowRight") cube.rotation.y += 0.1;
         if(e.key === "ArrowUp") cube.rotation.x -= 0.1;
-        if(e.key === "ArrowDown") cube.rotation.x += 0.05;
+        if(e.key === "ArrowDown") cube.rotation.x += 0.1;
     });
 
-    function exportTechnicalPDF() {
+    function exportPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.text("RAPPORT OXYONE - CONFIGURATION THERMIQUE", 20, 20);
-        doc.text("Dimensions : " + document.getElementById('width').value + "x" + document.getElementById('height').value + "x" + document.getElementById('depth').value, 20, 40);
-        doc.text("Consigne Positive : " + document.getElementById('tempPos').value + " C", 20, 50);
-        doc.text("Consigne Negative : " + document.getElementById('tempNeg').value + " C", 20, 60);
-        doc.text("Mention : Protege par la Convention de Berne", 20, 80);
-        doc.save("OxyONE_Export.pdf");
+        doc.text("RAPPORT TECHNIQUE OXYONE", 20, 20);
+        doc.text("Temperature: " + document.getElementById('display-temp').innerText + " C", 20, 40);
+        doc.text("Convention de Berne - Propriete de l'auteur", 20, 100);
+        doc.save("OxyONE-Snapshot.pdf");
     }
 
     function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
     animate();
-    updateLogic();
+    updateDim();
+    updateThermal(10, 'pos');
 </script>
 </body>
 </html>
