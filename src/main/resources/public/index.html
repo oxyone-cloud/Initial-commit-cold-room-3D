@@ -2,36 +2,52 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Console Startup Labellisée</title>
+    <title>OxyONE | Global Network</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.9); padding: 20px; border-left: 4px solid #00d2ff; width: 300px; z-index: 100; border-radius: 0 10px 10px 0; max-height: 90vh; overflow-y: auto; }
-        .display-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; border: 1px solid rgba(0,210,255,0.2); }
-        .main-val { font-size: 1.5em; font-weight: bold; color: #fff; }
-        .sub-label { font-size: 0.7em; text-transform: uppercase; opacity: 0.7; }
-        .control-group { margin-bottom: 12px; }
-        .val-badge { float: right; background: #00d2ff; color: #050505; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
+        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.95); padding: 20px; border-left: 4px solid #00d2ff; width: 310px; z-index: 100; border-radius: 0 10px 10px 0; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
+        .display-box { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 5px; margin-bottom: 12px; text-align: center; border: 1px solid rgba(0,210,255,0.3); }
+        .main-val { font-size: 1.6em; font-weight: bold; color: #fff; }
+        .sub-label { font-size: 0.65em; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+        .control-group { margin-bottom: 10px; }
+        .val-badge { float: right; background: #00d2ff; color: #050505; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
+        
+        select { width: 100%; background: #111; color: #00d2ff; border: 1px solid #00d2ff; padding: 8px; border-radius: 4px; margin-top: 5px; cursor: pointer; }
+        
         input[type=range] { width: 100%; cursor: pointer; accent-color: #00d2ff; margin-top: 5px; }
-        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; }
-        #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 50px); grid-gap: 5px; }
-        .nav-btn { width: 50px; height: 50px; border: 1px solid #00d2ff; color: #00d2ff; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,210,255,0.1); font-weight: bold; }
+        button { background: #00d2ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; color: #050505; transition: 0.3s; }
+        button:hover { background: #fff; }
+        #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 55px); grid-gap: 8px; }
+        .nav-btn { width: 55px; height: 55px; border: 2px solid #00d2ff; color: #00d2ff; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,210,255,0.1); font-weight: bold; border-radius: 8px; }
     </style>
 </head>
 <body>
 
 <div id="gui">
-    <h3 style="margin:0 0 5px 0; font-size: 0.8em;">OxyONE SYSTEM</h3>
-    <p style="font-size: 0.6em; margin: 0 0 10px 0; opacity: 0.6;">Startup labellisée@2021 par le Ministère de l'Économie</p>
+    <h2 style="margin:0; font-size: 1.2em; letter-spacing: 2px;">OxyONE 3D</h2>
+    <p style="font-size: 0.6em; margin: 5px 0 15px 0; color: #aaa;">Startup labellisée@2021 | Ministère de l'Économie</p>
     
+    <div class="control-group">
+        <label style="font-size: 0.8em; opacity: 0.8;">SÉLECTION DU PAYS / REGION</label>
+        <select id="country-select" onchange="updateCountry()">
+            <option value="DZ">🇩🇿 ALGERIE (Siège social)</option>
+            <option value="FR">🇫🇷 FRANCE</option>
+            <option value="AE">🇦🇪 EMIRATS ARABES UNIS</option>
+            <option value="MA">🇲🇦 MAROC</option>
+            <option value="TN">🇹🇳 TUNISIE</option>
+            <option value="INT">🌐 INTERNATIONAL (Global)</option>
+        </select>
+    </div>
+
     <div class="display-box">
-        <div class="sub-label">Volume Total</div>
+        <div class="sub-label">Volume de Stockage</div>
         <div class="main-val"><span id="total-v">90.00</span> m³</div>
     </div>
 
     <div class="display-box" id="temp-frame" style="border-color: #ff4444;">
-        <div class="sub-label">Consigne Température</div>
+        <div class="sub-label">Consigne Thermique</div>
         <div class="main-val" id="main-t">4°C</div>
     </div>
     
@@ -44,7 +60,7 @@
         <input type="range" id="tn" min="-18" max="0" value="0" oninput="calculate()">
     </div>
 
-    <hr style="opacity:0.2">
+    <hr style="opacity:0.1; margin: 15px 0;">
 
     <div class="control-group">
         <label>Largeur <span class="val-badge" id="v-w">6.0m</span></label>
@@ -52,7 +68,7 @@
     </div>
     <div class="control-group">
         <label>Hauteur <span class="val-badge" id="v-h">3.0m</span></label>
-        <input type="range" id="rh" min="1" max="10" step="0.5" value="3" oninput="calculate()">
+        <input type="range" id="rh" min="1" max="8" step="0.5" value="3" oninput="calculate()">
     </div>
     <div class="control-group">
         <label>Profondeur <span class="val-badge" id="v-d">5.0m</span></label>
@@ -65,7 +81,7 @@
 <div id="nav-pad">
     <div style="grid-column: 2" class="nav-btn" onmousedown="move('up')" onmouseup="stop()">▲</div>
     <div class="nav-btn" onmousedown="move('left')" onmouseup="stop()">◀</div>
-    <div class="nav-btn" onclick="fullReset()" title="Réinitialiser tout">RESTART</div>
+    <div class="nav-btn" onclick="fullReset()">RESET</div>
     <div class="nav-btn" onmousedown="move('right')" onmouseup="stop()">▶</div>
     <div style="grid-column: 2" class="nav-btn" onmousedown="move('down')" onmouseup="stop()">▼</div>
 </div>
@@ -77,45 +93,38 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const light = new THREE.PointLight(0xffffff, 1); light.position.set(10,20,10); scene.add(light);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const light = new THREE.DirectionalLight(0xffffff, 1); light.position.set(5, 10, 7); scene.add(light);
 
     const group = new THREE.Group();
-    const material = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.5, roughness: 0.4 });
+    const material = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.7, roughness: 0.2 });
     const chamber = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
     group.add(chamber);
     
-    const door = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.7, 0.3), new THREE.MeshStandardMaterial({color: 0x222222}));
-    door.position.set(0.51, -0.1, 0);
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.7, 0.3), new THREE.MeshStandardMaterial({color: 0x111111}));
+    door.position.set(0.501, -0.1, 0);
     group.add(door);
     
     scene.add(group);
-    scene.add(new THREE.GridHelper(40, 40, 0x00d2ff, 0x222222));
-    camera.position.set(12, 10, 12); camera.lookAt(0,0,0);
+    scene.add(new THREE.GridHelper(50, 50, 0x00d2ff, 0x111111));
+    camera.position.set(12, 8, 12); camera.lookAt(0,0,0);
 
     let vX = 0, vY = 0;
     function move(d) {
-        if(d==='up') vX = -0.05; if(d==='down') vX = 0.05;
-        if(d==='left') vY = -0.05; if(d==='right') vY = 0.05;
+        if(d==='up') vX = -0.04; if(d==='down') vX = 0.04;
+        if(d==='left') vY = -0.04; if(d==='right') vY = 0.04;
     }
     function stop() { vX = 0; vY = 0; }
 
-    // FONCTION RESTART AMÉLIORÉE
     function fullReset() {
-        // Reset 3D
         group.rotation.set(0,0,0);
-        vX = 0; vY = 0;
-        
-        // Reset Curseurs
         document.getElementById('tp').value = 4;
         document.getElementById('tn').value = 0;
         document.getElementById('rw').value = 6;
         document.getElementById('rh').value = 3;
         document.getElementById('rd').value = 5;
-        
-        // Relancer le calcul
+        document.getElementById('country-select').value = 'DZ';
         calculate();
-        console.log("Système OxyONE réinitialisé");
     }
 
     function calculate() {
@@ -138,24 +147,35 @@
         if(tn < 0) {
             document.getElementById('main-t').innerText = tn + "°C";
             document.getElementById('temp-frame').style.borderColor = "#4444ff";
-            chamber.material.color.setRGB(0.7, 0.8, 1);
+            chamber.material.color.setRGB(0.6, 0.8, 1);
         } else {
             document.getElementById('main-t').innerText = tp + "°C";
             document.getElementById('temp-frame').style.borderColor = "#ff4444";
-            chamber.material.color.setRGB(1, 0.9, 0.8);
+            chamber.material.color.setRGB(0.8, 0.8, 0.8);
         }
+    }
+
+    function updateCountry() {
+        const c = document.getElementById('country-select').value;
+        console.log("Region switched to: " + c);
+        // Possibilité ici de changer les unités ou les devises à l'avenir
     }
 
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFontSize(18); doc.text("RAPPORT TECHNIQUE OxyONE", 20, 20);
-        doc.setFontSize(10); doc.text("Startup labellisée@2021 par le Ministère de l'Économie de la connaissance,", 20, 30);
-        doc.text("des starts-up et des micro-entreprises.", 20, 35);
-        doc.setFontSize(12);
-        doc.text("Volume : " + document.getElementById('total-v').innerText + " m3", 20, 50);
-        doc.text("Consigne : " + document.getElementById('main-t').innerText, 20, 60);
-        doc.save("OxyONE_Labellisee_2021.pdf");
+        const country = document.getElementById('country-select').options[document.getElementById('country-select').selectedIndex].text;
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("OxyONE - TECHNICAL REPORT", 20, 20);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.text("Region : " + country, 20, 30);
+        doc.text("Startup labellisée@2021 par le Ministère de l'Économie de la connaissance.", 20, 35);
+        doc.line(20, 40, 190, 40);
+        doc.text("Volume: " + document.getElementById('total-v').innerText + " m3", 20, 55);
+        doc.text("Setpoint: " + document.getElementById('main-t').innerText, 20, 65);
+        doc.save("OxyONE_Report_" + document.getElementById('country-select').value + ".pdf");
     }
 
     function animate() {
