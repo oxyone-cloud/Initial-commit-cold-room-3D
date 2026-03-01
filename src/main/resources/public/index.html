@@ -28,13 +28,17 @@
     
     <div class="control-group">
         <label style="font-size: 0.8em; opacity: 0.8;">📍 LOCALISATION (WILAYA)</label>
-        <select id="wilaya-select">
-            </select>
+        <select id="wilaya-select"></select>
     </div>
 
     <div class="display-box">
         <div class="sub-label">Volume Calculé</div>
         <div class="main-val"><span id="total-v">90.00</span> m³</div>
+    </div>
+
+    <div class="display-box" style="border-color: rgba(255, 255, 255, 0.2);">
+        <div class="sub-label">Surface des Parois</div>
+        <div class="main-val"><span id="total-s">126.00</span> m²</div>
     </div>
 
     <div class="display-box" id="temp-frame" style="border-color: #ff4444;">
@@ -136,12 +140,21 @@
         const d = parseFloat(document.getElementById('rd').value);
         const tp = document.getElementById('tp').value;
         const tn = document.getElementById('tn').value;
+        
         document.getElementById('v-w').innerText = w.toFixed(1) + "m";
         document.getElementById('v-h').innerText = h.toFixed(1) + "m";
         document.getElementById('v-d').innerText = d.toFixed(1) + "m";
         document.getElementById('v-tp').innerText = tp + "°C";
         document.getElementById('v-tn').innerText = tn + "°C";
+        
+        // Calcul Volume
         document.getElementById('total-v').innerText = (w * h * d).toFixed(2);
+        
+        // NOUVEAU : Calcul Surface Totale des Parois
+        // Formule : 2*(L*H) + 2*(P*H) + 2*(L*P)
+        const surface = (2 * (w * h)) + (2 * (d * h)) + (2 * (w * d));
+        document.getElementById('total-s').innerText = surface.toFixed(2);
+
         group.scale.set(w, h, d);
         group.position.y = h/2;
         if(tn < 0) {
@@ -166,7 +179,9 @@
         doc.text("Startup Labellisée@2021 | Ministère de l'Économie", 20, 35);
         doc.line(20, 40, 190, 40);
         doc.text("Volume: " + document.getElementById('total-v').innerText + " m3", 20, 55);
-        doc.text("Consigne: " + document.getElementById('main-t').innerText, 20, 65);
+        // Ajout de la surface dans le PDF
+        doc.text("Surface des Parois: " + document.getElementById('total-s').innerText + " m2", 20, 65);
+        doc.text("Consigne: " + document.getElementById('main-t').innerText, 20, 75);
         doc.save("OxyONE_Rapport_" + wilaya + ".pdf");
     }
 
