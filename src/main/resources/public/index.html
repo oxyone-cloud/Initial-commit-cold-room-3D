@@ -7,9 +7,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { margin: 0; background: #050505; color: #00d2ff; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.95); padding: 20px; border-left: 4px solid #00d2ff; width: 310px; z-index: 100; border-radius: 0 10px 10px 0; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
+        #gui { position: absolute; top: 10px; left: 10px; background: rgba(0, 20, 40, 0.95); padding: 20px; border-left: 4px solid #00d2ff; width: 320px; z-index: 100; border-radius: 0 10px 10px 0; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-height: 95vh; overflow-y: auto; }
         .display-box { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 5px; margin-bottom: 12px; text-align: center; border: 1px solid rgba(0,210,255,0.3); }
-        .main-val { font-size: 1.6em; font-weight: bold; color: #fff; }
+        .main-val { font-size: 1.5em; font-weight: bold; color: #fff; }
         .sub-label { font-size: 0.65em; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
         .control-group { margin-bottom: 10px; }
         .val-badge { float: right; background: #00d2ff; color: #050505; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
@@ -29,6 +29,18 @@
     <div class="control-group">
         <label style="font-size: 0.8em; opacity: 0.8;">📍 LOCALISATION (WILAYA)</label>
         <select id="wilaya-select"></select>
+    </div>
+
+    <div class="control-group">
+        <label style="font-size: 0.8em; opacity: 0.8;">🥩 CATÉGORIE DE CONSERVATION</label>
+        <select id="category-select" onchange="onCategoryChange()">
+            <option value="viande_rouge">Viande Rouge (0°C à +2°C)</option>
+            <option value="viande_blanche">Viande Blanche (+1°C à +3°C)</option>
+            <option value="fruits_legumes">Fruits & Légumes (+4°C à +8°C)</option>
+            <option value="produits_laitiers">Produits Laitiers (+2°C à +6°C)</option>
+            <option value="poissons">Poissons & Crustacés (0°C à +2°C)</option>
+            <option value="congele">Produits Congelés (-18°C à -25°C)</option>
+        </select>
     </div>
 
     <div class="control-group">
@@ -68,7 +80,7 @@
     </div>
     <div class="control-group">
         <label>Temp. Négative <span class="val-badge" style="background:#4444ff" id="v-tn">0°C</span></label>
-        <input type="range" id="tn" min="-18" max="0" value="0" oninput="calculate()">
+        <input type="range" id="tn" min="-25" max="0" value="0" oninput="calculate()">
     </div>
 
     <hr style="opacity:0.1; margin: 15px 0;">
@@ -146,10 +158,24 @@
 
     function fullReset() {
         group.rotation.set(0,0,0);
-        document.getElementById('tp').value = 4; document.getElementById('tn').value = 0;
+        document.getElementById('category-select').value = "viande_rouge";
+        document.getElementById('tp').value = 1; 
+        document.getElementById('tn').value = 0;
         document.getElementById('rw').value = 6; document.getElementById('rh').value = 3; document.getElementById('rd').value = 5;
         document.getElementById('wilaya-select').value = "16 Alger";
         document.getElementById('rooms-select').value = "1";
+        calculate();
+    }
+
+    // Gestion de l'ajustement automatique de la température selon le produit choisi
+    function onCategoryChange() {
+        const cat = document.getElementById('category-select').value;
+        if (cat === "viande_rouge") { document.getElementById('tp').value = 1; document.getElementById('tn').value = 0; }
+        else if (cat === "viande_blanche") { document.getElementById('tp').value = 2; document.getElementById('tn').value = 0; }
+        else if (cat === "fruits_legumes") { document.getElementById('tp').value = 6; document.getElementById('tn').value = 0; }
+        else if (cat === "produits_laitiers") { document.getElementById('tp').value = 4; document.getElementById('tn').value = 0; }
+        else if (cat === "poissons") { document.getElementById('tp').value = 1; document.getElementById('tn').value = 0; }
+        else if (cat === "congele") { document.getElementById('tp').value = 1; document.getElementById('tn').value = -18; }
         calculate();
     }
 
@@ -157,9 +183,10 @@
         const w = parseFloat(document.getElementById('rw').value);
         const h = parseFloat(document.getElementById('rh').value);
         const d = parseFloat(document.getElementById('rd').value);
-        const tp = document.getElementById('tp').value;
-        const tn = document.getElementById('tn').value;
+        const tp = parseInt(document.getElementById('tp').value);
+        const tn = parseInt(document.getElementById('tn').value);
         const roomCount = parseInt(document.getElementById('rooms-select').value);
+        const cat = document.getElementById('category-select').value;
         
         document.getElementById('v-w').innerText = w.toFixed(1) + "m";
         document.getElementById('v-h').innerText = h.toFixed(1) + "m";
@@ -167,25 +194,29 @@
         document.getElementById('v-tp').innerText = tp + "°C";
         document.getElementById('v-tn').innerText = tn + "°C";
         
-        // Calcul du Volume Global (Multiplié par le nombre de chambres)
         const unitVolume = w * h * d;
         const totalVolume = unitVolume * roomCount;
         document.getElementById('total-v').innerText = totalVolume.toFixed(2);
         
-        // Calcul Surface Totale des Parois (Unitaire)
         const surface = (2 * (w * h)) + (2 * (d * h)) + (2 * (w * d));
         document.getElementById('total-s').innerText = surface.toFixed(2);
 
         group.scale.set(w, h, d);
         group.position.y = h/2;
-        if(tn < 0) {
+
+        // Choix de l'affichage de la consigne (Négatif prioritaire si actif)
+        if(cat === "congele" || tn < 0) {
             document.getElementById('main-t').innerText = tn + "°C";
             document.getElementById('temp-frame').style.borderColor = "#4444ff";
-            chamber.material.color.setRGB(0.6, 0.8, 1);
+            chamber.material.color.setRGB(0.5, 0.7, 1.0); // Teinte bleutée / gel
         } else {
             document.getElementById('main-t').innerText = tp + "°C";
             document.getElementById('temp-frame').style.borderColor = "#ff4444";
-            chamber.material.color.setRGB(0.8, 0.8, 0.8);
+            
+            // Adaptation visuelle mineure selon la catégorie
+            if (cat === "fruits_legumes") chamber.material.color.setRGB(0.4, 0.7, 0.4); // Vert
+            else if (cat === "viande_rouge") chamber.material.color.setRGB(0.8, 0.4, 0.4); // Rougeâtre
+            else chamber.material.color.setRGB(0.8, 0.8, 0.8); // Gris standard
         }
     }
 
@@ -194,19 +225,21 @@
         const doc = new jsPDF();
         const wilaya = document.getElementById('wilaya-select').value;
         const roomCount = document.getElementById('rooms-select').value;
+        const categoryText = document.getElementById('category-select').options[document.getElementById('category-select').selectedIndex].text;
 
         doc.setFont("helvetica", "bold");
         doc.text("OxyONE - RAPPORT TECHNIQUE", 20, 20);
         doc.setFontSize(9); doc.setFont("helvetica", "normal");
         doc.text("Wilaya : " + wilaya, 20, 30);
-        doc.text("Nombre de chambres froides : " + roomCount, 20, 35);
-        doc.text("Startup Labellisée@2021 | Ministère de l'Économie", 20, 40);
-        doc.line(20, 45, 190, 45);
+        doc.text("Catégorie de Conservation : " + categoryText, 20, 35);
+        doc.text("Nombre de chambres froides : " + roomCount, 20, 40);
+        doc.text("Startup Labellisée@2021 | Ministère de l'Économie", 20, 45);
+        doc.line(20, 48, 190, 48);
         
         doc.text("Volume Global Total : " + document.getElementById('total-v').innerText + " m3", 20, 60);
         doc.text("Surface des Parois (par unité) : " + document.getElementById('total-s').innerText + " m2", 20, 70);
-        doc.text("Consigne Température : " + document.getElementById('main-t').innerText, 20, 80);
-        doc.save("OxyONE_Rapport_" + wilaya + "_" + roomCount + "chambres.pdf");
+        doc.text("Consigne Température Cible : " + document.getElementById('main-t').innerText, 20, 80);
+        doc.save("OxyONE_Rapport_" + wilaya + "_" + roomCount + "_chambres.pdf");
     }
 
     function animate() {
