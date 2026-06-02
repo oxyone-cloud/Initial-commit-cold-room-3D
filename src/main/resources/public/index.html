@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>OxyONE | Algérie 58 Wilayas</title>
+    <title>OxyONE | Algérie 69 Wilayas</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -82,6 +82,7 @@
 </div>
 
 <script>
+    // Liste mise à jour à 69 Wilayas (Incluant la refonte administrative officielle)
     const wilayas = [
         "01 Adrar", "02 Chlef", "03 Laghouat", "04 Oum El Bouaghi", "05 Batna", "06 Béjaïa", "07 Biskra", "08 Béchar", 
         "09 Blida", "10 Bouira", "11 Tamanrasset", "12 Tébessa", "13 Tlemcen", "14 Tiaret", "15 Tizi Ouzou", "16 Alger", 
@@ -89,8 +90,11 @@
         "25 Constantine", "26 Médéa", "27 Mostaganem", "28 M'Sila", "29 Mascara", "30 Ouargla", "31 Oran", "32 El Bayadh", 
         "33 Illizi", "34 Bordj Bou Arreridj", "35 Boumerdès", "36 El Tarf", "37 Tindouf", "38 Tissemsilt", "39 El Oued", 
         "40 Khenchela", "41 Souk Ahras", "42 Tipaza", "43 Mila", "44 Aïn Defla", "45 Naâma", "46 Aïn Témouchent", "47 Ghardaïa", 
-        "48 Relizane", "49 El M'Ghair", "50 El Meniaa", "51 Ouled Djellal", "52 Bordj Baji Mokhtar", "53 Béni Abbès", 
-        "54 Timimoun", "55 Touggourt", "56 Djanet", "57 In Salah", "58 In Guezzam"
+        "48 Relizane", "49 Timimoun", "50 Bordj Badji Mokhtar", "51 Ouled Djellal", "52 Béni Abbès", "53 In Salah", 
+        "54 In Guezzam", "55 Touggourt", "56 Djanet", "57 El M'Ghaier", "58 El Meniaa",
+        // Les 11 nouvelles wilayas des Hauts-Plateaux
+        "59 Aflou", "60 El Abiodh Sidi Cheikh", "61 El Aricha", "62 El Kantara", "63 Barika", "64 Bou Saâda", 
+        "65 Bir El Ater", "66 Ksar El Boukhari", "67 Ksar Chellala", "68 Aïn Oussera", "69 Messaad"
     ];
 
     const select = document.getElementById('wilaya-select');
@@ -150,8 +154,7 @@
         // Calcul Volume
         document.getElementById('total-v').innerText = (w * h * d).toFixed(2);
         
-        // NOUVEAU : Calcul Surface Totale des Parois
-        // Formule : 2*(L*H) + 2*(P*H) + 2*(L*P)
+        // Calcul Surface Totale des Parois
         const surface = (2 * (w * h)) + (2 * (d * h)) + (2 * (w * d));
         document.getElementById('total-s').innerText = surface.toFixed(2);
 
@@ -179,7 +182,6 @@
         doc.text("Startup Labellisée@2021 | Ministère de l'Économie", 20, 35);
         doc.line(20, 40, 190, 40);
         doc.text("Volume: " + document.getElementById('total-v').innerText + " m3", 20, 55);
-        // Ajout de la surface dans le PDF
         doc.text("Surface des Parois: " + document.getElementById('total-s').innerText + " m2", 20, 65);
         doc.text("Consigne: " + document.getElementById('main-t').innerText, 20, 75);
         doc.save("OxyONE_Rapport_" + wilaya + ".pdf");
