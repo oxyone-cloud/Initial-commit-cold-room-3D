@@ -118,7 +118,7 @@
         /* BOÎTES D'AFFICHAGE MÉTRIQUES */
         .display-box { background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 5px; margin-bottom: 12px; text-align: center; border: 1px solid #00f0ff; }
         .main-val { font-size: 1.6em; font-weight: bold; color: #ffffff; }
-        .sub-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; font-weight: 600; } /* Gris conforme */
+        .sub-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; font-weight: 600; }
         
         /* FORMULAIRES ET ÉLÉMENTS DE CONTRÔLE */
         .control-group { margin-bottom: 12px; }
@@ -164,6 +164,7 @@
     <h2 style="margin:0; font-size: 1.25em; letter-spacing: 2px; color: #ffffff;">OxyONE 3D</h2>
     <p style="font-size: 0.7em; margin: 5px 0 10px 0; color: #9ca3af; font-weight: 500;">Startup Labellisée@2021 | Ministère de l'Économie</p>
     
+    <!-- CARTE CONTACT AVEC ADRESSE INTEGRÉE -->
     <div class="contact-card">
         <div class="contact-item">
             <span class="contact-icon">👤</span>
@@ -173,8 +174,13 @@
             <span class="contact-icon">📞</span>
             <span>+213 7 82 09 02 81</span>
         </div>
+        <div class="contact-item" style="align-items: flex-start;">
+            <span class="contact-icon">🏢</span>
+            <span style="font-size: 0.9em; line-height: 1.3;">07, Rue Soleillet, Plateau St Michel<br>31026 Oran, Algérie</span>
+        </div>
     </div>
 
+    <!-- BOUTONS RONDS (TYPE DE STRUCTURE) -->
     <div class="control-group">
         <label>⚙️ TYPE DE STRUCTURE</label>
         <div class="radio-group">
@@ -280,7 +286,7 @@
 </nav>
 
 <script>
-    // GESTION DU HORLOGE DYNAMIQUE
+    // GESTION DE L'HORLOGE DYNAMIQUE
     function updateClock() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -318,7 +324,6 @@
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
     
-    // IMPORTANT : preserveDrawingBuffer configuré pour capturer les pixels pour le PDF
     const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
@@ -406,7 +411,7 @@
         }
     }
 
-    // EXTRACTION DU SCHÉMA 3D ET COMPOSITION DU PDF
+    // COMPOSITION DU RAPPORT PDF TÉLÉCHARGEABLE
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -415,36 +420,75 @@
         const roomCount = document.getElementById('rooms-select').value;
         const categoryText = document.getElementById('category-select').options[document.getElementById('category-select').selectedIndex].text;
         
-        // RECUPERATION DU BOUTON RADIO SELECTIONNE
         const structType = document.querySelector('input[name="structure-type"]:checked').value;
         const structLabel = structType === "industrielle" ? "Industrielle" : "Commerciale";
 
+        // BLOC EN-TÊTE : TITRE DE L'APPLICATION
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.text("OxyONE - RAPPORT TECHNIQUE", 20, 20);
+        doc.setFontSize(18);
+        doc.setTextColor(0, 51, 102);
+        doc.text("OxyONE - FICHE RAPPORT TECHNIQUE", 20, 20);
         
-        doc.setFontSize(10); 
+        // INFORMATIONS DE CONTACT SÉCURISÉES DANS LE PDF
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(50, 50, 50);
+        doc.text("Responsable Projet : Benhamamouch Othman", 20, 29);
+        
         doc.setFont("helvetica", "normal");
-        doc.text("Type de Structure : Chambre Froide " + structLabel, 20, 32);
-        doc.text("Wilaya : " + wilaya, 20, 38);
-        doc.text("Catégorie de Conservation : " + categoryText, 20, 44);
-        doc.text("Nombre de chambres froides : " + roomCount, 20, 50);
-        doc.text("Startup Labellisée@2021 | Ministère de l'Économie", 20, 56);
-        doc.line(20, 60, 190, 60);
+        doc.setTextColor(80, 80, 80);
+        doc.text("Téléphone : +213 7 82 09 02 81", 20, 35);
         
-        doc.text("Volume Global Total : " + document.getElementById('total-v').innerText + " m3", 20, 70);
-        doc.text("Surface des Parois (par unité) : " + document.getElementById('total-s').innerText + " m2", 20, 76);
-        doc.text("Dimensions Unitaires : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 20, 82);
-        doc.text("Consigne Température Cible : " + document.getElementById('main-t').innerText, 20, 88);
+        // AJOUT STRICT ET PROPRE DE L'ADRESSE DEMANDÉE
+        doc.text("Adresse : 07, Rue Soleillet, Plateau St Michel, 31026 Oran, Algérie", 20, 41);
         
-        // CAPTURE DIRECTE DU CANVAS WEBGL SÉCURISÉ
+        // LIGNE DE SÉPARATION GRAPHIQUE
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(0, 240, 255);
+        doc.line(20, 46, 190, 46);
+        
+        // CARACTÉRISTIQUES DU PROJET
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text("1. CONFIGURATION DU DEPLOIEMENT", 20, 55);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.text("• Type d'Infrastructure : Chambre Froide " + structLabel, 22, 62);
+        doc.text("• Zone de Localisation : Wilaya de " + wilaya, 22, 68);
+        doc.text("• Catégorie d'Exploitation : " + categoryText, 22, 74);
+        doc.text("• Nombre d'Unités Parallèles : " + roomCount + " chambre(s)", 22, 80);
+        doc.text("• Certification Structurelle : Startup Labellisée @2021 | Ministère de l'Économie", 22, 86);
+
+        // SPÉCIFICATIONS MÉTRIQUES & THERMIQUES
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text("2. DONNÉES ET MESURES THÉORIQUES", 20, 97);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.text("• Volume Global Total Cumulé : " + document.getElementById('total-v').innerText + " m³", 22, 104);
+        doc.text("• Surface Totale des Parois Échangeuses (Unitaire) : " + document.getElementById('total-s').innerText + " m²", 22, 110);
+        doc.text("• Dimensions Enveloppe Extérieure : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 22, 116);
+        doc.text("• Consigne Régulation Thermique Cible : " + document.getElementById('main-t').innerText, 22, 122);
+        
+        // CAPTURE DU REPERE ET RENDU DYNAMIQUE DE L'ESPACE 3D
         const image3D = renderer.domElement.toDataURL("image/jpeg", 0.85);
         
         doc.setFont("helvetica", "bold");
-        doc.text("SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE 3D) :", 20, 102);
-        doc.addImage(image3D, 'JPEG', 20, 108, 170, 95);
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE INTERFACE NUMÉRIQUE OXYONE) :", 20, 134);
         
-        doc.save("OxyONE_Fiche_Technique_" + wilaya.replace(" ", "_") + ".pdf");
+        // EMPLACEMENT DE L'IMAGE CAPTURÉE SANS DEBORDEMENT
+        doc.addImage(image3D, 'JPEG', 20, 140, 170, 95);
+        
+        // EXPORT AUTOMATIQUE DU FICHIER PDF COMPILÉ
+        doc.save("OxyONE_Rapport_Technique_" + wilaya.replace(/\s+/g, '_') + ".pdf");
     }
 
     // GRAPHIQUE SUIVI INTERNAL ANALYTICS (CHART.JS)
