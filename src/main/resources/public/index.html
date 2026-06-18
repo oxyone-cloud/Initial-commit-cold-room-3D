@@ -70,6 +70,51 @@
             font-size: 1.1em;
         }
 
+        /* OPTIONS BOUTONS RONDS (RADIO) */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 240, 255, 0.15);
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #e5e7eb;
+        }
+        .radio-input {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #00f0ff;
+            border-radius: 50%;
+            outline: none;
+            background: transparent;
+            display: inline-grid;
+            place-content: center;
+            cursor: pointer;
+        }
+        .radio-input::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            background-color: #00f0ff;
+        }
+        .radio-input:checked::before {
+            transform: scale(1);
+        }
+
         /* BOÎTES D'AFFICHAGE MÉTRIQUES */
         .display-box { background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 5px; margin-bottom: 12px; text-align: center; border: 1px solid #00f0ff; }
         .main-val { font-size: 1.6em; font-weight: bold; color: #ffffff; }
@@ -119,7 +164,6 @@
     <h2 style="margin:0; font-size: 1.25em; letter-spacing: 2px; color: #ffffff;">OxyONE 3D</h2>
     <p style="font-size: 0.7em; margin: 5px 0 10px 0; color: #9ca3af; font-weight: 500;">Startup Labellisée@2021 | Ministère de l'Économie</p>
     
-    <!-- CARTE CONTACT AJOUTÉE -->
     <div class="contact-card">
         <div class="contact-item">
             <span class="contact-icon">👤</span>
@@ -128,6 +172,20 @@
         <div class="contact-item">
             <span class="contact-icon">📞</span>
             <span>+213 7 82 09 02 81</span>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label>⚙️ TYPE DE STRUCTURE</label>
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="structure-type" value="industrielle" class="radio-input" checked onchange="calculate()">
+                <span>🏬 Chambre Froide Industrielle</span>
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="structure-type" value="commerciale" class="radio-input" onchange="calculate()">
+                <span>🏪 Chambre Froide Commerciale</span>
+            </label>
         </div>
     </div>
     
@@ -289,6 +347,7 @@
     function fullReset() {
         group.rotation.set(0,0,0);
         document.getElementById('category-select').value = "viande_rouge";
+        document.querySelector('input[name="structure-type"][value="industrielle"]').checked = true;
         document.getElementById('tp').value = 4; 
         document.getElementById('tn').value = 0;
         document.getElementById('rw').value = 6; document.getElementById('rh').value = 3; document.getElementById('rd').value = 5;
@@ -355,6 +414,10 @@
         const wilaya = document.getElementById('wilaya-select').value;
         const roomCount = document.getElementById('rooms-select').value;
         const categoryText = document.getElementById('category-select').options[document.getElementById('category-select').selectedIndex].text;
+        
+        // RECUPERATION DU BOUTON RADIO SELECTIONNE
+        const structType = document.querySelector('input[name="structure-type"]:checked').value;
+        const structLabel = structType === "industrielle" ? "Industrielle" : "Commerciale";
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
@@ -362,23 +425,24 @@
         
         doc.setFontSize(10); 
         doc.setFont("helvetica", "normal");
-        doc.text("Wilaya : " + wilaya, 20, 32);
-        doc.text("Catégorie de Conservation : " + categoryText, 20, 38);
-        doc.text("Nombre de chambres froides : " + roomCount, 20, 44);
-        doc.text("Startup Labellisée@2021 | Ministère de l'Économie", 20, 50);
-        doc.line(20, 54, 190, 54);
+        doc.text("Type de Structure : Chambre Froide " + structLabel, 20, 32);
+        doc.text("Wilaya : " + wilaya, 20, 38);
+        doc.text("Catégorie de Conservation : " + categoryText, 20, 44);
+        doc.text("Nombre de chambres froides : " + roomCount, 20, 50);
+        doc.text("Startup Labellisée@2021 | Ministère de l'Économie", 20, 56);
+        doc.line(20, 60, 190, 60);
         
-        doc.text("Volume Global Total : " + document.getElementById('total-v').innerText + " m3", 20, 66);
-        doc.text("Surface des Parois (par unité) : " + document.getElementById('total-s').innerText + " m2", 20, 72);
-        doc.text("Dimensions Unitaires : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 20, 78);
-        doc.text("Consigne Température Cible : " + document.getElementById('main-t').innerText, 20, 84);
+        doc.text("Volume Global Total : " + document.getElementById('total-v').innerText + " m3", 20, 70);
+        doc.text("Surface des Parois (par unité) : " + document.getElementById('total-s').innerText + " m2", 20, 76);
+        doc.text("Dimensions Unitaires : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 20, 82);
+        doc.text("Consigne Température Cible : " + document.getElementById('main-t').innerText, 20, 88);
         
         // CAPTURE DIRECTE DU CANVAS WEBGL SÉCURISÉ
         const image3D = renderer.domElement.toDataURL("image/jpeg", 0.85);
         
         doc.setFont("helvetica", "bold");
-        doc.text("SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE 3D) :", 20, 98);
-        doc.addImage(image3D, 'JPEG', 20, 104, 170, 95);
+        doc.text("SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE 3D) :", 20, 102);
+        doc.addImage(image3D, 'JPEG', 20, 108, 170, 95);
         
         doc.save("OxyONE_Fiche_Technique_" + wilaya.replace(" ", "_") + ".pdf");
     }
