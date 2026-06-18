@@ -11,20 +11,20 @@
         /* BASE ET STRUCTURE ACCESSIBLE */
         body { 
             margin: 0; 
-            background: #030712; /* Fond sombre profond pour optimiser le contraste */
-            color: #f9fafb; /* Écriture claire haute visibilité (Norme WCAG) */
+            background: #030712; 
+            color: #f9fafb; 
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
             overflow: hidden; 
         }
 
-        /* REPÈRE PRINCIPAL (Panneau de Contrôle Gauche) */
+        /* PANNEAU DE CONTRÔLE GAUCHE */
         #gui { 
             position: absolute; 
             top: 10px; 
             left: 10px; 
-            background: rgba(3, 15, 30, 0.96); /* Opacité renforcée pour la lecture */
+            background: rgba(3, 15, 30, 0.96); 
             padding: 20px; 
-            border-left: 4px solid #00f0ff; /* Cyan pur à forte luminance */
+            border-left: 4px solid #00f0ff; 
             width: 320px; 
             z-index: 100; 
             border-radius: 0 10px 10px 0; 
@@ -33,7 +33,7 @@
             overflow-y: auto; 
         }
         
-        /* HORLOGE ACCESSIBLE DROITE */
+        /* HORLOGE */
         #clock-panel { 
             position: absolute; 
             top: 10px; 
@@ -49,7 +49,7 @@
         #clock-time { font-size: 1.8em; font-weight: bold; color: #ffffff; font-family: monospace; letter-spacing: 2px; }
         #clock-date { font-size: 0.75em; text-transform: uppercase; color: #00e0ff; letter-spacing: 1px; margin-top: 2px; font-weight: 600; }
 
-        /* BLOC DE CONTACT PROFESSIONNEL */
+        /* CARTE CONTACT */
         .contact-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -115,12 +115,12 @@
             transform: scale(1);
         }
 
-        /* BOÎTES D'AFFICHAGE MÉTRIQUES */
+        /* BOÎTES D'AFFICHAGE */
         .display-box { background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 5px; margin-bottom: 12px; text-align: center; border: 1px solid #00f0ff; }
         .main-val { font-size: 1.6em; font-weight: bold; color: #ffffff; }
         .sub-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; font-weight: 600; }
         
-        /* FORMULAIRES ET ÉLÉMENTS DE CONTRÔLE */
+        /* FORMULAIRES */
         .control-group { margin-bottom: 12px; }
         .control-group label { display: block; font-size: 0.85em; font-weight: 600; color: #e5e7eb; margin-bottom: 4px; }
         .val-badge { float: right; background: #00f0ff; color: #030712; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
@@ -139,15 +139,15 @@
         }
         input[type=range] { width: 100%; cursor: pointer; accent-color: #00f0ff; margin-top: 5px; }
         
-        /* ACTIONNAIRES ET BOUTONS */
+        /* BOUTONS */
         button { background: #00f0ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; color: #030712; transition: 0.3s; font-size: 0.9em; letter-spacing: 0.5px; }
         button:hover { background: #ffffff; box-shadow: 0 0 15px #00f0ff; }
 
-        /* CONTROLEUR DE NAVIGATION 3D */
+        /* NAV PAD */
         #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 55px); grid-gap: 8px; z-index: 100; }
         .nav-btn { width: 55px; height: 55px; border: 2px solid #00f0ff; color: #00f0ff; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,240,255,0.1); font-weight: bold; border-radius: 8px; }
         
-        /* PANNEAU D'ADMINISTRATION INTERNE */
+        /* ADMIN PANEL */
         .admin-panel { background: rgba(15, 10, 5, 0.98); border: 2px solid #ff9900; border-radius: 8px; padding: 15px; margin-top: 20px; }
         .admin-title { color: #ff9900; font-size: 0.85em; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
         .stat-row { display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 5px; border-bottom: 1px solid rgba(255,153,0,0.2); padding-bottom: 5px; color: #f3f4f6; }
@@ -155,7 +155,7 @@
 </head>
 <body>
 
-<aside id="clock-panel" aria-label="Horloge système">
+<aside id="clock-panel">
     <div id="clock-time">00:00:00</div>
     <div id="clock-date">Chargement...</div>
 </aside>
@@ -164,7 +164,6 @@
     <h2 style="margin:0; font-size: 1.25em; letter-spacing: 2px; color: #ffffff;">OxyONE 3D</h2>
     <p style="font-size: 0.7em; margin: 5px 0 10px 0; color: #9ca3af; font-weight: 500;">Startup Labellisée@2021 | Ministère de l'Économie</p>
     
-    <!-- CARTE CONTACT AVEC ADRESSE INTEGRÉE -->
     <div class="contact-card">
         <div class="contact-item">
             <span class="contact-icon">👤</span>
@@ -180,7 +179,6 @@
         </div>
     </div>
 
-    <!-- BOUTONS RONDS (TYPE DE STRUCTURE) -->
     <div class="control-group">
         <label>⚙️ TYPE DE STRUCTURE</label>
         <div class="radio-group">
@@ -277,7 +275,7 @@
     </div>
 </main>
 
-<nav id="nav-pad" aria-label="Commandes de navigation 3D">
+<nav id="nav-pad">
     <div style="grid-column: 2" class="nav-btn" onclick="move('up')">▲</div>
     <div class="nav-btn" onclick="move('left')">◀</div>
     <div class="nav-btn" onclick="fullReset()">RESET</div>
@@ -286,7 +284,6 @@
 </nav>
 
 <script>
-    // GESTION DE L'HORLOGE DYNAMIQUE
     function updateClock() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -299,7 +296,6 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // LE VECTEUR DES 69 WILAYAS D'ALGÉRIE
     const wilayas = [
         "01 Adrar", "02 Chlef", "03 Laghouat", "04 Oum El Bouaghi", "05 Batna", "06 Béjaïa", "07 Biskra", "08 Béchar", 
         "09 Blida", "10 Bouira", "11 Tamanrasset", "12 Tébessa", "13 Tlemcen", "14 Tiaret", "15 Tizi Ouzou", "16 Alger", 
@@ -320,10 +316,8 @@
         select.appendChild(opt);
     });
 
-    // CONFIGURATION DE LA SCÈNE THREE.JS (3D)
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-    
     const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
@@ -341,7 +335,6 @@
     scene.add(new THREE.GridHelper(50, 50, 0x00f0ff, 0x111111));
     camera.position.set(12, 8, 12); camera.lookAt(0,0,0);
 
-    // LOGIQUE DE COMMANDE ET D'ORIENTATION CAMERA
     function move(direction) {
         if(direction === 'up') group.rotation.x -= 0.2;
         if(direction === 'down') group.rotation.x += 0.2;
@@ -372,7 +365,6 @@
         calculate();
     }
 
-    // CALCULS DIMENSIONNELS & THERMIQUES DYNAMIQUES
     function calculate() {
         const w = parseFloat(document.getElementById('rw').value);
         const h = parseFloat(document.getElementById('rh').value);
@@ -411,7 +403,7 @@
         }
     }
 
-    // COMPOSITION DU RAPPORT PDF TÉLÉCHARGEABLE
+    // EXPORT PDF : CERTIFICATS PRÉSENTS EXCLUSIVEMENT ICI
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -423,13 +415,12 @@
         const structType = document.querySelector('input[name="structure-type"]:checked').value;
         const structLabel = structType === "industrielle" ? "Industrielle" : "Commerciale";
 
-        // BLOC EN-TÊTE : TITRE DE L'APPLICATION
+        // BLOC EN-TÊTE
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
         doc.setTextColor(0, 51, 102);
         doc.text("OxyONE - FICHE RAPPORT TECHNIQUE", 20, 20);
         
-        // INFORMATIONS DE CONTACT SÉCURISÉES DANS LE PDF
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(50, 50, 50);
@@ -438,16 +429,13 @@
         doc.setFont("helvetica", "normal");
         doc.setTextColor(80, 80, 80);
         doc.text("Téléphone : +213 7 82 09 02 81", 20, 35);
-        
-        // AJOUT STRICT ET PROPRE DE L'ADRESSE DEMANDÉE
         doc.text("Adresse : 07, Rue Soleillet, Plateau St Michel, 31026 Oran, Algérie", 20, 41);
         
-        // LIGNE DE SÉPARATION GRAPHIQUE
         doc.setLineWidth(0.5);
         doc.setDrawColor(0, 240, 255);
         doc.line(20, 46, 190, 46);
         
-        // CARACTÉRISTIQUES DU PROJET
+        // 1. CONFIGURATION
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(0, 0, 0);
@@ -462,7 +450,7 @@
         doc.text("• Nombre d'Unités Parallèles : " + roomCount + " chambre(s)", 22, 80);
         doc.text("• Certification Structurelle : Startup Labellisée @2021 | Ministère de l'Économie", 22, 86);
 
-        // SPÉCIFICATIONS MÉTRIQUES & THERMIQUES
+        // 2. DONNÉES TECHNIQUES
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
@@ -476,22 +464,29 @@
         doc.text("• Dimensions Enveloppe Extérieure : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 22, 116);
         doc.text("• Consigne Régulation Thermique Cible : " + document.getElementById('main-t').innerText, 22, 122);
         
-        // CAPTURE DU REPERE ET RENDU DYNAMIQUE DE L'ESPACE 3D
+        // 3. IMAGE MODÈLE 3D
         const image3D = renderer.domElement.toDataURL("image/jpeg", 0.85);
-        
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
-        doc.setTextColor(0, 0, 0);
-        doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE INTERFACE NUMÉRIQUE OXYONE) :", 20, 134);
+        doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE OXYONE) :", 20, 134);
+        doc.addImage(image3D, 'JPEG', 20, 139, 170, 85);
         
-        // EMPLACEMENT DE L'IMAGE CAPTURÉE SANS DEBORDEMENT
-        doc.addImage(image3D, 'JPEG', 20, 140, 170, 95);
+        // 4. CERTIFICATIONS EXCLUSIVES AU RAPPORT PDF
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text("4. CERTIFICATIONS & SÉCURITÉ DU SYSTÈME (RAPPORT PDF)", 20, 236);
         
-        // EXPORT AUTOMATIQUE DU FICHIER PDF COMPILÉ
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.text("• Infrastructure Logicielle : Dépôt centralisé et audité sur la plateforme GitHub.", 22, 243);
+        doc.text("• Certification d'Intégrité : Code source protégé, chiffré et tracé via l'architecture Oxyone-Security.", 22, 249);
+        doc.text("• Conformité de Sécurité : Validations automatisées et contrôle d'accès des flux IoT.", 22, 255);
+
+        // SAUVEGARDE DU PDF
         doc.save("OxyONE_Rapport_Technique_" + wilaya.replace(/\s+/g, '_') + ".pdf");
     }
 
-    // GRAPHIQUE SUIVI INTERNAL ANALYTICS (CHART.JS)
     const ctxInternal = document.getElementById('internalAnalyticsChart').getContext('2d');
     new Chart(ctxInternal, {
         type: 'line',
@@ -516,7 +511,6 @@
         }
     });
 
-    // BOUCLE D'ANIMATION ET RENDU CONTINU
     function animate() {
         requestAnimationFrame(animate);
         renderer.render(scene, camera);
