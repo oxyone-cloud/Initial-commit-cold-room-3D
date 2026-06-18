@@ -49,6 +49,27 @@
         #clock-time { font-size: 1.8em; font-weight: bold; color: #ffffff; font-family: monospace; letter-spacing: 2px; }
         #clock-date { font-size: 0.75em; text-transform: uppercase; color: #00e0ff; letter-spacing: 1px; margin-top: 2px; font-weight: 600; }
 
+        /* BLOC DE CONTACT PROFESSIONNEL */
+        .contact-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0;
+            color: #e5e7eb;
+        }
+        .contact-icon {
+            color: #00f0ff;
+            font-size: 1.1em;
+        }
+
         /* BOÎTES D'AFFICHAGE MÉTRIQUES */
         .display-box { background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 5px; margin-bottom: 12px; text-align: center; border: 1px solid #00f0ff; }
         .main-val { font-size: 1.6em; font-weight: bold; color: #ffffff; }
@@ -96,7 +117,19 @@
 
 <main id="gui">
     <h2 style="margin:0; font-size: 1.25em; letter-spacing: 2px; color: #ffffff;">OxyONE 3D</h2>
-    <p style="font-size: 0.7em; margin: 5px 0 15px 0; color: #9ca3af; font-weight: 500;">Startup Labellisée@2021 | Ministère de l'Économie</p>
+    <p style="font-size: 0.7em; margin: 5px 0 10px 0; color: #9ca3af; font-weight: 500;">Startup Labellisée@2021 | Ministère de l'Économie</p>
+    
+    <!-- CARTE CONTACT AJOUTÉE -->
+    <div class="contact-card">
+        <div class="contact-item">
+            <span class="contact-icon">👤</span>
+            <strong>Benhamamouch Othman</strong>
+        </div>
+        <div class="contact-item">
+            <span class="contact-icon">📞</span>
+            <span>+213 7 82 09 02 81</span>
+        </div>
+    </div>
     
     <div class="control-group">
         <label for="wilaya-select">📍 LOCALISATION (WILAYA)</label>
