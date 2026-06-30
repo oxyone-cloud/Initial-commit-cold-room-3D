@@ -70,6 +70,34 @@
             font-size: 1.1em;
         }
 
+        /* SECTION BLOG & TUTORIELS */
+        .blog-box {
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px dashed #00f0ff;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .blog-box p {
+            margin: 0 0 8px 0;
+            font-size: 0.8em;
+            color: #e5e7eb;
+            line-height: 1.4;
+        }
+        .blog-link {
+            display: inline-block;
+            color: #00f0ff;
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .blog-link:hover {
+            color: #ffffff;
+            text-shadow: 0 0 8px #00f0ff;
+        }
+
         /* OPTIONS BOUTONS RONDS (RADIO) */
         .radio-group {
             display: flex;
@@ -266,6 +294,11 @@
     </div>
 
     <button onclick="generatePDF()">GÉNÉRER RAPPORT TECHNIQUE</button>
+
+    <div class="blog-box">
+        <p><strong>💡 Note :</strong> Consultez notre blog pour découvrir toutes les nouveautés de l'écosystème OxyONE et accéder à nos tutoriels complets.</p>
+        <a href="https://solutionofcold.blogspot.com" target="_blank" class="blog-link">🌐 Visiter solutionofcold.blogspot.com</a>
+    </div>
 
     <div class="admin-panel">
         <div class="admin-title">📊 Suivi Interne (Admin)</div>
