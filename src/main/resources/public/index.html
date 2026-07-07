@@ -16,6 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         /* BASE ET STRUCTURE ACCESSIBLE */
         body { 
@@ -241,7 +242,7 @@
             <option value="viande_rouge">Viande Rouge (0°C à +2°C)</option>
             <option value="viande_blanche">Viande Blanche (+1°C à +3°C)</option>
             <option value="fruits_legumes">Fruits & Légumes (+4°C à +8°C)</option>
-            <option value="produits_laitiers">Produits Laitiers (+2°C à +6°C)</option>
+            <option value="produits_laitiers">Pourduits Laitiers (+2°C à +6°C)</option>
             <option value="poissons">Poissons & Crustacés (0°C à +2°C)</option>
             <option value="congele">Produits Congelés (-18°C à -25°C)</option>
         </select>
@@ -445,7 +446,7 @@
         }
     }
 
-    // EXPORT PDF AVEC INTEGRATION DIRECTE DE L'IMAGE HQ DE LA CHAMBRE FROIDE
+    // EXPORT PDF AVEC INTÉGRATION DE LA NOUVELLE IMAGE 3D HAUTE DÉFINITION
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -512,10 +513,10 @@
         doc.setTextColor(0, 0, 0);
         doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE INTERNE OXYONE) :", 20, 134);
         
-        // Image externe hébergée chargée dynamiquement dans le PDF
+        // Chargement dynamique de la nouvelle image générée
         const imgHDOxyone = new Image();
         imgHDOxyone.crossOrigin = "Anonymous";
-        imgHDOxyone.src = "https://lh3.googleusercontent.com/d/1_y-D4-Iq20o5PZfXk7gq3TfAnqH8g_8e";
+        imgHDOxyone.src = "http://googleusercontent.com/image_generation_content/0";
         
         imgHDOxyone.onload = function() {
             doc.addImage(imgHDOxyone, 'JPEG', 20, 139, 170, 85);
@@ -523,7 +524,7 @@
         };
         
         imgHDOxyone.onerror = function() {
-            // Fallback si l'image externe échoue : on utilise le canvas local en secours
+            // Plan B de secours en cas de problème réseau
             const imageFallback = renderer.domElement.toDataURL("image/jpeg", 0.85);
             doc.addImage(imageFallback, 'JPEG', 20, 139, 170, 85);
             finaliserEtSauvegarderPDF(doc, wilaya);
