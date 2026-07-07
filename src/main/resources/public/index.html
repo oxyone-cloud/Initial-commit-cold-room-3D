@@ -1,29 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!DOCTYPE html>
-<html lang="fr">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon projet OxyONE</title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <title>OxyONE 3D | Algérie 69 Wilayas</title>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1FGNWDMZGQ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
       gtag('config', 'G-1FGNWDMZGQ');
     </script>
-    </head>
-<body>
-    <h1>Bienvenue sur mon site</h1>
-</body>
-</html>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OxyONE 3D | Algérie 69 Wilayas</title>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -456,7 +445,7 @@
         }
     }
 
-    // EXPORT PDF : CERTIFICATS PRÉSENTS EXCLUSIVEMENT ICI
+    // EXPORT PDF AVEC INTEGRATION DIRECTE DE L'IMAGE HQ DE LA CHAMBRE FROIDE
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -517,16 +506,35 @@
         doc.text("• Dimensions Enveloppe Extérieure : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 22, 116);
         doc.text("• Consigne Régulation Thermique Cible : " + document.getElementById('main-t').innerText, 22, 122);
         
-        // 3. IMAGE MODÈLE 3D
-        const image3D = renderer.domElement.toDataURL("image/jpeg", 0.85);
+        // 3. IMAGE HD DE LA CHAMBRE FROIDE OXYONE
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
-        doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE OXYONE) :", 20, 134);
-        doc.addImage(image3D, 'JPEG', 20, 139, 170, 85);
+        doc.setTextColor(0, 0, 0);
+        doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE INTERNE OXYONE) :", 20, 134);
         
+        // Image externe hébergée chargée dynamiquement dans le PDF
+        const imgHDOxyone = new Image();
+        imgHDOxyone.crossOrigin = "Anonymous";
+        imgHDOxyone.src = "https://lh3.googleusercontent.com/d/1_y-D4-Iq20o5PZfXk7gq3TfAnqH8g_8e";
+        
+        imgHDOxyone.onload = function() {
+            doc.addImage(imgHDOxyone, 'JPEG', 20, 139, 170, 85);
+            finaliserEtSauvegarderPDF(doc, wilaya);
+        };
+        
+        imgHDOxyone.onerror = function() {
+            // Fallback si l'image externe échoue : on utilise le canvas local en secours
+            const imageFallback = renderer.domElement.toDataURL("image/jpeg", 0.85);
+            doc.addImage(imageFallback, 'JPEG', 20, 139, 170, 85);
+            finaliserEtSauvegarderPDF(doc, wilaya);
+        };
+    }
+
+    function finaliserEtSauvegarderPDF(doc, wilaya) {
         // 4. CERTIFICATIONS EXCLUSIVES AU RAPPORT PDF
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
         doc.text("4. CERTIFICATIONS & SÉCURITÉ DU SYSTÈME (RAPPORT PDF)", 20, 236);
         
         doc.setFont("helvetica", "normal");
