@@ -180,6 +180,7 @@
         /* BOUTONS */
         button { background: #00f0ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; color: #030712; transition: 0.3s; font-size: 0.9em; letter-spacing: 0.5px; }
         button:hover { background: #ffffff; box-shadow: 0 0 15px #00f0ff; }
+        button:disabled { background: #1e293b; color: #64748b; cursor: not-allowed; box-shadow: none; border: 1px solid #334155; }
 
         /* NAV PAD */
         #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 55px); grid-gap: 8px; z-index: 100; }
@@ -217,6 +218,10 @@
         </div>
     </div>
 
+    <div style="display:none !important; visibility:hidden;" aria-hidden="true">
+        <input type="text" id="verification_human_field" autocomplete="off" value="">
+    </div>
+
     <div class="control-group">
         <label>⚙️ TYPE DE STRUCTURE</label>
         <div class="radio-group">
@@ -242,7 +247,7 @@
             <option value="viande_rouge">Viande Rouge (0°C à +2°C)</option>
             <option value="viande_blanche">Viande Blanche (+1°C à +3°C)</option>
             <option value="fruits_legumes">Fruits & Légumes (+4°C à +8°C)</option>
-            <option value="produits_laitiers">Pourduits Laitiers (+2°C à +6°C)</option>
+            <option value="produits_laitiers">Produits Laitiers (+2°C à +6°C)</option>
             <option value="poissons">Poissons & Crustacés (0°C à +2°C)</option>
             <option value="congele">Produits Congelés (-18°C à -25°C)</option>
         </select>
@@ -303,7 +308,7 @@
         <input type="range" id="rd" min="1" max="20" step="0.5" value="5" oninput="calculate()">
     </div>
 
-    <button onclick="generatePDF()">GÉNÉRER RAPPORT TECHNIQUE</button>
+    <button id="btn-submit-pdf" onclick="securePdfTrigger()">GÉNÉRER RAPPORT TECHNIQUE</button>
 
     <div class="blog-box">
         <p><strong>💡 Note :</strong> Consultez notre blog pour découvrir toutes les nouveautés de l'écosystème OxyONE et accéder à nos tutoriels complets.</p>
@@ -446,7 +451,31 @@
         }
     }
 
-    // EXPORT PDF AVEC INTÉGRATION DE LA NOUVELLE IMAGE 3D HAUTE DÉFINITION
+    // DISPOSITIF SÉCURISÉ ANTI-BOTS AVANT TOUTE LOGIQUE DE GÉNÉRATION
+    function securePdfTrigger() {
+        // 1. Vérification du piège (Honeypot)
+        const honeyTrapValue = document.getElementById('verification_human_field').value;
+        if (honeyTrapValue !== "") {
+            console.warn("Bot activity detected via honeypot.");
+            return; // Bloque silencieusement le script automatique
+        }
+
+        // 2. Blocage anti-spam (Désactivation temporaire)
+        const submitBtn = document.getElementById('btn-submit-pdf');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "VÉRIFICATION ET GÉNÉRATION EN COURS...";
+
+        // Exécute la vraie génération de document
+        generatePDF();
+
+        // Réactive le bouton après un délai de 5 secondes pour éviter la surcharge mécanique
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "GÉNÉRER RAPPORT TECHNIQUE";
+        }, 5000);
+    }
+
+    // EXPORT PDF AVEC INTÉGRATION DE L'IMAGE 3D HAUTE DÉFINITION
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
