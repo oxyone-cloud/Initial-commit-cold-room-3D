@@ -27,6 +27,94 @@
             overflow: hidden; 
         }
 
+        /* ÉCRAN D'ACCUEIL / SPLASH SCREEN */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #060b18;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .splash-title {
+            font-size: 2.2em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 0 0 10px 0;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .splash-subtitle {
+            font-size: 1.1em;
+            color: #9ca3af;
+            margin: 0 0 20px 0;
+            font-weight: 500;
+        }
+
+        .badge-gratuit {
+            background: #00f0ff;
+            color: #030712;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            margin-bottom: 50px;
+        }
+
+        /* BOUTON FLOCON DE NEIGE ANIMÉ */
+        .snowflake-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .snowflake-icon {
+            font-size: 70px;
+            color: #00f0ff;
+            animation: pulse 2s infinite ease-in-out, spin 20s infinite linear;
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
+        }
+
+        .snowflake-txt {
+            margin-top: 15px;
+            color: #9ca3af;
+            font-size: 0.95em;
+            letter-spacing: 1px;
+            font-weight: 600;
+            animation: pulse-text 2s infinite ease-in-out;
+        }
+
+        /* ANIMATIONS SPLASH SCREEN */
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.9)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6)); }
+        }
+        @keyframes pulse-text {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; color: #ffffff; }
+        }
+
         /* PANNEAU DE CONTRÔLE GAUCHE */
         #gui { 
             position: absolute; 
@@ -194,6 +282,18 @@
 </head>
 <body>
 
+<!-- ÉCRAN D'ACCUEIL INTERACTIF (SPLASH SCREEN) -->
+<div id="splash-screen">
+    <h1 class="splash-title">Welcome</h1>
+    <div class="splash-subtitle">OxyONE Live 3D</div>
+    <div class="badge-gratuit">APPLICATION 100% GRATUITE</div>
+    
+    <button class="snowflake-btn" onclick="enterApplication()">
+        <div class="snowflake-icon">❄</div>
+        <div class="snowflake-txt">TOUCHER LE FLOCON POUR ACCÉDER</div>
+    </button>
+</div>
+
 <aside id="clock-panel">
     <div id="clock-time">00:00:00</div>
     <div id="clock-date">Chargement...</div>
@@ -337,6 +437,16 @@
 </nav>
 
 <script>
+    // FONCTION POUR QUITTER LE SPLASH SCREEN AU CLIC SUR LE FLOCON
+    function enterApplication() {
+        const splash = document.getElementById('splash-screen');
+        splash.style.opacity = '0';
+        splash.style.visibility = 'hidden';
+        setTimeout(() => {
+            splash.style.display = 'none';
+        }, 600);
+    }
+
     function updateClock() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
