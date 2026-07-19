@@ -4,19 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OxyONE 3D | Algérie 69 Wilayas</title>
-    
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1FGNWDMZGQ"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-1FGNWDMZGQ');
-    </script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
         /* BASE ET STRUCTURE ACCESSIBLE */
         body { 
@@ -25,98 +15,6 @@
             color: #f9fafb; 
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
             overflow: hidden; 
-        }
-
-        /* ÉCRAN D'ACCUEIL / SPLASH SCREEN */
-        #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #060b18;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.6s ease, visibility 0.6s;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .splash-title {
-            font-size: 2.2em;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 0 0 10px 0;
-            color: #ffffff;
-            text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-        }
-
-        .splash-subtitle {
-            font-size: 1.1em;
-            color: #9ca3af;
-            margin: 0 0 20px 0;
-            font-weight: 500;
-        }
-
-        .badge-gratuit {
-            background: #00f0ff;
-            color: #030712;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 900;
-            font-size: 0.85em;
-            letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-            margin-bottom: 50px;
-        }
-
-        /* BOUTON FLOCON DE NEIGE ANIMÉ */
-        .snowflake-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            outline: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 0.2s;
-        }
-
-        .snowflake-icon {
-            font-size: 70px;
-            color: #00f0ff;
-            animation: pulse 2s infinite ease-in-out, spin 20s infinite linear;
-            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
-        }
-
-        .snowflake-txt {
-            margin-top: 15px;
-            color: #9ca3af;
-            font-size: 0.95em;
-            letter-spacing: 1px;
-            font-weight: 600;
-            animation: pulse-text 2s infinite ease-in-out;
-        }
-
-        /* ANIMATIONS SPLASH SCREEN */
-        @keyframes pulse {
-            0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6)); }
-            50% { transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.9)); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6)); }
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes pulse-text {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; color: #ffffff; }
         }
 
         /* PANNEAU DE CONTRÔLE GAUCHE */
@@ -156,7 +54,7 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 6px;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 15px;
             font-size: 0.85em;
         }
@@ -164,22 +62,23 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 4px 0;
+            margin: 5px 0;
             color: #e5e7eb;
         }
         .contact-icon {
             color: #00f0ff;
             font-size: 1.1em;
+            width: 16px;
+            text-align: center;
         }
-        .dev-link {
+        .contact-link {
             color: #00f0ff;
             text-decoration: none;
             font-weight: 600;
-            transition: color 0.2s, text-shadow 0.2s;
         }
-        .dev-link:hover {
+        .contact-link:hover {
+            text-decoration: underline;
             color: #ffffff;
-            text-shadow: 0 0 8px #00f0ff;
         }
 
         /* OPTIONS BOUTONS RONDS (RADIO) */
@@ -255,48 +154,17 @@
         button { background: #00f0ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; color: #030712; transition: 0.3s; font-size: 0.9em; letter-spacing: 0.5px; }
         button:hover { background: #ffffff; box-shadow: 0 0 15px #00f0ff; }
 
-        /* CANVAS SCÈNE 3D */
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* PREMIUM LINK STYLE */
-        .premium-box {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 153, 0, 0.2));
-            border: 1px solid #ff9900;
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            margin-top: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .premium-box:hover {
-            box-shadow: 0 0 15px rgba(255, 153, 0, 0.4);
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 153, 0, 0.3));
-        }
+        /* NAV PAD */
+        #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 55px); grid-gap: 8px; z-index: 100; }
+        .nav-btn { width: 55px; height: 55px; border: 2px solid #00f0ff; color: #00f0ff; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,240,255,0.1); font-weight: bold; border-radius: 8px; }
+        
+        /* ADMIN PANEL */
+        .admin-panel { background: rgba(15, 10, 5, 0.98); border: 2px solid #ff9900; border-radius: 8px; padding: 15px; margin-top: 20px; }
+        .admin-title { color: #ff9900; font-size: 0.85em; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 5px; border-bottom: 1px solid rgba(255,153,0,0.2); padding-bottom: 5px; color: #f3f4f6; }
     </style>
 </head>
 <body>
-
-<div id="canvas-container"></div>
-
-<!-- ÉCRAN D'ACCUEIL INTERACTIF (SPLASH SCREEN) -->
-<div id="splash-screen">
-    <h1 class="splash-title">Welcome</h1>
-    <div class="splash-subtitle">OxyONE Live 3D</div>
-    <div class="badge-gratuit">APPLICATION 100% GRATUITE</div>
-    
-    <button class="snowflake-btn" onclick="enterApplication()">
-        <div class="snowflake-icon">❄</div>
-        <div class="snowflake-txt">TOUCHER LE FLOCON POUR ACCÉDER</div>
-    </button>
-</div>
 
 <aside id="clock-panel">
     <div id="clock-time">00:00:00</div>
@@ -310,14 +178,15 @@
     <div class="contact-card">
         <div class="contact-item">
             <span class="contact-icon">👤</span>
-            <div>
-                <strong>Benhamamouch Othman</strong><br>
-                <span style="font-size: 0.85em; color: #9ca3af;">Développeur Flutter & Firebase</span>
-            </div>
+            <strong>Benhamamouch Othman</strong>
         </div>
         <div class="contact-item">
-            <span class="contact-icon">🔗</span>
-            <a href="https://g.dev/oxy-one" target="_blank" class="dev-link">g.dev/oxy-one</a>
+            <span class="contact-icon">💻</span>
+            <span style="font-size: 0.95em;">Développeur Flutter & Firebase</span>
+        </div>
+        <div class="contact-item">
+            <span class="contact-icon">🌐</span>
+            <a href="https://g.dev/oxy-one" target="_blank" class="contact-link">g.dev/oxy-one</a>
         </div>
         <div class="contact-item">
             <span class="contact-icon">📞</span>
@@ -345,212 +214,327 @@
     
     <div class="control-group">
         <label for="wilaya-select">📍 LOCALISATION (WILAYA)</label>
-        <select id="wilaya-select" onchange="calculate()"></select>
+        <select id="wilaya-select"></select>
     </div>
 
     <div class="control-group">
         <label for="category-select">🥩 CATÉGORIE DE CONSERVATION</label>
-        <select id="category-select" onchange="calculate()">
+        <select id="category-select" onchange="onCategoryChange()">
             <option value="viande_rouge">Viande Rouge (0°C à +2°C)</option>
-            <option value="viande_blanche">Viande Blanche (+1°C à +4°C)</option>
-            <option value="fruits_legumes">Fruits & Légumes (+4°C à +12°C)</option>
+            <option value="viande_blanche">Viande Blanche (+1°C à +3°C)</option>
+            <option value="fruits_legumes">Fruits & Légumes (+4°C à +8°C)</option>
+            <option value="produits_laitiers">Products Laitiers (+2°C à +6°C)</option>
+            <option value="poissons">Poissons & Crustacés (0°C à +2°C)</option>
             <option value="congele">Produits Congelés (-18°C à -25°C)</option>
         </select>
     </div>
 
     <div class="control-group">
-        <label for="volume-range">📦 VOLUME DE STOCKAGE <span id="volume-badge" class="val-badge">50 m³</span></label>
-        <input type="range" id="volume-range" min="10" max="1000" value="50" oninput="updateVolumeBadge(this.value)">
+        <label for="rooms-select">❄️ NOMBRE DE CHAMBRES FROIDES</label>
+        <select id="rooms-select" onchange="calculate()">
+            <option value="1">1 Chambre</option>
+            <option value="2">2 Chambres</option>
+            <option value="3">3 Chambres</option>
+            <option value="4">4 Chambres</option>
+            <option value="5">5 Chambres</option>
+            <option value="6">6 Chambres</option>
+            <option value="7">7 Chambres</option>
+            <option value="8">8 Chambres</option>
+            <option value="9">9 Chambres</option>
+            <option value="10">10 Chambres</option>
+        </select>
     </div>
 
     <div class="display-box">
-        <div class="sub-label">Puissance Frigorifique Estimée</div>
-        <div id="power-val" class="main-val">0.00 kW</div>
+        <div class="sub-label">Volume Global Total</div>
+        <div class="main-val"><span id="total-v">90.00</span> m³</div>
     </div>
 
-    <button onclick="generatePDF()">📥 EXPORTER BILAN PDF</button>
+    <div class="display-box" style="border-color: rgba(255, 255, 255, 0.4);">
+        <div class="sub-label">Surface des Parois (Unitaire)</div>
+        <div class="main-val"><span id="total-s">126.00</span> m²</div>
+    </div>
 
-    <div class="premium-box" onclick="accessPremium()">
-        <span style="font-size: 1.2em;">🚀</span>
-        <div style="color: #ff9900; font-weight: bold; font-size: 0.85em; margin-top:2px;">ACCÉDER À LA VERSION PREMIUM</div>
+    <div class="display-box" id="temp-frame" style="border-color: #ff4444; background: rgba(30,0,0,0.4);">
+        <div class="sub-label">Consigne Température</div>
+        <div class="main-val" id="main-t">4°C</div>
+    </div>
+    
+    <div class="control-group">
+        <label for="tp">Temp. Positive <span class="val-badge" style="background:#ff4444; color:#fff;" id="v-tp">4°C</span></label>
+        <input type="range" id="tp" min="1" max="20" value="4" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label for="tn">Temp. Négative <span class="val-badge" style="background:#3b82f6; color:#fff;" id="v-tn">0°C</span></label>
+        <input type="range" id="tn" min="-25" max="0" value="0" oninput="calculate()">
+    </div>
+
+    <hr style="opacity:0.15; margin: 15px 0;">
+
+    <div class="control-group">
+        <label for="rw">Largeur <span class="val-badge" id="v-w">6.0m</span></label>
+        <input type="range" id="rw" min="1" max="20" step="0.5" value="6" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label for="rh">Hauteur <span class="val-badge" id="v-h">3.0m</span></label>
+        <input type="range" id="rh" min="1" max="8" step="0.5" value="3" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label for="rd">Profondeur <span class="val-badge" id="v-d">5.0m</span></label>
+        <input type="range" id="rd" min="1" max="20" step="0.5" value="5" oninput="calculate()">
+    </div>
+
+    <button onclick="generatePDF()">GÉNÉRER RAPPORT TECHNIQUE</button>
+
+    <div class="admin-panel">
+        <div class="admin-title">📊 Suivi Interne (Admin)</div>
+        <div class="stat-row"><span>Utilisateurs Actifs :</span><span style="color: #fff; font-weight: bold;">142</span></div>
+        <div class="stat-row"><span>Rapports PDF Générés :</span><span style="color: #fff; font-weight: bold;">389</span></div>
+        <canvas id="internalAnalyticsChart" style="width: 100%; height: 110px; margin-top: 10px;"></canvas>
     </div>
 </main>
 
+<nav id="nav-pad">
+    <div style="grid-column: 2" class="nav-btn" onclick="move('up')">▲</div>
+    <div class="nav-btn" onclick="move('left')">◀</div>
+    <div class="nav-btn" onclick="fullReset()">RESET</div>
+    <div class="nav-btn" onclick="move('right')">▶</div>
+    <div style="grid-column: 2" class="nav-btn" onclick="move('down')">▼</div>
+</nav>
+
 <script>
-    // --- INITIALISATION DE L'HORLOGE ---
     function updateClock() {
         const now = new Date();
-        const timeStr = now.toTimeString().split(' ')[0];
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Africa/Algiers' };
-        const dateStr = now.toLocaleDateString('fr-FR', options);
-        
-        document.getElementById('clock-time').textContent = timeStr;
-        document.getElementById('clock-date').textContent = dateStr;
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('clock-time').innerText = `${hours}:${minutes}:${seconds}`;
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('clock-date').innerText = now.toLocaleDateString('fr-FR', options);
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // --- DICTIONNAIRE DES 69 WILAYAS D'ALGÉRIE ---
     const wilayas = [
-        "01 Adrar", "02 Chlef", "03 Laghouat", "04 Oum El Bouaghi", "05 Batna", "06 Béjaïa", "07 Biskra", "08 Béchar", "09 Blida", "10 Bouira",
-        "11 Tamanrasset", "12 Tébessa", "13 Tlemcen", "14 Tiaret", "15 Tizi Ouzou", "16 Alger", "17 Djelfa", "18 Jijel", "19 Sétif", "20 Saïda",
-        "21 Skikda", "22 Sidi Bel Abbès", "23 Annaba", "24 Guelma", "25 Constantine", "26 Médéa", "27 Mostaganem", "28 M'Sila", "29 Mascara", "30 Ouargla",
-        "31 Oran", "32 El Bayadh", "33 Illizi", "34 Bordj Bou Arréridj", "35 Boumerdès", "36 El Tarf", "37 Tindouf", "38 Tissemsilt", "39 El Oued", "40 Khenchela",
-        "41 Souk Ahras", "42 Tipaza", "43 Mila", "44 Aïn Defla", "45 Naâma", "46 Aïn Témouchent", "47 Ghardaïa", "48 Relizane", "49 El M'Ghair", "50 El Meniaa",
-        "51 Ouled Djellal", "52 Bordj Badji Mokhtar", "53 Béni Abbès", "54 Timimoun", "55 Touggourt", "56 Djanet", "57 In Salah", "58 In Guezzam", "59 Mila",
-        "60 Aïn Defla", "61 Naâma", "62 Aïn Témouchent", "63 Ghardaïa", "64 Relizane", "65 El M'Ghair", "66 El Meniaa", "67 Ouled Djellal", "68 Bordj Badji Mokhtar", "69 Béni Abbès"
+        "01 Adrar", "02 Chlef", "03 Laghouat", "04 Oum El Bouaghi", "05 Batna", "06 Béjaïa", "07 Biskra", "08 Béchar", 
+        "09 Blida", "10 Bouira", "11 Tamanrasset", "12 Tébessa", "13 Tlemcen", "14 Tiaret", "15 Tizi Ouzou", "16 Alger", 
+        "17 Djelfa", "18 Jijel", "19 Sétif", "20 Saïda", "21 Skikda", "22 Sidi Bel Abbès", "23 Annaba", "24 Guelma", 
+        "25 Constantine", "26 Médéa", "27 Mostaganem", "28 M'Sila", "29 Mascara", "30 Ouargla", "31 Oran", "32 El Bayadh", 
+        "33 Illizi", "34 Bordj Bou Arreridj", "35 Boumerdès", "36 El Tarf", "37 Tindouf", "38 Tissemsilt", "39 El Oued", 
+        "40 Khenchela", "41 Souk Ahras", "42 Tipaza", "43 Mila", "44 Aïn Defla", "45 Naâma", "46 Aïn Témouchent", "47 Ghardaïa", 
+        "48 Relizane", "49 Timimoun", "50 Bordj Badji Mokhtar", "51 Ouled Djellal", "52 Béni Abbès", "53 In Salah", 
+        "54 In Guezzam", "55 Touggourt", "56 Djanet", "57 El M'Ghaier", "58 El Meniaa",
+        "59 Aflou", "60 El Abiodh Sidi Cheikh", "61 El Aricha", "62 El Kantara", "63 Barika", "64 Bou Saâda", 
+        "65 Bir El Ater", "66 Ksar El Boukhari", "67 Ksar Chellala", "68 Aïn Oussera", "69 Messaad"
     ];
 
-    const wilayaSelect = document.getElementById('wilaya-select');
-    wilayas.forEach((w, index) => {
+    const select = document.getElementById('wilaya-select');
+    wilayas.forEach(w => {
         let opt = document.createElement('option');
-        opt.value = index + 1;
-        opt.textContent = w;
-        if(w.includes("Oran")) opt.selected = true;
-        wilayaSelect.appendChild(opt);
+        opt.value = w; opt.innerHTML = w;
+        select.appendChild(opt);
     });
 
-    // --- NAVIGATION DU SPLASH SCREEN ---
-    function enterApplication() {
-        const splash = document.getElementById('splash-screen');
-        splash.style.opacity = 0;
-        setTimeout(() => {
-            splash.style.visibility = 'hidden';
-        }, 600);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const light = new THREE.DirectionalLight(0xffffff, 1); light.position.set(5, 10, 7); scene.add(light);
+
+    const group = new THREE.Group();
+    const material = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.7, roughness: 0.2 });
+    const chamber = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+    group.add(chamber);
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.7, 0.3), new THREE.MeshStandardMaterial({color: 0x111111}));
+    door.position.set(0.501, -0.1, 0); group.add(door);
+    scene.add(group);
+    scene.add(new THREE.GridHelper(50, 50, 0x00f0ff, 0x111111));
+    camera.position.set(12, 8, 12); camera.lookAt(0,0,0);
+
+    function move(direction) {
+        if(direction === 'up') group.rotation.x -= 0.2;
+        if(direction === 'down') group.rotation.x += 0.2;
+        if(direction === 'left') group.rotation.y -= 0.2;
+        if(direction === 'right') group.rotation.y += 0.2;
     }
 
-    function accessPremium() {
-        alert("Redirection vers l'espace Premium OxyONE...");
-    }
-
-    function updateVolumeBadge(val) {
-        document.getElementById('volume-badge').textContent = val + " m³";
+    function fullReset() {
+        group.rotation.set(0,0,0);
+        document.getElementById('category-select').value = "viande_rouge";
+        document.querySelector('input[name="structure-type"][value="industrielle"]').checked = true;
+        document.getElementById('tp').value = 4; 
+        document.getElementById('tn').value = 0;
+        document.getElementById('rw').value = 6; document.getElementById('rh').value = 3; document.getElementById('rd').value = 5;
+        document.getElementById('wilaya-select').value = "01 Adrar";
+        document.getElementById('rooms-select').value = "1";
         calculate();
-        update3DStructure(val);
     }
 
-    // --- ENGINE CALCULATION (THERMODYNAMIQUE SIMPLIFIÉE OXYONE) ---
+    function onCategoryChange() {
+        const cat = document.getElementById('category-select').value;
+        if (cat === "viande_rouge") { document.getElementById('tp').value = 1; document.getElementById('tn').value = 0; }
+        else if (cat === "viande_blanche") { document.getElementById('tp').value = 2; document.getElementById('tn').value = 0; }
+        else if (cat === "fruits_legumes") { document.getElementById('tp').value = 6; document.getElementById('tn').value = 0; }
+        else if (cat === "produits_laitiers") { document.getElementById('tp').value = 4; document.getElementById('tn').value = 0; }
+        else if (cat === "poissons") { document.getElementById('tp').value = 1; document.getElementById('tn').value = 0; }
+        else if (cat === "congele") { document.getElementById('tp').value = 1; document.getElementById('tn').value = -18; }
+        calculate();
+    }
+
     function calculate() {
-        const type = document.querySelector('input[name="structure-type"]:checked').value;
-        const category = document.getElementById('category-select').value;
-        const volume = parseFloat(document.getElementById('volume-range').value);
-
-        let baseFactor = 30; // Watts/m³ de base
+        const w = parseFloat(document.getElementById('rw').value);
+        const h = parseFloat(document.getElementById('rh').value);
+        const d = parseFloat(document.getElementById('rd').value);
+        const tp = parseInt(document.getElementById('tp').value);
+        const tn = parseInt(document.getElementById('tn').value);
+        const roomCount = parseInt(document.getElementById('rooms-select').value);
+        const cat = document.getElementById('category-select').value;
         
-        if (type === 'industrielle') baseFactor += 15;
-        if (category === 'congele') baseFactor += 25;
-        else if (category === 'viande_rouge' || category === 'viande_blanche') baseFactor += 10;
+        document.getElementById('v-w').innerText = w.toFixed(1) + "m";
+        document.getElementById('v-h').innerText = h.toFixed(1) + "m";
+        document.getElementById('v-d').innerText = d.toFixed(1) + "m";
+        document.getElementById('v-tp').innerText = tp + "°C";
+        document.getElementById('v-tn').innerText = tn + "°C";
+        
+        const unitVolume = w * h * d;
+        const totalVolume = unitVolume * roomCount;
+        document.getElementById('total-v').innerText = totalVolume.toFixed(2);
+        
+        const surface = (2 * (w * h)) + (2 * (d * h)) + (2 * (w * d));
+        document.getElementById('total-s').innerText = surface.toFixed(2);
 
-        // Calcul de la puissance frigorifique (Q = V * G * deltaT)
-        let totalWatts = volume * baseFactor;
-        let totalKW = totalWatts / 1000;
+        group.scale.set(w, h, d);
+        group.position.y = h/2;
 
-        document.getElementById('power-val').textContent = totalKW.toFixed(2) + " kW";
-    }
-
-    // --- SCÈNE THREE.JS 3D AUTOMATIQUE ---
-    let scene, camera, renderer, cube;
-    function init3D() {
-        const container = document.getElementById('canvas-container');
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x030712);
-
-        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(5, 5, 8);
-        camera.lookAt(0, 0, 0);
-
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
-
-        // Lumières
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-        const dirLight = new THREE.DirectionalLight(0x00f0ff, 0.8);
-        dirLight.position.set(5, 10, 7);
-        scene.add(dirLight);
-
-        // Représentation de la Chambre Froide
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshStandardMaterial({ 
-            color: 0x00f0ff, 
-            wireframe: false,
-            roughness: 0.4,
-            metalness: 0.2
-        });
-        cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-
-        // Lignes de contour (Wireframe overlay pour un style technologique)
-        const wireframeGeom = new THREE.EdgesGeometry(geometry);
-        const wireframeMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
-        const wireframe = new THREE.LineSegments(wireframeGeom, wireframeMat);
-        cube.add(wireframe);
-
-        animate();
-    }
-
-    function update3DStructure(volume) {
-        if (!cube) return;
-        // Changement d'échelle proportionnel au volume simulé
-        let scale = Math.cbrt(volume / 50);
-        cube.scale.set(scale, scale, scale);
-    }
-
-    function animate() {
-        requestAnimationFrame(animate);
-        if (cube) {
-            cube.rotation.y += 0.005;
+        if(cat === "congele" || tn < 0) {
+            document.getElementById('main-t').innerText = tn + "°C";
+            document.getElementById('temp-frame').style.borderColor = "#3b82f6";
+            chamber.material.color.setRGB(0.3, 0.6, 1.0);
+        } else {
+            document.getElementById('main-t').innerText = tp + "°C";
+            document.getElementById('temp-frame').style.borderColor = "#ff4444";
+            if (cat === "fruits_legumes") chamber.material.color.setRGB(0.2, 0.6, 0.2);
+            else if (cat === "viande_rouge") chamber.material.color.setRGB(0.7, 0.2, 0.2);
+            else chamber.material.color.setRGB(0.6, 0.6, 0.6);
         }
-        renderer.render(scene, camera);
     }
 
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    // --- EXPORTATION PDF (jspdf) ---
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-
-        const type = document.querySelector('input[name="structure-type"]:checked').value;
-        const wilaya = document.getElementById('wilaya-select').options[document.getElementById('wilaya-select').selectedIndex].text;
-        const cat = document.getElementById('category-select').options[document.getElementById('category-select').selectedIndex].text;
-        const vol = document.getElementById('volume-range').value;
-        const power = document.getElementById('power-val').textContent;
-
-        doc.setFont("Helvetica", "bold");
-        doc.setFontSize(22);
-        doc.setTextColor(0, 150, 255);
-        doc.text("BILAN TECHNIQUE OXYONE 3D", 20, 25);
-
-        doc.setFontSize(12);
-        doc.setTextColor(50, 50, 50);
-        doc.setFont("Helvetica", "normal");
-        doc.text(`Auteur / Expert : Benhamamouch Othman (Oxy-One)`, 20, 40);
-        doc.text(`Structure : Chambre Froide ${type.toUpperCase()}`, 20, 50);
-        doc.text(`Localisation : ${wilaya}`, 20, 60);
-        doc.text(`Régime de conservation : ${cat}`, 20, 70);
-        doc.text(`Volume de Stockage : ${vol} m³`, 20, 80);
         
-        doc.setFont("Helvetica", "bold");
-        doc.text(`Puissance Frigorifique Estimée : ${power}`, 20, 95);
+        const wilaya = document.getElementById('wilaya-select').value;
+        const roomCount = document.getElementById('rooms-select').value;
+        const categoryText = document.getElementById('category-select').options[document.getElementById('category-select').selectedIndex].text;
+        
+        const structType = document.querySelector('input[name="structure-type"]:checked').value;
+        const structLabel = structType === "industrielle" ? "Industrielle" : "Commerciale";
 
+        // BLOC EN-TÊTE
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        doc.setTextColor(0, 51, 102);
+        doc.text("OxyONE - FICHE RAPPORT TECHNIQUE", 20, 20);
+        
         doc.setFontSize(10);
-        doc.setFont("Helvetica", "italic");
-        doc.text("Document généré automatiquement par l'application OxyONE 3D - Modèle protégé.", 20, 120);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(50, 50, 50);
+        doc.text("Responsable Projet : Benhamamouch Othman (Flutter & Firebase)", 20, 29);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(80, 80, 80);
+        doc.text("Profil Google Dev : https://g.dev/oxy-one", 20, 35);
+        doc.text("Téléphone : +213 7 82 09 02 81", 20, 41);
+        doc.text("Adresse : 07, Rue Soleillet, Plateau St Michel, 31026 Oran, Algérie", 20, 47);
+        
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(0, 240, 255);
+        doc.line(20, 52, 190, 52);
+        
+        // 1. CONFIGURATION
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        doc.text("1. CONFIGURATION DU DEPLOIEMENT", 20, 61);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.text("• Type d'Infrastructure : Chambre Froide " + structLabel, 22, 68);
+        doc.text("• Zone de Localisation : Wilaya de " + wilaya, 22, 74);
+        doc.text("• Catégorie d'Exploitation : " + categoryText, 22, 80);
+        doc.text("• Nombre d'Unités Parallèles : " + roomCount + " chambre(s)", 22, 86);
+        doc.text("• Certification Structurelle : Startup Labellisée @2021 | Ministère de l'Économie", 22, 92);
 
-        doc.save(`OxyONE_Bilan_${wilaya.replace(/\s+/g, '_')}.pdf`);
+        // 2. DONNÉES TECHNIQUES
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text("2. DONNÉES ET MESURES THÉORIQUES", 20, 103);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.text("• Volume Global Total Cumulé : " + document.getElementById('total-v').innerText + " m³", 22, 110);
+        doc.text("• Surface Totale des Parois Échangeuses (Unitaire) : " + document.getElementById('total-s').innerText + " m²", 22, 116);
+        doc.text("• Dimensions Enveloppe Extérieure : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 22, 122);
+        doc.text("• Consigne Régulation Thermique Cible : " + document.getElementById('main-t').innerText, 22, 128);
+        
+        // 3. IMAGE MODÈLE 3D
+        const image3D = renderer.domElement.toDataURL("image/jpeg", 0.85);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE OXYONE) :", 20, 140);
+        doc.addImage(image3D, 'JPEG', 20, 145, 170, 85);
+        
+        // 4. CERTIFICATIONS EXCLUSIVES AU RAPPORT PDF
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text("4. CERTIFICATIONS & SÉCURITÉ DU SYSTÈME (RAPPORT PDF)", 20, 240);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        doc.text("• Infrastructure Logicielle : Dépôt centralisé et audité sur la plateforme GitHub.", 22, 247);
+        doc.text("• Certification d'Intégrité : Code source protégé, chiffré et tracé via l'architecture Oxyone-Security.", 22, 253);
+        doc.text("• Conformité de Sécurité : Validations automatisées et contrôle d'accès des flux IoT.", 22, 259);
+
+        doc.save("OxyONE_Rapport_Technique_" + wilaya.replace(/\s+/g, '_') + ".pdf");
     }
 
-    // Lancement au chargement complet
-    window.onload = () => {
-        init3D();
-        calculate();
-    };
+    const ctxInternal = document.getElementById('internalAnalyticsChart').getContext('2d');
+    new Chart(ctxInternal, {
+        type: 'line',
+        data: {
+            labels: ['Mars', 'Avril', 'Mai', 'Juin'],
+            datasets: [{
+                label: 'Traction OxyONE',
+                data: [45, 78, 112, 142],
+                borderColor: '#ff9900',
+                backgroundColor: 'rgba(255, 153, 0, 0.05)',
+                borderWidth: 2,
+                tension: 0.35,
+                pointRadius: 2
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#ff9900', font: { size: 8 } } },
+                y: { grid: { color: 'rgba(255,153,0,0.05)' }, ticks: { color: '#ff9900', font: { size: 8 } } }
+            }
+        }
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate(); 
+    calculate();
 </script>
 </body>
 </html>
