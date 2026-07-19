@@ -54,7 +54,7 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(0, 240, 255, 0.2);
             border-radius: 6px;
-            padding: 12px;
+            padding: 10px;
             margin-bottom: 15px;
             font-size: 0.85em;
         }
@@ -62,23 +62,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 5px 0;
+            margin: 4px 0;
             color: #e5e7eb;
         }
         .contact-icon {
             color: #00f0ff;
             font-size: 1.1em;
-            width: 16px;
-            text-align: center;
-        }
-        .contact-link {
-            color: #00f0ff;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .contact-link:hover {
-            text-decoration: underline;
-            color: #ffffff;
         }
 
         /* OPTIONS BOUTONS RONDS (RADIO) */
@@ -181,14 +170,6 @@
             <strong>Benhamamouch Othman</strong>
         </div>
         <div class="contact-item">
-            <span class="contact-icon">💻</span>
-            <span style="font-size: 0.95em;">Développeur Flutter & Firebase</span>
-        </div>
-        <div class="contact-item">
-            <span class="contact-icon">🌐</span>
-            <a href="https://g.dev/oxy-one" target="_blank" class="contact-link">g.dev/oxy-one</a>
-        </div>
-        <div class="contact-item">
             <span class="contact-icon">📞</span>
             <span>+213 7 82 09 02 81</span>
         </div>
@@ -223,7 +204,7 @@
             <option value="viande_rouge">Viande Rouge (0°C à +2°C)</option>
             <option value="viande_blanche">Viande Blanche (+1°C à +3°C)</option>
             <option value="fruits_legumes">Fruits & Légumes (+4°C à +8°C)</option>
-            <option value="produits_laitiers">Products Laitiers (+2°C à +6°C)</option>
+            <option value="produits_laitiers">Produits Laitiers (+2°C à +6°C)</option>
             <option value="poissons">Poissons & Crustacés (0°C à +2°C)</option>
             <option value="congele">Produits Congelés (-18°C à -25°C)</option>
         </select>
@@ -422,6 +403,7 @@
         }
     }
 
+    // EXPORT PDF : CERTIFICATS PRÉSENTS EXCLUSIVEMENT ICI
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -442,66 +424,66 @@
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(50, 50, 50);
-        doc.text("Responsable Projet : Benhamamouch Othman (Flutter & Firebase)", 20, 29);
+        doc.text("Responsable Projet : Benhamamouch Othman", 20, 29);
         
         doc.setFont("helvetica", "normal");
         doc.setTextColor(80, 80, 80);
-        doc.text("Profil Google Dev : https://g.dev/oxy-one", 20, 35);
-        doc.text("Téléphone : +213 7 82 09 02 81", 20, 41);
-        doc.text("Adresse : 07, Rue Soleillet, Plateau St Michel, 31026 Oran, Algérie", 20, 47);
+        doc.text("Téléphone : +213 7 82 09 02 81", 20, 35);
+        doc.text("Adresse : 07, Rue Soleillet, Plateau St Michel, 31026 Oran, Algérie", 20, 41);
         
         doc.setLineWidth(0.5);
         doc.setDrawColor(0, 240, 255);
-        doc.line(20, 52, 190, 52);
+        doc.line(20, 46, 190, 46);
         
         // 1. CONFIGURATION
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(0, 0, 0);
-        doc.text("1. CONFIGURATION DU DEPLOIEMENT", 20, 61);
+        doc.text("1. CONFIGURATION DU DEPLOIEMENT", 20, 55);
         
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
         doc.setTextColor(60, 60, 60);
-        doc.text("• Type d'Infrastructure : Chambre Froide " + structLabel, 22, 68);
-        doc.text("• Zone de Localisation : Wilaya de " + wilaya, 22, 74);
-        doc.text("• Catégorie d'Exploitation : " + categoryText, 22, 80);
-        doc.text("• Nombre d'Unités Parallèles : " + roomCount + " chambre(s)", 22, 86);
-        doc.text("• Certification Structurelle : Startup Labellisée @2021 | Ministère de l'Économie", 22, 92);
+        doc.text("• Type d'Infrastructure : Chambre Froide " + structLabel, 22, 62);
+        doc.text("• Zone de Localisation : Wilaya de " + wilaya, 22, 68);
+        doc.text("• Catégorie d'Exploitation : " + categoryText, 22, 74);
+        doc.text("• Nombre d'Unités Parallèles : " + roomCount + " chambre(s)", 22, 80);
+        doc.text("• Certification Structurelle : Startup Labellisée @2021 | Ministère de l'Économie", 22, 86);
 
         // 2. DONNÉES TECHNIQUES
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(0, 0, 0);
-        doc.text("2. DONNÉES ET MESURES THÉORIQUES", 20, 103);
+        doc.text("2. DONNÉES ET MESURES THÉORIQUES", 20, 97);
         
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
         doc.setTextColor(60, 60, 60);
-        doc.text("• Volume Global Total Cumulé : " + document.getElementById('total-v').innerText + " m³", 22, 110);
-        doc.text("• Surface Totale des Parois Échangeuses (Unitaire) : " + document.getElementById('total-s').innerText + " m²", 22, 116);
-        doc.text("• Dimensions Enveloppe Extérieure : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 22, 122);
-        doc.text("• Consigne Régulation Thermique Cible : " + document.getElementById('main-t').innerText, 22, 128);
+        doc.text("• Volume Global Total Cumulé : " + document.getElementById('total-v').innerText + " m³", 22, 104);
+        doc.text("• Surface Totale des Parois Échangeuses (Unitaire) : " + document.getElementById('total-s').innerText + " m²", 22, 110);
+        doc.text("• Dimensions Enveloppe Extérieure : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 22, 116);
+        doc.text("• Consigne Régulation Thermique Cible : " + document.getElementById('main-t').innerText, 22, 122);
         
         // 3. IMAGE MODÈLE 3D
         const image3D = renderer.domElement.toDataURL("image/jpeg", 0.85);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
-        doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE OXYONE) :", 20, 140);
-        doc.addImage(image3D, 'JPEG', 20, 145, 170, 85);
+        doc.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE OXYONE) :", 20, 134);
+        doc.addImage(image3D, 'JPEG', 20, 139, 170, 85);
         
         // 4. CERTIFICATIONS EXCLUSIVES AU RAPPORT PDF
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
-        doc.text("4. CERTIFICATIONS & SÉCURITÉ DU SYSTÈME (RAPPORT PDF)", 20, 240);
+        doc.text("4. CERTIFICATIONS & SÉCURITÉ DU SYSTÈME (RAPPORT PDF)", 20, 236);
         
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
         doc.setTextColor(60, 60, 60);
-        doc.text("• Infrastructure Logicielle : Dépôt centralisé et audité sur la plateforme GitHub.", 22, 247);
-        doc.text("• Certification d'Intégrité : Code source protégé, chiffré et tracé via l'architecture Oxyone-Security.", 22, 253);
-        doc.text("• Conformité de Sécurité : Validations automatisées et contrôle d'accès des flux IoT.", 22, 259);
+        doc.text("• Infrastructure Logicielle : Dépôt centralisé et audité sur la plateforme GitHub.", 22, 243);
+        doc.text("• Certification d'Intégrité : Code source protégé, chiffré et tracé via l'architecture Oxyone-Security.", 22, 249);
+        doc.text("• Conformité de Sécurité : Validations automatisées et contrôle d'accès des flux IoT.", 22, 255);
 
+        // SAUVEGARDE DU PDF
         doc.save("OxyONE_Rapport_Technique_" + wilaya.replace(/\s+/g, '_') + ".pdf");
     }
 
