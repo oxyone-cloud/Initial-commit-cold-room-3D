@@ -1,0 +1,55 @@
+name: SLSA Provenance Generator
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      # CORRECTION 1 : Le nom 'hashes' doit correspondre à l'étape ci-dessous
+      hashes: ${{ steps.hash.outputs.hashes }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ========================================================
+      # Étape 1 : Build de vos fichiers/artefacts
+      # ========================================================
+      - name: Build artifacts
+        run: |
+          # Remplacez ceci par vos vraies commandes de compilation
+          echo "artifact1" > artifact1
+          echo "artifact2" > artifact2
+
+      # ========================================================
+      # Étape 2 : Génération de l'empreinte SHA-256 (Base64)
+      # ========================================================
+      - name: Generate subject for provenance
+        id: hash
+        run: |
+          set -euo pipefail
+
+          # Lister les fichiers cibles
+          files=$(ls artifact*)
+          
+          # Calculer le SHA256 et l'envoyer sur l'output 'hashes'
+          echo "hashes=$(sha256sum $files | base64 -w0)" >> "${GITHUB_OUTPUT}"
+
+  provenance:
+    needs: [build]
+    permissions:
+      actions: read   # Pour lire le chemin du workflow
+      id-token: write # Pour signer cryptographiquement la provenance (Sigstore)
+      contents: write # Pour attacher l'attestation à votre Release GitHub
+    # CORRECTION 2 : Passage à v2.0.0 recommandé
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+      upload-assets: true
