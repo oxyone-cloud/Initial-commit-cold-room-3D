@@ -516,6 +516,18 @@
     scene.add(new THREE.GridHelper(50, 50, 0x00f0ff, 0x111111));
     camera.position.set(12, 8, 12); camera.lookAt(0,0,0);
 
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
     function enterApplication() {
         const splash = document.getElementById('splash-screen');
         splash.style.opacity = 0;
@@ -716,29 +728,34 @@
         data: {
             labels: ['Mars', 'Avril', 'Mai', 'Juin'],
             datasets: [{
-                label: 'Traction OxyONE',
-                data: [45, 78, 112, 142],
+                label: 'Simulations 3D',
+                data: [65, 89, 120, 142],
                 borderColor: '#ff9900',
-                backgroundColor: 'rgba(255, 153, 0, 0.05)',
+                backgroundColor: 'rgba(255, 153, 0, 0.15)',
                 borderWidth: 2,
-                tension: 0.35,
-                pointRadius: 2
+                fill: true,
+                tension: 0.3
             }]
         },
         options: {
-            plugins: { legend: { display: false } },
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
             scales: {
-                x: { grid: { display: false }, ticks: { color: '#ff9900', font: { size: 8 } } },
-                y: { grid: { color: 'rgba(255,153,0,0.05)' }, ticks: { color: '#ff9900', font: { size: 8 } } }
+                x: {
+                    ticks: { color: '#9ca3af', font: { size: 9 } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                },
+                y: {
+                    ticks: { color: '#9ca3af', font: { size: 9 } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                }
             }
         }
     });
 
-    function animate() {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-    }
-    animate(); 
     calculate();
 </script>
 </body>
