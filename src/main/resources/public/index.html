@@ -13,10 +13,8 @@
       gtag('config', 'G-1FGNWDMZGQ');
     </script>
 
-    <!-- LIBRAIRIES 3D, PDF ET ZIP -->
+    <!-- LIBRAIRIES 3D -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
         /* BASE ET STRUCTURE ACCESSIBLE */
@@ -462,15 +460,15 @@
         <input type="range" id="rd" min="1" max="20" step="0.5" value="5" oninput="calculate()">
     </div>
 
-    <!-- BOUTON D'EXPORTATION DOSSIER ZIP -->
-    <button onclick="generateZIP()">📦 EXPORTER DOSSIER ZIP (BILAN + CATALOGUE)</button>
+    <!-- BOUTON EXPORT ZIP REDIRIGÉ VERS LE MESSAGE PREMIUM -->
+    <button onclick="requestPremiumZip()">📦 EXPORTER DOSSIER ZIP (BILAN + CATALOGUE)</button>
 
     <div class="premium-box" onclick="accessPremium()">
         <span style="font-size: 1.2em;">🚀</span>
         <div style="color: #ff9900; font-weight: bold; font-size: 0.85em; margin-top:2px;">ACCÉDER À LA VERSION PREMIUM</div>
     </div>
 
-    <!-- NOUVEAU BLOC PHOTO DANS LE SUIVI INTERNE -->
+    <!-- BLOC CAPTURE PHOTO -->
     <div class="admin-panel">
         <div class="admin-title">📷 Capture & Modélisation d'Espace</div>
         <div class="stat-row"><span>Utilisateurs Actifs :</span><span style="color: #fff; font-weight: bold;">142</span></div>
@@ -564,14 +562,17 @@
     }
 
     function accessPremium() {
-        alert("Redirection vers l'offre commerciale et les suites logicielle Premium OxyONE...");
+        alert("🔒 VERSION PREMIUM OxyONE :\n\nPour obtenir un accès illimité aux rapports ZIP, aux bilans certifiés et à l'exportation complète, veuillez contacter le développeur :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Dev Profile : g.dev/oxy-one");
     }
 
-    /* FONCTION PHOTO D'ESPACE AVEC RENDER & MESSAGE PREMIUM */
+    /* MESSAGE VERSION PREMIUM POUR LE DOSSIER ZIP */
+    function requestPremiumZip() {
+        alert("🔒 FONCTIONNALITÉ PREMIUM :\n\nL'exportation du Dossier Complet en format ZIP (Rapport Technique PDF + Catalogue Commercial) est une option réservée à la Version Premium.\n\nVeuillez contacter le développeur pour activer votre licence Premium :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Profil Dev : https://g.dev/oxy-one");
+    }
+
     function takeSpacePhoto() {
         renderer.render(scene, camera);
-        
-        alert("📸 Photo de l'espace 3D capturée avec succès !\n\n⭐ [VERSION PREMIUM] :\nL'exportation en très haute résolution (HD/4K), l'incrustation en Réalité Augmentée (AR) et la sauvegarde illimitée dans le Cloud OxyONE sont réservées à la Version Premium.\n\nContactez Benhamamouch Othman pour activer votre accès Premium.");
+        alert("📸 Photo de l'espace 3D capturée avec succès !\n\n⭐ [VERSION PREMIUM] :\nL'exportation en haute résolution (HD/4K) et la sauvegarde illimitée sont réservées à la Version Premium.\n\nContactez le développeur Benhamamouch Othman pour activer votre accès Premium.");
     }
 
     function move(direction) {
@@ -640,120 +641,6 @@
             else if (cat === "viande_rouge") chamber.material.color.setRGB(0.7, 0.2, 0.2);
             else chamber.material.color.setRGB(0.6, 0.6, 0.6);
         }
-    }
-
-    // GENERATION COMPLÈTE ZIP (BILAN + OFFRES COMMERCIALES)
-    async function generateZIP() {
-        const { jsPDF } = window.jspdf;
-        const zip = new JSZip();
-
-        const wilaya = document.getElementById('wilaya-select').value;
-        const roomCount = document.getElementById('rooms-select').value;
-        const categoryText = document.getElementById('category-select').options[document.getElementById('category-select').selectedIndex].text;
-        const structType = document.querySelector('input[name="structure-type"]:checked').value;
-        const structLabel = structType === "industrielle" ? "Industrielle" : "Commerciale";
-
-        // 1. FICHIER PDF : BILAN RAPPORT TECHNIQUE
-        const docBilan = new jsPDF();
-        docBilan.setFont("helvetica", "bold");
-        docBilan.setFontSize(18);
-        docBilan.setTextColor(0, 51, 102);
-        docBilan.text("OxyONE - FICHE RAPPORT TECHNIQUE", 20, 20);
-        
-        docBilan.setFontSize(10);
-        docBilan.setFont("helvetica", "bold");
-        docBilan.setTextColor(50, 50, 50);
-        docBilan.text("Responsable Projet : Benhamamouch Othman (Flutter & Firebase)", 20, 29);
-        
-        docBilan.setFont("helvetica", "normal");
-        docBilan.setTextColor(80, 80, 80);
-        docBilan.text("Profil Google Dev : https://g.dev/oxy-one", 20, 35);
-        docBilan.text("Téléphone : +213 7 82 09 02 81", 20, 41);
-        docBilan.text("Adresse : 07, Rue Soleillet, Plateau St Michel, 31026 Oran, Algérie", 20, 47);
-        
-        docBilan.setLineWidth(0.5);
-        docBilan.setDrawColor(0, 240, 255);
-        docBilan.line(20, 52, 190, 52);
-        
-        docBilan.setFontSize(11);
-        docBilan.setFont("helvetica", "bold");
-        docBilan.setTextColor(0, 0, 0);
-        docBilan.text("1. CONFIGURATION DU DEPLOIEMENT", 20, 61);
-        
-        docBilan.setFont("helvetica", "normal");
-        docBilan.setFontSize(10);
-        docBilan.setTextColor(60, 60, 60);
-        docBilan.text("• Type d'Infrastructure : Chambre Froide " + structLabel, 22, 68);
-        docBilan.text("• Zone de Localisation : Wilaya de " + wilaya, 22, 74);
-        docBilan.text("• Catégorie d'Exploitation : " + categoryText, 22, 80);
-        docBilan.text("• Nombre d'Unités Parallèles : " + roomCount + " chambre(s)", 22, 86);
-        docBilan.text("• Certification Structurelle : Startup Labellisée @2021 | Ministère de l'Économie", 22, 92);
-
-        docBilan.setFont("helvetica", "bold");
-        docBilan.setFontSize(11);
-        docBilan.setTextColor(0, 0, 0);
-        docBilan.text("2. DONNÉES ET MESURES THÉORIQUES", 20, 103);
-        
-        docBilan.setFont("helvetica", "normal");
-        docBilan.setFontSize(10);
-        docBilan.setTextColor(60, 60, 60);
-        docBilan.text("• Volume Global Total Cumulé : " + document.getElementById('total-v').innerText + " m³", 22, 110);
-        docBilan.text("• Surface Totale des Parois Échangeuses (Unitaire) : " + document.getElementById('total-s').innerText + " m²", 22, 116);
-        docBilan.text("• Dimensions Enveloppe Extérieure : L " + document.getElementById('v-w').innerText + " x H " + document.getElementById('v-h').innerText + " x P " + document.getElementById('v-d').innerText, 22, 122);
-        docBilan.text("• Consigne Régulation Thermique Cible : " + document.getElementById('main-t').innerText, 22, 128);
-        
-        const image3D = renderer.domElement.toDataURL("image/jpeg", 0.85);
-        docBilan.setFont("helvetica", "bold");
-        docBilan.setFontSize(11);
-        docBilan.text("3. SCHÉMA DU MODÈLE NUMÉRIQUE (VUE SATELLITE OXYONE) :", 20, 140);
-        docBilan.addImage(image3D, 'JPEG', 20, 145, 170, 85);
-        
-        docBilan.setFont("helvetica", "bold");
-        docBilan.setFontSize(11);
-        docBilan.text("4. CERTIFICATIONS & SÉCURITÉ DU SYSTÈME (RAPPORT PDF)", 20, 240);
-        
-        docBilan.setFont("helvetica", "normal");
-        docBilan.setFontSize(10);
-        docBilan.setTextColor(60, 60, 60);
-        docBilan.text("• Infrastructure Logicielle : Dépôt centralisé et audité sur la plateforme GitHub.", 22, 247);
-        docBilan.text("• Certification d'Intégrité : Code source protégé, chiffré et tracé via l'architecture Oxyone-Security.", 22, 253);
-        docBilan.text("• Conformité de Sécurité : Validations automatisées et contrôle d'accès des flux IoT.", 22, 259);
-
-        const bilanBlob = docBilan.output('blob');
-        zip.file(`OxyONE_Rapport_Technique_${wilaya.replace(/\s+/g, '_')}.pdf`, bilanBlob);
-
-        // 2. FICHIER PDF : CATALOGUE ET OFFRE COMMERCIALES PREMIUM
-        const docCat = new jsPDF();
-        docCat.setFont("helvetica", "bold");
-        docCat.setFontSize(18);
-        docCat.setTextColor(0, 51, 102);
-        docCat.text("PROPOSITION COMMERCIALES & OFFRE DE SERVICE", 20, 20);
-
-        docCat.setFontSize(10);
-        docCat.setFont("helvetica", "normal");
-        docCat.setTextColor(60, 60, 60);
-        docCat.text("Suite Logicielle Industrielle IoT: Cold Service | Smart Tracking | Digital Sens", 20, 28);
-        docCat.text("Développeur / Fondateur : Benhamamouch Othman (https://g.dev/oxy-one)", 20, 34);
-
-        docCat.setFont("helvetica", "bold");
-        docCat.text("GRILLE TARIFAIRE & FORMULES D'ACCOMPAGNEMENT (Dinar Algérien DA) :", 20, 48);
-        
-        docCat.setFont("helvetica", "normal");
-        docCat.text("• Pack Starter (100 000 DA) : 1 App au choix, jusqu'à 5 capteurs IoT.", 20, 58);
-        docCat.text("• Pack Business (500 000 DA) : 2 Apps couplées, jusqu'à 25 capteurs & 5 véhicules.", 20, 68);
-        docCat.text("• Pack Premium Pro (1 800 000 DA) : Suite complète, 100 capteurs IoT & Module IA.", 20, 78);
-        docCat.text("• Pack Enterprise (5 000 000 DA) : Sur-mesure multi-sites, capteurs illimités & ERP.", 20, 88);
-
-        const catBlob = docCat.output('blob');
-        zip.file("Catalogue_Offres_Commerciales_OxyONE.pdf", catBlob);
-
-        // 3. GENERATION DE L'ARCHIVE ZIP
-        zip.generateAsync({ type: "blob" }).then(function (content) {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(content);
-            link.download = `OxyONE_Dossier_Complet_${wilaya.replace(/\s+/g, '_')}.zip`;
-            link.click();
-        });
     }
 
     calculate();
