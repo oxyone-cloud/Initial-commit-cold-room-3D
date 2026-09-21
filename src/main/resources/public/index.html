@@ -149,7 +149,7 @@
         #clock-time { font-size: 1.8em; font-weight: bold; color: #ffffff; font-family: monospace; letter-spacing: 2px; }
         #clock-date { font-size: 0.75em; text-transform: uppercase; color: #00e0ff; letter-spacing: 1px; margin-top: 2px; font-weight: 600; }
 
-        /* CARTE CONTACT & WHATSAPP */
+        /* CARTE CONTACT & UPWORK */
         .contact-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -192,13 +192,34 @@
             border-radius: 20px;
             font-weight: bold;
             font-size: 0.85em;
-            margin-top: 10px;
+            margin-top: 8px;
             box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .whatsapp-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(37, 211, 102, 0.5);
+            color: #ffffff;
+        }
+        .upwork-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #14a800, #0d7300);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-top: 8px;
+            box-shadow: 0 4px 10px rgba(20, 168, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .upwork-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(20, 168, 0, 0.5);
             color: #ffffff;
         }
 
@@ -365,10 +386,11 @@
             <span class="contact-icon">📞</span>
             <span>+213 7 82 09 02 81</span>
         </div>
-        <div class="contact-item" style="align-items: flex-start;">
-            <span class="contact-icon">🏢</span>
-            <span style="font-size: 0.9em; line-height: 1.3;">07, Rue Soleillet, Plateau St Michel<br>31026 Oran, Algérie</span>
-        </div>
+        
+        <a href="https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971?ref=project_share" target="_blank" class="upwork-btn">
+            <span>💚 Catalogue d'offres Upwork</span>
+        </a>
+        
         <a href="https://wa.me/213782090281" target="_blank" class="whatsapp-btn">
             <span>💬 Contact WhatsApp Direct</span>
         </a>
@@ -562,12 +584,12 @@
     }
 
     function accessPremium() {
-        alert("🔒 VERSION PREMIUM OxyONE :\n\nPour obtenir un accès illimité aux rapports ZIP, aux bilans certifiés et à l'exportation complète, veuillez contacter le développeur :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Dev Profile : g.dev/oxy-one");
+        alert("🔒 VERSION PREMIUM OxyONE :\n\nPour obtenir un accès illimité aux rapports ZIP, aux bilans certifiés et au catalogue d'offres de services, veuillez contacter le développeur :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Dev Profile : g.dev/oxy-one\n💼 Upwork : https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971");
     }
 
     /* MESSAGE VERSION PREMIUM POUR LE DOSSIER ZIP */
     function requestPremiumZip() {
-        alert("🔒 FONCTIONNALITÉ PREMIUM :\n\nL'exportation du Dossier Complet en format ZIP (Rapport Technique PDF + Catalogue Commercial) est une option réservée à la Version Premium.\n\nVeuillez contacter le développeur pour activer votre licence Premium :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Profil Dev : https://g.dev/oxy-one");
+        alert("🔒 FONCTIONNALITÉ PREMIUM :\n\nL'exportation du Dossier Complet en format ZIP (Rapport Technique PDF + Catalogue Commercial Upwork) est une option réservée à la Version Premium.\n\nVeuillez contacter le développeur pour activer votre licence Premium :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Profil Dev : https://g.dev/oxy-one");
     }
 
     function takeSpacePhoto() {
