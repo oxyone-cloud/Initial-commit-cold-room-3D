@@ -180,6 +180,31 @@
             text-decoration: underline;
             color: #ffffff;
         }
+
+        /* BOUTON DÉMO VIDÉO (CYAN) */
+        .demo-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #00f0ff, #0088cc);
+            color: #030712;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-top: 8px;
+            box-shadow: 0 4px 10px rgba(0, 240, 255, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 240, 255, 0.6);
+            color: #000000;
+        }
+
+        /* BOUTONS LIAISONS (UPWORK ET WHATSAPP) */
         .whatsapp-btn {
             display: flex;
             align-items: center;
@@ -380,7 +405,7 @@
         </div>
         <div class="contact-item">
             <span class="contact-icon">🇩🇿</span>
-            <a href="https://startup.dz/profile/" target="_blank" class="contact-link">Profil Startup.dz (Ministère)</a>
+            <a href="https://startup.dz/startups-labellisees/" target="_blank" class="contact-link">Startup Labellisée (Ministère)</a>
         </div>
         <div class="contact-item">
             <span class="contact-icon">🌐</span>
@@ -391,10 +416,17 @@
             <span>+213 7 82 09 02 81</span>
         </div>
         
+        <!-- BOUTON DÉMO VIDÉO DIRECTE -->
+        <a href="https://www.youtube.com/watch?v=KB7cZpvRyRg" target="_blank" class="demo-btn">
+            <span>🎬 REGARDER NOTRE DÉMO VIDÉO</span>
+        </a>
+
+        <!-- CATALOGUE UPWORK -->
         <a href="https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971?ref=project_share" target="_blank" class="upwork-btn">
             <span>💚 Catalogue d'offres Upwork</span>
         </a>
         
+        <!-- WHATSAPP DIRECT -->
         <a href="https://wa.me/213782090281" target="_blank" class="whatsapp-btn">
             <span>💬 Contact WhatsApp Direct</span>
         </a>
@@ -588,7 +620,7 @@
     }
 
     function accessPremium() {
-        alert("🔒 VERSION PREMIUM OxyONE :\n\nPour obtenir un accès illimité aux rapports ZIP, aux bilans certifiés et au catalogue d'offres de services, veuillez contacter le développeur :\n\n👤 Benhamamouch Othman\n🇩🇿 Profil Startup.dz : https://startup.dz/profile/\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Dev Profile : g.dev/oxy-one\n💼 Upwork : https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971");
+        alert("🔒 VERSION PREMIUM OxyONE :\n\nPour obtenir un accès illimité aux rapports ZIP, aux bilans certifiés et au catalogue d'offres de services, veuillez contacter le développeur :\n\n👤 Benhamamouch Othman\n🇩🇿 Profil Startup.dz : https://startup.dz/startups-labellisees/\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Dev Profile : g.dev/oxy-one\n🎬 Démo YouTube : https://www.youtube.com/watch?v=KB7cZpvRyRg\n💼 Upwork : https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971");
     }
 
     /* MESSAGE VERSION PREMIUM POUR LE DOSSIER ZIP */
