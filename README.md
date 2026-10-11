@@ -1,3 +1,4 @@
+<img width="640" height="521" alt="495391021_665448673000571_4748866864739225710_n-3" src="https://github.com/user-attachments/assets/e5009597-587d-4011-9763-15a3558acb69" />
 [![ORCID](https://img.shields.io/badge/ORCID-0009--0000--1250--8205-A6CE39?style=flat&logo=orcid&logoColor=white)](https://orcid.org/0009-0000-1250-8205)
 
 ![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
