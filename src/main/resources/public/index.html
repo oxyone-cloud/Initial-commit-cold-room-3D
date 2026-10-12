@@ -81,7 +81,7 @@
             cursor: pointer;
             outline: none;
             padding: 0;
-            margin: 0 0 25px 0;
+            margin: 0 0 20px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -112,6 +112,7 @@
             gap: 15px;
             flex-wrap: wrap;
             margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .codehype-splash-container, .github-splash-container, .ph-splash-container {
@@ -125,72 +126,94 @@
             transform: translateY(-2px);
         }
 
-        /* STYLE DU BADGE GITHUB SUR LE SPLASH */
-        .github-badge-card {
+        /* STYLE DES BADGES GITHUB ET PRODUCT HUNT */
+        .github-badge-card, .ph-badge-card {
             display: flex;
             align-items: center;
             gap: 10px;
             background: rgba(15, 23, 42, 0.9);
-            border: 1.5px solid #ffffff;
             padding: 10px 14px;
             border-radius: 8px;
             text-decoration: none;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
             height: 65px;
             box-sizing: border-box;
+        }
+        .github-badge-card {
+            border: 1.5px solid #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
         .github-badge-card:hover {
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
             border-color: #00f0ff;
         }
-        .github-badge-info {
-            text-align: left;
-        }
-        .github-badge-title {
-            font-size: 0.7em;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-        .github-badge-user {
-            font-size: 0.85em;
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        /* STYLE DU BADGE PRODUCT HUNT SUR LE SPLASH */
         .ph-badge-card {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(15, 23, 42, 0.9);
             border: 1.5px solid #DA552F;
-            padding: 10px 14px;
-            border-radius: 8px;
-            text-decoration: none;
             box-shadow: 0 0 15px rgba(218, 85, 47, 0.3);
-            height: 65px;
-            box-sizing: border-box;
         }
         .ph-badge-card:hover {
             box-shadow: 0 0 20px rgba(218, 85, 47, 0.6);
             border-color: #ff7651;
         }
-        .ph-badge-info {
-            text-align: left;
-        }
-        .ph-badge-title {
+        .badge-info-title {
             font-size: 0.7em;
             color: #9ca3af;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
+            text-align: left;
         }
-        .ph-badge-user {
+        .badge-info-user {
             font-size: 0.85em;
-            color: #DA552F;
             font-weight: bold;
+            text-align: left;
+        }
+
+        /* SECTION DES FICHIERS PDF SOUS LES BADGES */
+        .pdf-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 450px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .pdf-title {
+            font-size: 0.8em;
+            color: #00f0ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .pdf-links-grid {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .pdf-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid #00f0ff;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: 0.3s;
+            flex: 1;
+        }
+        .pdf-btn:hover {
+            background: #00f0ff;
+            color: #030712;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
         }
 
         @keyframes pulse {
@@ -463,7 +486,7 @@
 </head>
 <body>
 
-<!-- ÉCRAN D'ACCUEIL INTERACTIF (SPLASH SCREEN AVEC BADGES CODEHYPE, GITHUB & PRODUCT HUNT) -->
+<!-- ÉCRAN D'ACCUEIL INTERACTIF (SPLASH SCREEN AVEC BADGES ET FICHIERS PDF) -->
 <div id="splash-screen">
     <h1 class="splash-title">Welcome</h1>
     <div class="splash-subtitle">OxyONE Live 3D</div>
@@ -490,8 +513,8 @@
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill="#ffffff"/>
                 </svg>
                 <div class="github-badge-info">
-                    <div class="github-badge-title">Source Code</div>
-                    <div class="github-badge-user">GitHub Repository</div>
+                    <div class="badge-info-title">Source Code</div>
+                    <div class="badge-info-user" style="color: #ffffff;">GitHub Repository</div>
                 </div>
             </a>
         </div>
@@ -504,9 +527,24 @@
                     <path d="M12 7H9v10h2.5v-3.5H13c2.209 0 4-1.791 4-4s-1.791-2.5-4-2.5zm1 5h-1.5V9.5H13c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5z" fill="#FFFFFF"/>
                 </svg>
                 <div class="ph-badge-info">
-                    <div class="ph-badge-title">Featured on</div>
-                    <div class="ph-badge-user">Product Hunt</div>
+                    <div class="badge-info-title">Featured on</div>
+                    <div class="badge-info-user" style="color: #DA552F;">Product Hunt</div>
                 </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- SECTION DE TÉLÉCHARGEMENT DES FICHIERS PDF -->
+    <div class="pdf-section">
+        <div class="pdf-title">📚 Documentation & Tutoriels Officiels</div>
+        <div class="pdf-links-grid">
+            <!-- Remplacez "tutoriel-fr.pdf" par le chemin réel de votre fichier français -->
+            <a href="tutoriel-fr.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
+                <span>📄 Tutoriel (Français)</span>
+            </a>
+            <!-- Remplacez "tutoriel-en.pdf" par le chemin réel de votre fichier anglais -->
+            <a href="tutoriel-en.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
+                <span>📄 User Guide (English)</span>
             </a>
         </div>
     </div>
