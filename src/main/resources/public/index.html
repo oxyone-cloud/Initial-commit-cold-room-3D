@@ -168,18 +168,19 @@
             text-align: left;
         }
 
-        /* SECTION DES FICHIERS PDF SOUS LES BADGES */
+        /* SECTION PROPRE DES FICHIERS PDF SOUS LES BADGES */
         .pdf-section {
             display: flex;
             flex-direction: column;
             gap: 10px;
             width: 100%;
-            max-width: 450px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            padding: 15px;
-            border-radius: 8px;
+            max-width: 480px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 15px 20px;
+            border-radius: 10px;
             box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
         .pdf-title {
             font-size: 0.8em;
@@ -187,33 +188,34 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: bold;
-            margin-bottom: 5px;
+            text-align: center;
         }
         .pdf-links-grid {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
         }
         .pdf-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             background: rgba(0, 240, 255, 0.1);
-            border: 1px solid #00f0ff;
+            border: 1.5px solid #00f0ff;
             color: #ffffff;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 10px 14px;
+            border-radius: 8px;
             text-decoration: none;
-            font-size: 0.8em;
+            font-size: 0.85em;
             font-weight: 600;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             flex: 1;
         }
         .pdf-btn:hover {
             background: #00f0ff;
             color: #030712;
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+            transform: translateY(-2px);
         }
 
         @keyframes pulse {
@@ -486,7 +488,7 @@
 </head>
 <body>
 
-<!-- ÉCRAN D'ACCUEIL INTERACTIF (SPLASH SCREEN AVEC BADGES ET FICHIERS PDF) -->
+<!-- ÉCRAN D'ACCUEIL INTERACTIF (SPLASH SCREEN) -->
 <div id="splash-screen">
     <h1 class="splash-title">Welcome</h1>
     <div class="splash-subtitle">OxyONE Live 3D</div>
@@ -497,7 +499,7 @@
         <div class="snowflake-txt">TOUCHER LE FLOCON POUR ACCÉDER</div>
     </button>
 
-    <!-- CONTENEUR DES TROIS BADGES CÔTE À CÔTE -->
+    <!-- CONTENEUR DES BADGES -->
     <div class="badges-container">
         <!-- 1. BADGE CODEHYPE -->
         <div class="codehype-splash-container">
@@ -534,16 +536,14 @@
         </div>
     </div>
 
-    <!-- SECTION DE TÉLÉCHARGEMENT DES FICHIERS PDF -->
+    <!-- SECTION DOCUMENTATION & TUTORIELS PDF (AU PROPRE) -->
     <div class="pdf-section">
         <div class="pdf-title">📚 Documentation & Tutoriels Officiels</div>
         <div class="pdf-links-grid">
-            <!-- Remplacez "tutoriel-fr.pdf" par le chemin réel de votre fichier français -->
-            <a href="tutoriel-fr.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
+            <a href="Tutoriel_PDF_de_l_application_OxyOne.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
                 <span>📄 Tutoriel (Français)</span>
             </a>
-            <!-- Remplacez "tutoriel-en.pdf" par le chemin réel de votre fichier anglais -->
-            <a href="tutoriel-en.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
+            <a href="Tutoriel_PDF_de_l_application_OxyOne_EN.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
                 <span>📄 User Guide (English)</span>
             </a>
         </div>
@@ -858,14 +858,4 @@
             chamber.material.color.setRGB(0.3, 0.6, 1.0);
         } else {
             document.getElementById('main-t').innerText = tp + "°C";
-            document.getElementById('temp-frame').style.borderColor = "#ff4444";
-            if (cat === "fruits_legumes") chamber.material.color.setRGB(0.2, 0.6, 0.2);
-            else if (cat === "viande_rouge") chamber.material.color.setRGB(0.7, 0.2, 0.2);
-            else chamber.material.color.setRGB(0.6, 0.6, 0.6);
-        }
-    }
-
-    calculate();
-</script>
-</body>
-</html>
+            document
