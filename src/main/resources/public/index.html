@@ -114,19 +114,19 @@
             margin-top: 10px;
         }
 
-        .codehype-splash-container, .github-splash-container, .ph-splash-container {
+        .startup-splash-container, .github-splash-container, .ph-splash-container {
             display: flex;
             justify-content: center;
             opacity: 0.9;
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
-        .codehype-splash-container:hover, .github-splash-container:hover, .ph-splash-container:hover {
+        .startup-splash-container:hover, .github-splash-container:hover, .ph-splash-container:hover {
             opacity: 1;
             transform: translateY(-2px);
         }
 
-        /* STYLE DES BADGES GITHUB ET PRODUCT HUNT */
-        .github-badge-card, .ph-badge-card {
+        /* STYLE DES BADGES (STARTUP, GITHUB, PRODUCT HUNT) */
+        .startup-badge-card, .github-badge-card, .ph-badge-card {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -136,6 +136,14 @@
             text-decoration: none;
             height: 65px;
             box-sizing: border-box;
+        }
+        .startup-badge-card {
+            border: 1.5px solid #ff9900;
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.3);
+        }
+        .startup-badge-card:hover {
+            box-shadow: 0 0 20px rgba(255, 153, 0, 0.6);
+            border-color: #ffaa22;
         }
         .github-badge-card {
             border: 1.5px solid #ffffff;
@@ -291,31 +299,6 @@
             color: #ffffff;
         }
 
-        /* BOUTONS PDF TUTO DANS LA CARTE CONTACT */
-        .pdf-tuto-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: rgba(0, 240, 255, 0.1);
-            border: 1.5px solid #00f0ff;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85em;
-            margin-top: 8px;
-            box-shadow: 0 2px 8px rgba(0, 240, 255, 0.2);
-            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
-        }
-        .pdf-tuto-btn:hover {
-            transform: translateY(-2px);
-            background: #00f0ff;
-            color: #030712;
-            box-shadow: 0 4px 12px rgba(0, 240, 255, 0.5);
-        }
-
         /* OPTIONS BOUTONS RONDS (RADIO) */
         .radio-group {
             display: flex;
@@ -454,10 +437,16 @@
 
     <!-- CONTENEUR DES BADGES -->
     <div class="badges-container">
-        <!-- 1. BADGE CODEHYPE -->
-        <div class="codehype-splash-container">
-            <a href="https://www.codehype.ai/product/oxyone?utm_source=codehype_badge" target="_blank" rel="noopener noreferrer">
-                <img src="https://www.codehype.ai/badges/oxyone.svg?variant=find-us&v=20" alt="Featured on CodeHype" width="180" height="65" loading="lazy" decoding="async" style="display:inline-block;border:0;width:100%;max-width:180px;height:auto;max-height:65px;" />
+        <!-- 1. BADGE STARTUP LABELLISÉE -->
+        <div class="startup-splash-container">
+            <a href="https://startup.dz/startups-labellisees/" target="_blank" rel="noopener noreferrer" class="startup-badge-card">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#ff9900" stroke="#ffffff" stroke-width="1"/>
+                </svg>
+                <div class="startup-badge-info">
+                    <div class="badge-info-title">Labellisation</div>
+                    <div class="badge-info-user" style="color: #ff9900;">Startup Algérie</div>
+                </div>
             </a>
         </div>
 
@@ -526,14 +515,6 @@
             <span>🎬 REGARDER NOTRE DÉMO VIDÉO</span>
         </a>
 
-        <!-- TUTORIELS PDF (REMPLACEMENT DU CATALOGUE UPWORK) -->
-        <a href="tutoriel-oxyone-fr.pdf" target="_blank" rel="noopener noreferrer" class="pdf-tuto-btn">
-            <span>📄 Tutoriel (Français)[cite: 5]</span>
-        </a>
-        <a href="tutoriel-oxyone-en.pdf" target="_blank" rel="noopener noreferrer" class="pdf-tuto-btn">
-            <span>📄 User Guide (English)[cite: 1]</span>
-        </a>
-        
         <!-- WHATSAPP DIRECT -->
         <a href="https://wa.me/213782090281" target="_blank" class="whatsapp-btn">
             <span>💬 Contact WhatsApp Direct</span>
