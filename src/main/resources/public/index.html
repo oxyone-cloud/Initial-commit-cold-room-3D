@@ -112,6 +112,7 @@
             gap: 15px;
             flex-wrap: wrap;
             margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .codehype-splash-container, .github-splash-container, .ph-splash-container {
@@ -165,6 +166,56 @@
             font-size: 0.85em;
             font-weight: bold;
             text-align: left;
+        }
+
+        /* SECTION DOCUMENTATION & TUTORIELS PDF (AU PROPRE) */
+        .pdf-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 480px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        .pdf-title {
+            font-size: 0.8em;
+            color: #00f0ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .pdf-links-grid {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .pdf-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1.5px solid #00f0ff;
+            color: #ffffff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        .pdf-btn:hover {
+            background: #00f0ff;
+            color: #030712;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+            transform: translateY(-2px);
         }
 
         @keyframes pulse {
@@ -268,7 +319,7 @@
             color: #000000;
         }
 
-        /* BOUTON WHATSAPP */
+        /* BOUTONS LIAISONS (UPWORK ET WHATSAPP) */
         .whatsapp-btn {
             display: flex;
             align-items: center;
@@ -290,15 +341,12 @@
             box-shadow: 0 6px 15px rgba(37, 211, 102, 0.5);
             color: #ffffff;
         }
-
-        /* BOUTONS PDF TUTO DANS LA CARTE CONTACT */
-        .pdf-tuto-btn {
+        .upwork-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            background: rgba(0, 240, 255, 0.1);
-            border: 1.5px solid #00f0ff;
+            background: linear-gradient(135deg, #14a800, #0d7300);
             color: #ffffff;
             text-decoration: none;
             padding: 8px 12px;
@@ -306,14 +354,13 @@
             font-weight: bold;
             font-size: 0.85em;
             margin-top: 8px;
-            box-shadow: 0 2px 8px rgba(0, 240, 255, 0.2);
-            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(20, 168, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .pdf-tuto-btn:hover {
+        .upwork-btn:hover {
             transform: translateY(-2px);
-            background: #00f0ff;
-            color: #030712;
-            box-shadow: 0 4px 12px rgba(0, 240, 255, 0.5);
+            box-shadow: 0 6px 15px rgba(20, 168, 0, 0.5);
+            color: #ffffff;
         }
 
         /* OPTIONS BOUTONS RONDS (RADIO) */
@@ -488,6 +535,19 @@
             </a>
         </div>
     </div>
+
+    <!-- SECTION DOCUMENTATION & TUTORIELS PDF (CHEMINS SIMPLIFIÉS SANS ESPACES) -->
+    <div class="pdf-section">
+        <div class="pdf-title">📚 Documentation & Tutoriels Officiels</div>
+        <div class="pdf-links-grid">
+            <a href="tutoriel-oxyone-fr.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
+                <span>📄 Tutoriel (Français)</span>
+            </a>
+            <a href="tutoriel-oxyone-en.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
+                <span>📄 User Guide (English)</span>
+            </a>
+        </div>
+    </div>
 </div>
 
 <aside id="clock-panel">
@@ -526,12 +586,9 @@
             <span>🎬 REGARDER NOTRE DÉMO VIDÉO</span>
         </a>
 
-        <!-- TUTORIELS PDF (REMPLACEMENT DU CATALOGUE UPWORK) -->
-        <a href="tutoriel-oxyone-fr.pdf" target="_blank" rel="noopener noreferrer" class="pdf-tuto-btn">
-            <span>📄 Tutoriel (Français)[cite: 5]</span>
-        </a>
-        <a href="tutoriel-oxyone-en.pdf" target="_blank" rel="noopener noreferrer" class="pdf-tuto-btn">
-            <span>📄 User Guide (English)[cite: 1]</span>
+        <!-- CATALOGUE UPWORK -->
+        <a href="https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971?ref=project_share" target="_blank" class="upwork-btn">
+            <span>💚 Catalogue d'offres Upwork</span>
         </a>
         
         <!-- WHATSAPP DIRECT -->
@@ -728,11 +785,11 @@
     }
 
     function accessPremium() {
-        alert("🔒 VERSION PREMIUM OxyONE :\n\nPour obtenir un accès illimité aux rapports ZIP, aux bilans certifiés et au catalogue d'offres de services, veuillez contacter le développeur :\n\n👤 Benhamamouch Othman\n🇩🇿 Profil Startup.dz : https://startup.dz/startups-labellisees/\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Dev Profile : g.dev/oxy-one\n🎬 Démo YouTube : https://www.youtube.com/watch?v=KB7cZpvRyRg");
+        alert("🔒 VERSION PREMIUM OxyONE :\n\nPour obtenir un accès illimité aux rapports ZIP, aux bilans certifiés et au catalogue d'offres de services, veuillez contacter le développeur :\n\n👤 Benhamamouch Othman\n🇩🇿 Profil Startup.dz : https://startup.dz/startups-labellisees/\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Dev Profile : g.dev/oxy-one\n🎬 Démo YouTube : https://www.youtube.com/watch?v=KB7cZpvRyRg\n💼 Upwork : https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971");
     }
 
     function requestPremiumZip() {
-        alert("🔒 FONCTIONNALITÉ PREMIUM :\n\nL'exportation du Dossier Complet en format ZIP (Rapport Technique PDF + Documentation) est une option réservée à la Version Premium.\n\nVeuillez contacter le développeur pour activer votre licence Premium :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Profil Dev : https://g.dev/oxy-one");
+        alert("🔒 FONCTIONNALITÉ PREMIUM :\n\nL'exportation du Dossier Complet en format ZIP (Rapport Technique PDF + Catalogue Commercial Upwork) est une option réservée à la Version Premium.\n\nVeuillez contacter le développeur pour activer votre licence Premium :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Profil Dev : https://g.dev/oxy-one");
     }
 
     function takeSpacePhoto() {
