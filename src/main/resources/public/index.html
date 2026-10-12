@@ -380,3 +380,492 @@
             gap: 10px;
             cursor: pointer;
             font-size: 0.85em;
+            font-weight: 600;
+            color: #e5e7eb;
+        }
+        .radio-input {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #00f0ff;
+            border-radius: 50%;
+            outline: none;
+            background: transparent;
+            display: inline-grid;
+            place-content: center;
+            cursor: pointer;
+        }
+        .radio-input::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            background-color: #00f0ff;
+        }
+        .radio-input:checked::before {
+            transform: scale(1);
+        }
+
+        /* BOÎTES D'AFFICHAGE */
+        .display-box { background: rgba(0, 0, 0, 0.6); padding: 10px; border-radius: 5px; margin-bottom: 12px; text-align: center; border: 1px solid #00f0ff; }
+        .main-val { font-size: 1.6em; font-weight: bold; color: #ffffff; }
+        .sub-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; font-weight: 600; }
+        
+        /* FORMULAIRES */
+        .control-group { margin-bottom: 12px; }
+        .control-group label { display: block; font-size: 0.85em; font-weight: 600; color: #e5e7eb; margin-bottom: 4px; }
+        .val-badge { float: right; background: #00f0ff; color: #030712; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
+        
+        select { 
+            width: 100%; 
+            background: #0f172a; 
+            color: #00f0ff; 
+            border: 1.5px solid #00f0ff; 
+            padding: 8px; 
+            border-radius: 4px; 
+            margin-top: 5px; 
+            cursor: pointer; 
+            font-family: inherit; 
+            font-weight: 600;
+        }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: #00f0ff; margin-top: 5px; }
+        
+        /* BOUTONS */
+        button { background: #00f0ff; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; border-radius: 5px; color: #030712; transition: 0.3s; font-size: 0.85em; letter-spacing: 0.5px; }
+        button:hover { background: #ffffff; box-shadow: 0 0 15px #00f0ff; }
+
+        /* NAV PAD */
+        #nav-pad { position: absolute; bottom: 30px; right: 30px; display: grid; grid-template-columns: repeat(3, 55px); grid-gap: 8px; z-index: 100; }
+        .nav-btn { width: 55px; height: 55px; border: 2px solid #00f0ff; color: #00f0ff; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,240,255,0.1); font-weight: bold; border-radius: 8px; }
+        
+        /* ADMIN PANEL */
+        .admin-panel { background: rgba(15, 10, 5, 0.98); border: 2px solid #ff9900; border-radius: 8px; padding: 15px; margin-top: 20px; }
+        .admin-title { color: #ff9900; font-size: 0.85em; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 5px; border-bottom: 1px solid rgba(255,153,0,0.2); padding-bottom: 5px; color: #f3f4f6; }
+
+        /* BOUTON PHOTO & CAPTURE */
+        .photo-btn {
+            background: linear-gradient(135deg, #ff9900, #ff5500);
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 0 10px rgba(255, 153, 0, 0.3);
+            transition: 0.3s;
+        }
+        .photo-btn:hover {
+            background: linear-gradient(135deg, #ffaa22, #ff6611);
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.6);
+        }
+
+        /* PREMIUM LINK STYLE */
+        .premium-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 153, 0, 0.2));
+            border: 1px solid #ff9900;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .premium-box:hover {
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.4);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 153, 0, 0.3));
+        }
+    </style>
+</head>
+<body>
+
+<!-- ÉCRAN D'ACCUEIL INTERACTIF (SPLASH SCREEN) -->
+<div id="splash-screen">
+    <h1 class="splash-title">Welcome</h1>
+    <div class="splash-subtitle">OxyONE Live 3D</div>
+    <div class="badge-gratuit">APPLICATION 100% GRATUITE</div>
+    
+    <button class="snowflake-btn" onclick="enterApplication()">
+        <div class="snowflake-icon">❄</div>
+        <div class="snowflake-txt">TOUCHER LE FLOCON POUR ACCÉDER</div>
+    </button>
+
+    <!-- CONTENEUR DES BADGES -->
+    <div class="badges-container">
+        <!-- 1. BADGE CODEHYPE -->
+        <div class="codehype-splash-container">
+            <a href="https://www.codehype.ai/product/oxyone?utm_source=codehype_badge" target="_blank" rel="noopener noreferrer">
+                <img src="https://www.codehype.ai/badges/oxyone.svg?variant=find-us&v=20" alt="Featured on CodeHype" width="180" height="65" loading="lazy" decoding="async" style="display:inline-block;border:0;width:100%;max-width:180px;height:auto;max-height:65px;" />
+            </a>
+        </div>
+
+        <!-- 2. BADGE GITHUB -->
+        <div class="github-splash-container">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="github-badge-card">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill="#ffffff"/>
+                </svg>
+                <div class="github-badge-info">
+                    <div class="badge-info-title">Source Code</div>
+                    <div class="badge-info-user" style="color: #ffffff;">GitHub Repository</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 3. BADGE PRODUCT HUNT -->
+        <div class="ph-splash-container">
+            <a href="https://www.producthunt.com/" target="_blank" rel="noopener noreferrer" class="ph-badge-card">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zM15.5 11H13v2.5h2.5a1.25 1.25 0 000-2.5z" fill="#DA552F"/>
+                    <path d="M12 7H9v10h2.5v-3.5H13c2.209 0 4-1.791 4-4s-1.791-2.5-4-2.5zm1 5h-1.5V9.5H13c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5z" fill="#FFFFFF"/>
+                </svg>
+                <div class="ph-badge-info">
+                    <div class="badge-info-title">Featured on</div>
+                    <div class="badge-info-user" style="color: #DA552F;">Product Hunt</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- SECTION DOCUMENTATION & TUTORIELS PDF (CHEMINS SIMPLIFIÉS SANS ESPACES) -->
+    <div class="pdf-section">
+        <div class="pdf-title">📚 Documentation & Tutoriels Officiels</div>
+        <div class="pdf-links-grid">
+            <a href="tutoriel-oxyone-fr.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
+                <span>📄 Tutoriel (Français)</span>
+            </a>
+            <a href="tutoriel-oxyone-en.pdf" target="_blank" rel="noopener noreferrer" class="pdf-btn">
+                <span>📄 User Guide (English)</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<aside id="clock-panel">
+    <div id="clock-time">00:00:00</div>
+    <div id="clock-date">Chargement...</div>
+</aside>
+
+<main id="gui">
+    <h2 style="margin:0; font-size: 1.25em; letter-spacing: 2px; color: #ffffff;">OxyONE 3D</h2>
+    <p style="font-size: 0.7em; margin: 5px 0 10px 0; color: #9ca3af; font-weight: 500;">Startup Labellisée @2021 | Ministère de l'Économie</p>
+    
+    <div class="contact-card">
+        <div class="contact-item">
+            <span class="contact-icon">👤</span>
+            <strong>Benhamamouch Othman</strong>
+        </div>
+        <div class="contact-item">
+            <span class="contact-icon">💻</span>
+            <span style="font-size: 0.95em;">Développeur Flutter & Firebase</span>
+        </div>
+        <div class="contact-item">
+            <span class="contact-icon">🇩🇿</span>
+            <a href="https://startup.dz/startups-labellisees/" target="_blank" class="contact-link">Startup Labellisée (Ministère)</a>
+        </div>
+        <div class="contact-item">
+            <span class="contact-icon">🌐</span>
+            <a href="https://g.dev/oxy-one" target="_blank" class="contact-link">g.dev/oxy-one</a>
+        </div>
+        <div class="contact-item">
+            <span class="contact-icon">📞</span>
+            <span>+213 7 82 09 02 81</span>
+        </div>
+        
+        <!-- BOUTON DÉMO VIDÉO DIRECTE -->
+        <a href="https://www.youtube.com/watch?v=KB7cZpvRyRg" target="_blank" class="demo-btn">
+            <span>🎬 REGARDER NOTRE DÉMO VIDÉO</span>
+        </a>
+
+        <!-- CATALOGUE UPWORK -->
+        <a href="https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971?ref=project_share" target="_blank" class="upwork-btn">
+            <span>💚 Catalogue d'offres Upwork</span>
+        </a>
+        
+        <!-- WHATSAPP DIRECT -->
+        <a href="https://wa.me/213782090281" target="_blank" class="whatsapp-btn">
+            <span>💬 Contact WhatsApp Direct</span>
+        </a>
+    </div>
+
+    <div class="control-group">
+        <label>⚙️ TYPE DE STRUCTURE</label>
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="structure-type" value="industrielle" class="radio-input" checked onchange="calculate()">
+                <span>🏬 Chambre Froide Industrielle</span>
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="structure-type" value="commerciale" class="radio-input" onchange="calculate()">
+                <span>🏪 Chambre Froide Commerciale</span>
+            </label>
+        </div>
+    </div>
+    
+    <div class="control-group">
+        <label for="wilaya-select">📍 LOCALISATION (WILAYA)</label>
+        <select id="wilaya-select"></select>
+    </div>
+
+    <div class="control-group">
+        <label for="category-select">🥩 CATÉGORIE DE CONSERVATION</label>
+        <select id="category-select" onchange="onCategoryChange()">
+            <option value="viande_rouge">Viande Rouge (0°C à +2°C)</option>
+            <option value="viande_blanche">Viande Blanche (+1°C à +3°C)</option>
+            <option value="fruits_legumes">Fruits & Légumes (+4°C à +8°C)</option>
+            <option value="produits_laitiers">Produits Laitiers (+2°C à +6°C)</option>
+            <option value="poissons">Poissons & Crustacés (0°C à +2°C)</option>
+            <option value="congele">Produits Congelés (-18°C à -25°C)</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <label for="rooms-select">❄️ NOMBRE DE CHAMBRES FROIDES</label>
+        <select id="rooms-select" onchange="calculate()">
+            <option value="1">1 Chambre</option>
+            <option value="2">2 Chambres</option>
+            <option value="3">3 Chambres</option>
+            <option value="4">4 Chambres</option>
+            <option value="5">5 Chambres</option>
+            <option value="6">6 Chambres</option>
+            <option value="7">7 Chambres</option>
+            <option value="8">8 Chambres</option>
+            <option value="9">9 Chambres</option>
+            <option value="10">10 Chambres</option>
+        </select>
+    </div>
+
+    <div class="display-box">
+        <div class="sub-label">Volume Global Total</div>
+        <div class="main-val"><span id="total-v">90.00</span> m³</div>
+    </div>
+
+    <div class="display-box" style="border-color: rgba(255, 255, 255, 0.4);">
+        <div class="sub-label">Surface des Parois (Unitaire)</div>
+        <div class="main-val"><span id="total-s">126.00</span> m²</div>
+    </div>
+
+    <div class="display-box" id="temp-frame" style="border-color: #ff4444; background: rgba(30,0,0,0.4);">
+        <div class="sub-label">Consigne Température</div>
+        <div class="main-val" id="main-t">4°C</div>
+    </div>
+    
+    <div class="control-group">
+        <label for="tp">Temp. Positive <span class="val-badge" style="background:#ff4444; color:#fff;" id="v-tp">4°C</span></label>
+        <input type="range" id="tp" min="1" max="20" value="4" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label for="tn">Temp. Négative <span class="val-badge" style="background:#3b82f6; color:#fff;" id="v-tn">0°C</span></label>
+        <input type="range" id="tn" min="-25" max="0" value="0" oninput="calculate()">
+    </div>
+
+    <hr style="opacity:0.15; margin: 15px 0;">
+
+    <div class="control-group">
+        <label for="rw">Largeur <span class="val-badge" id="v-w">6.0m</span></label>
+        <input type="range" id="rw" min="1" max="20" step="0.5" value="6" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label for="rh">Hauteur <span class="val-badge" id="v-h">3.0m</span></label>
+        <input type="range" id="rh" min="1" max="8" step="0.5" value="3" oninput="calculate()">
+    </div>
+    <div class="control-group">
+        <label for="rd">Profondeur <span class="val-badge" id="v-d">5.0m</span></label>
+        <input type="range" id="rd" min="1" max="20" step="0.5" value="5" oninput="calculate()">
+    </div>
+
+    <!-- BOUTON EXPORT ZIP REDIRIGÉ VERS LE MESSAGE PREMIUM -->
+    <button onclick="requestPremiumZip()">📦 EXPORTER DOSSIER ZIP (BILAN + CATALOGUE)</button>
+
+    <div class="premium-box" onclick="accessPremium()">
+        <span style="font-size: 1.2em;">🚀</span>
+        <div style="color: #ff9900; font-weight: bold; font-size: 0.85em; margin-top:2px;">ACCÉDER À LA VERSION PREMIUM</div>
+    </div>
+
+    <!-- BLOC CAPTURE PHOTO -->
+    <div class="admin-panel">
+        <div class="admin-title">📷 Capture & Modélisation d'Espace</div>
+        <div class="stat-row"><span>Utilisateurs Actifs :</span><span style="color: #fff; font-weight: bold;">142</span></div>
+        <div class="stat-row"><span>Rapports PDF Générés :</span><span style="color: #fff; font-weight: bold;">389</span></div>
+        
+        <button class="photo-btn" onclick="takeSpacePhoto()">
+            <span>📸 PRENDRE UNE PHOTO DE L'ESPACE</span>
+        </button>
+    </div>
+</main>
+
+<nav id="nav-pad">
+    <div style="grid-column: 2" class="nav-btn" onclick="move('up')">▲</div>
+    <div class="nav-btn" onclick="move('left')">◀</div>
+    <div class="nav-btn" onclick="fullReset()">RESET</div>
+    <div class="nav-btn" onclick="move('right')">▶</div>
+    <div style="grid-column: 2" class="nav-btn" onclick="move('down')">▼</div>
+</nav>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('clock-time').innerText = `${hours}:${minutes}:${seconds}`;
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Africa/Algiers' };
+        document.getElementById('clock-date').innerText = now.toLocaleDateString('fr-FR', options);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    const wilayas = [
+        "01 Adrar", "02 Chlef", "03 Laghouat", "04 Oum El Bouaghi", "05 Batna", "06 Béjaïa", "07 Biskra", "08 Béchar", 
+        "09 Blida", "10 Bouira", "11 Tamanrasset", "12 Tébessa", "13 Tlemcen", "14 Tiaret", "15 Tizi Ouzou", "16 Alger", 
+        "17 Djelfa", "18 Jijel", "19 Sétif", "20 Saïda", "21 Skikda", "22 Sidi Bel Abbès", "23 Annaba", "24 Guelma", 
+        "25 Constantine", "26 Médéa", "27 Mostaganem", "28 M'Sila", "29 Mascara", "30 Ouargla", "31 Oran", "32 El Bayadh", 
+        "33 Illizi", "34 Bordj Bou Arreridj", "35 Boumerdès", "36 El Tarf", "37 Tindouf", "38 Tissemsilt", "39 El Oued", 
+        "40 Khenchela", "41 Souk Ahras", "42 Tipaza", "43 Mila", "44 Aïn Defla", "45 Naâma", "46 Aïn Témouchent", "47 Ghardaïa", 
+        "48 Relizane", "49 Timimoun", "50 Bordj Badji Mokhtar", "51 Ouled Djellal", "52 Béni Abbès", "53 In Salah", 
+        "54 In Guezzam", "55 Touggourt", "56 Djanet", "57 El M'Ghaier", "58 El Meniaa",
+        "59 Aflou", "60 El Abiodh Sidi Cheikh", "61 El Aricha", "62 El Kantara", "63 Barika", "64 Bou Saâda", 
+        "65 Bir El Ater", "66 Ksar El Boukhari", "67 Ksar Chellala", "68 Aïn Oussera", "69 Messaad"
+    ];
+
+    const select = document.getElementById('wilaya-select');
+    wilayas.forEach(w => {
+        let opt = document.createElement('option');
+        opt.value = w; opt.innerHTML = w;
+        if(w.includes("Oran")) opt.selected = true;
+        select.appendChild(opt);
+    });
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const light = new THREE.DirectionalLight(0xffffff, 1); light.position.set(5, 10, 7); scene.add(light);
+
+    const group = new THREE.Group();
+    const material = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.7, roughness: 0.2 });
+    const chamber = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+    group.add(chamber);
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.7, 0.3), new THREE.MeshStandardMaterial({color: 0x111111}));
+    door.position.set(0.501, -0.1, 0); group.add(door);
+    scene.add(group);
+    scene.add(new THREE.GridHelper(50, 50, 0x00f0ff, 0x111111));
+    camera.position.set(12, 8, 12); camera.lookAt(0,0,0);
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function enterApplication() {
+        const splash = document.getElementById('splash-screen');
+        splash.style.opacity = 0;
+        setTimeout(() => {
+            splash.style.visibility = 'hidden';
+        }, 600);
+    }
+
+    function accessPremium() {
+        alert("🔒 VERSION PREMIUM OxyONE :\n\nPour obtenir un accès illimité aux rapports ZIP, aux bilans certifiés et au catalogue d'offres de services, veuillez contacter le développeur :\n\n👤 Benhamamouch Othman\n🇩🇿 Profil Startup.dz : https://startup.dz/startups-labellisees/\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Dev Profile : g.dev/oxy-one\n🎬 Démo YouTube : https://www.youtube.com/watch?v=KB7cZpvRyRg\n💼 Upwork : https://www.upwork.com/services/product/development-it-developpeur-application-mobile-android-ios-avec-flutter-firebase-1968624878277562971");
+    }
+
+    function requestPremiumZip() {
+        alert("🔒 FONCTIONNALITÉ PREMIUM :\n\nL'exportation du Dossier Complet en format ZIP (Rapport Technique PDF + Catalogue Commercial Upwork) est une option réservée à la Version Premium.\n\nVeuillez contacter le développeur pour activer votre licence Premium :\n\n👤 Benhamamouch Othman\n📞 Tél / WhatsApp : +213 7 82 09 02 81\n🌐 Profil Dev : https://g.dev/oxy-one");
+    }
+
+    function takeSpacePhoto() {
+        renderer.render(scene, camera);
+        alert("📸 Photo de l'espace 3D capturée avec succès !\n\n⭐ [VERSION PREMIUM] :\nL'exportation en haute résolution (HD/4K) et la sauvegarde illimitée sont réservées à la Version Premium.\n\nContactez le développeur Benhamamouch Othman pour activer votre accès Premium.");
+    }
+
+    function move(direction) {
+        if(direction === 'up') group.rotation.x -= 0.2;
+        if(direction === 'down') group.rotation.x += 0.2;
+        if(direction === 'left') group.rotation.y -= 0.2;
+        if(direction === 'right') group.rotation.y += 0.2;
+    }
+
+    function fullReset() {
+        group.rotation.set(0,0,0);
+        document.getElementById('category-select').value = "viande_rouge";
+        document.querySelector('input[name="structure-type"][value="industrielle"]').checked = true;
+        document.getElementById('tp').value = 4; 
+        document.getElementById('tn').value = 0;
+        document.getElementById('rw').value = 6; document.getElementById('rh').value = 3; document.getElementById('rd').value = 5;
+        document.getElementById('wilaya-select').value = "31 Oran";
+        document.getElementById('rooms-select').value = "1";
+        calculate();
+    }
+
+    function onCategoryChange() {
+        const cat = document.getElementById('category-select').value;
+        if (cat === "viande_rouge") { document.getElementById('tp').value = 1; document.getElementById('tn').value = 0; }
+        else if (cat === "viande_blanche") { document.getElementById('tp').value = 2; document.getElementById('tn').value = 0; }
+        else if (cat === "fruits_legumes") { document.getElementById('tp').value = 6; document.getElementById('tn').value = 0; }
+        else if (cat === "produits_laitiers") { document.getElementById('tp').value = 4; document.getElementById('tn').value = 0; }
+        else if (cat === "poissons") { document.getElementById('tp').value = 1; document.getElementById('tn').value = 0; }
+        else if (cat === "congele") { document.getElementById('tp').value = 1; document.getElementById('tn').value = -18; }
+        calculate();
+    }
+
+    function calculate() {
+        const w = parseFloat(document.getElementById('rw').value);
+        const h = parseFloat(document.getElementById('rh').value);
+        const d = parseFloat(document.getElementById('rd').value);
+        const tp = parseInt(document.getElementById('tp').value);
+        const tn = parseInt(document.getElementById('tn').value);
+        const roomCount = parseInt(document.getElementById('rooms-select').value);
+        const cat = document.getElementById('category-select').value;
+        
+        document.getElementById('v-w').innerText = w.toFixed(1) + "m";
+        document.getElementById('v-h').innerText = h.toFixed(1) + "m";
+        document.getElementById('v-d').innerText = d.toFixed(1) + "m";
+        document.getElementById('v-tp').innerText = tp + "°C";
+        document.getElementById('v-tn').innerText = tn + "°C";
+        
+        const unitVolume = w * h * d;
+        const totalVolume = unitVolume * roomCount;
+        document.getElementById('total-v').innerText = totalVolume.toFixed(2);
+        
+        const surface = (2 * (w * h)) + (2 * (d * h)) + (2 * (w * d));
+        document.getElementById('total-s').innerText = surface.toFixed(2);
+
+        group.scale.set(w, h, d);
+        group.position.y = h/2;
+
+        if(cat === "congele" || tn < 0) {
+            document.getElementById('main-t').innerText = tn + "°C";
+            document.getElementById('temp-frame').style.borderColor = "#3b82f6";
+            chamber.material.color.setRGB(0.3, 0.6, 1.0);
+        } else {
+            document.getElementById('main-t').innerText = tp + "°C";
+            document.getElementById('temp-frame').style.borderColor = "#ff4444";
+            if (cat === "fruits_legumes") chamber.material.color.setRGB(0.2, 0.6, 0.2);
+            else if (cat === "viande_rouge") chamber.material.color.setRGB(0.7, 0.2, 0.2);
+            else chamber.material.color.setRGB(0.6, 0.6, 0.6);
+        }
+    }
+
+    calculate();
+</script>
+</body>
+</html>
