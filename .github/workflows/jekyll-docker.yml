@@ -1,4 +1,4 @@
-name: Build Jekyll Site with Docker
+name: Build Jekyll Site with Docker & SLSA Provenance
 
 on:
   push:
@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  id-token: notwendig # Requis pour l'attestation SLSA
+  attestations: write # Requis pour signer l'artefact
 
 jobs:
   build:
@@ -21,11 +23,10 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       # ========================================================
-      # Étape 1 : Build du site Jekyll via Docker (jekyll/builder)
+      # Étape 1 : Build du site Jekyll via Docker
       # ========================================================
       - name: Build Jekyll site using jekyll/builder
         run: |
-          # Exécution du conteneur jekyll/builder avec version fixe (Jekyll 4.3)
           docker run --rm \
             --volume="$PWD:/srv/jekyll:Z" \
             -e JEKYLL_ENV=production \
@@ -38,25 +39,45 @@ jobs:
       - name: Package site artifact
         run: |
           mkdir -p dist
-          # Compression du dossier _site généré par Jekyll
           tar -czvf dist/jekyll-site.tar.gz -C _site .
 
       # ========================================================
-      # Étape 3 : Empreinte SHA-256 (Compatible SLSA / Provenance)
+      # Étape 3 : Empreinte SHA-256
       # ========================================================
       - name: Generate SHA-256 hash for provenance
         id: hash
         run: |
           set -euo pipefail
           cd dist
-          # Empreinte cryptographique du package final
           echo "hashes=$(sha256sum jekyll-site.tar.gz | base64 -w0)" >> "${GITHUB_OUTPUT}"
 
       # ========================================================
-      # Étape 4 : Sauvegarde de l'artefact pour GitHub Actions
+      # Étape 4 : Sauvegarde de l'artefact
       # ========================================================
       - name: Upload artifact
         uses: actions/upload-artifact@v4.4.3
         with:
           name: jekyll-site-package
           path: dist/jekyll-site.tar.gz
+          retention-days: 7
+
+  # ========================================================
+  # Job supplémentaire : Attestation de provenance SLSA
+  # ========================================================
+  provenance:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jekyll-site-package
+          path: dist
+
+      - name: Generate SLSA Provenance Attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: 'dist/jekyll-site.tar.gz'
