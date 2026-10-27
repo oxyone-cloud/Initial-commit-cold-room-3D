@@ -18,18 +18,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       # ========================================================
       # Étape 1 : Build du site Jekyll via Docker (jekyll/builder)
       # ========================================================
       - name: Build Jekyll site using jekyll/builder
         run: |
-          # Exécution du conteneur jekyll/builder avec les bons droits d'accès
+          # Exécution du conteneur jekyll/builder avec version fixe (Jekyll 4.3)
           docker run --rm \
             --volume="$PWD:/srv/jekyll:Z" \
             -e JEKYLL_ENV=production \
-            jekyll/builder:latest \
+            jekyll/builder:4.3 \
             jekyll build
 
       # ========================================================
@@ -56,7 +56,7 @@ jobs:
       # Étape 4 : Sauvegarde de l'artefact pour GitHub Actions
       # ========================================================
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: jekyll-site-package
           path: dist/jekyll-site.tar.gz
